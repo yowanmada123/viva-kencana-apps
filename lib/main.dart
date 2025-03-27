@@ -1,122 +1,131 @@
+import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:hydrated_bloc/hydrated_bloc.dart';
+import 'package:path_provider/path_provider.dart';
+import 'bloc/auth/authentication/authentication_bloc.dart';
+import 'data/data_providers/rest_api/auth_rest.dart';
+import 'data/data_providers/rest_api/expedition_rest.dart/expedition_rest.dart';
+import 'data/data_providers/shared-preferences/shared_preferences_key.dart';
+import 'data/data_providers/shared-preferences/shared_preferences_manager,dart';
+import 'data/repository/auth_repository.dart';
+import 'data/repository/expedition_repository.dart';
+import 'environment.dart';
+import 'presentation/admin_ekspedisi/warehouse_content_list_screen.dart';
+import 'presentation/driver/driver_dashboard_screen.dart';
+import 'presentation/qr_code/qr_code_screen.dart';
+import 'utils/interceptors/dio_request_token_interceptor.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // init Hydrated Storage
+  HydratedBloc.storage = await HydratedStorage.build(
+    storageDirectory:
+        kIsWeb
+            ? HydratedStorageDirectory.web
+            : HydratedStorageDirectory((await getTemporaryDirectory()).path),
+  );
+
+  // init shared preferences
+  final authSharedPref = SharedPreferencesManager(
+    key: SharedPreferencesKey.authKey,
+  );
+
+  // init dio http client
+  final dioClient = Dio(Environment.dioBaseOptions)
+    ..interceptors.addAll([DioRequestTokenInterceptor()]);
+
+  // init data provider layer
+  final authRest = AuthRest(dioClient);
+  final expeditionRest = ExpeditionRest(dioClient);
+
+  // init repository layer
+  final authRepository = AuthRepository(
+    authRest: authRest,
+    authSharedPref: authSharedPref,
+  );
+  final expeditionRepository = ExpeditionRepository(
+    expeditionRest: expeditionRest,
+  );
+
+  runApp(
+    MultiRepositoryProvider(
+      providers: [
+        RepositoryProvider.value(value: authRepository),
+        RepositoryProvider.value(value: expeditionRepository),
+      ],
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(lazy: false, create: (context) => AuthenticationBloc()),
+        ],
+        child: const MyApp(),
+      ),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return Scaffold(
-      appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
+    return ScreenUtilInit(
+      designSize: const Size(360, 690),
+      minTextAdapt: true,
+      builder:
+          (context, widget) => MaterialApp(
+            debugShowCheckedModeBanner: false,
+            title: 'Viva Kencana Ekspedisi',
+            theme: ThemeData(
+              colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+              primaryColor: Color(0xff1E4694),
+              hintColor: Color(0xffF1F1F1),
+              disabledColor: Color(0xff808186),
+              secondaryHeaderColor: Color(0xff575353),
+              fontFamily: "Poppins",
+              textTheme: TextTheme(
+                labelSmall: const TextStyle(
+                  fontFamily: "Poppins",
+                  fontSize: 12,
+                ),
+                labelMedium: const TextStyle(
+                  fontFamily: "Poppins",
+                  fontSize: 14,
+                ),
+                labelLarge: const TextStyle(
+                  fontFamily: "Poppins",
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                ),
+                headlineLarge: TextStyle(
+                  fontFamily: "Poppins",
+                  fontSize: 24,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.white,
+                ),
+              ),
             ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+
+            home: BlocBuilder<AuthenticationBloc, AuthenticationState>(
+              builder: (context, state) {
+                if (state is Authenticated) {
+                  final user = state.user;
+                  if (true) {
+                    return WarehouseListScreen();
+                  } else if (true) {
+                    return DriverDashboardScreen();
+                  } else {
+                    return Container();
+                  }
+                } else {
+                  return QrCodeView();
+                }
+              },
+            ),
+          ),
     );
   }
 }
