@@ -5,17 +5,17 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:vivakencanaapp/presentation/login/login_form_screen.dart';
 import 'bloc/auth/authentication/authentication_bloc.dart';
 import 'data/data_providers/rest_api/auth_rest.dart';
-import 'data/data_providers/rest_api/expedition_rest.dart/expedition_rest.dart';
+import 'data/data_providers/rest_api/warehouse_rest/warehouse_rest.dart';
 import 'data/data_providers/shared-preferences/shared_preferences_key.dart';
 import 'data/data_providers/shared-preferences/shared_preferences_manager,dart';
 import 'data/repository/auth_repository.dart';
-import 'data/repository/expedition_repository.dart';
+import 'data/repository/warehouse_repository.dart';
 import 'environment.dart';
-import 'presentation/admin_ekspedisi/warehouse_content_list_screen.dart';
+import 'presentation/warehouse/warehouse_select_screen.dart';
 import 'presentation/driver/driver_dashboard_screen.dart';
-import 'presentation/qr_code/qr_code_screen.dart';
 import 'utils/interceptors/dio_request_token_interceptor.dart';
 
 void main() async {
@@ -40,22 +40,20 @@ void main() async {
 
   // init data provider layer
   final authRest = AuthRest(dioClient);
-  final expeditionRest = ExpeditionRest(dioClient);
+  final warehouseRest = WarehouseRest(dioClient);
 
   // init repository layer
   final authRepository = AuthRepository(
     authRest: authRest,
     authSharedPref: authSharedPref,
   );
-  final expeditionRepository = ExpeditionRepository(
-    expeditionRest: expeditionRest,
-  );
+  final warehouseRepository = WarehouseRepository(warehouseRest: warehouseRest);
 
   runApp(
     MultiRepositoryProvider(
       providers: [
         RepositoryProvider.value(value: authRepository),
-        RepositoryProvider.value(value: expeditionRepository),
+        RepositoryProvider.value(value: warehouseRepository),
       ],
       child: MultiBlocProvider(
         providers: [
@@ -114,14 +112,14 @@ class MyApp extends StatelessWidget {
                 if (state is Authenticated) {
                   final user = state.user;
                   if (true) {
-                    return WareHouseContentListScreen();
+                    return WarehouseSelectScreen();
                   } else if (true) {
                     return DriverDashboardScreen();
                   } else {
                     return Container();
                   }
                 } else {
-                  return QrCodeView();
+                  return LoginFormScreen();
                 }
               },
             ),

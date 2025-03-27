@@ -2,7 +2,7 @@ import 'package:dartz/dartz.dart';
 
 import '../../models/errors/custom_exception.dart';
 import '../../models/vehicle.dart';
-import '../data_providers/rest_api/expedition_rest.dart/expedition_rest.dart';
+import '../data_providers/rest_api/expedition_rest/expedition_rest.dart';
 
 class ExpeditionRepository {
   final ExpeditionRest expeditionRest;

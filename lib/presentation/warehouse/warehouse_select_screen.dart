@@ -1,16 +1,49 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
+import 'package:vivakencanaapp/data/repository/warehouse_repository.dart';
+import '../../bloc/expedition/list-warehouse/list_warehouse_bloc.dart';
 import 'warehouse_content_list_screen.dart';
 
-class WarehouseSelectScreen extends StatefulWidget {
+class WarehouseSelectScreen extends StatelessWidget {
   const WarehouseSelectScreen({super.key});
 
   @override
-  State<WarehouseSelectScreen> createState() => _WarehouseSelectScreenState();
+  Widget build(BuildContext context) {
+    final warehouseRepository = context.read<WarehouseRepository>();
+    // final authRepository = context.read<AuthRepository>();
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create:
+              (context) =>
+                  ListWarehouseBloc(warehouseRepository: warehouseRepository),
+        ),
+      ],
+      child: WarehouseSelectView(),
+    );
+  }
 }
 
-class _WarehouseSelectScreenState extends State<WarehouseSelectScreen> {
+class WarehouseSelectView extends StatefulWidget {
+  const WarehouseSelectView({super.key});
+
+  @override
+  State<WarehouseSelectView> createState() => _WarehouseSelectViewState();
+}
+
+class _WarehouseSelectViewState extends State<WarehouseSelectView> {
+  @override
+  void initState() {
+    // final authState = context.read<AuthenticationBloc>().state as Authenticated;
+    // user = authState.user;
+    context.read<ListWarehouseBloc>().add(
+      LoadListWarehouse(deliveryId: '5011250200017'),
+    );
+
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -159,47 +192,63 @@ class _WarehouseSelectScreenState extends State<WarehouseSelectScreen> {
             SliverPadding(
               padding: EdgeInsets.symmetric(horizontal: 8.0),
               sliver: SliverToBoxAdapter(
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  physics: NeverScrollableScrollPhysics(),
-                  itemCount: 5, // Jumlah item dalam list
-                  itemBuilder: (context, index) {
-                    return Card(
-                      child: ListTile(
-                        leading: FlutterLogo(),
-                        title: Text('One-line with both widgets'),
-                        trailing: ElevatedButton(
-                          onPressed: () {
-                            final id = Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder:
-                                    (context) =>
-                                        const WareHouseContentListScreen(),
+                child: BlocBuilder<ListWarehouseBloc, ListWarehouseState>(
+                  builder: (context, state) {
+                    if (state is ListWarehouseLoading) {
+                      return Center(child: CircularProgressIndicator());
+                    } else if (state is ListWarehouseFailure) {
+                      return Center(child: Text("Error: ${state.message}"));
+                    } else if (state is ListWarehouseSuccess) {
+                      return ListView.builder(
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemCount:
+                            state.warehouses.length, // Jumlah item dalam list
+                        itemBuilder: (context, index) {
+                          return Card(
+                            child: ListTile(
+                              leading: FlutterLogo(),
+                              title: Text(
+                                state.warehouses[index].descr,
+                                style: TextStyle(fontSize: 12),
                               ),
-                            );
-                          },
-                          style: ElevatedButton.styleFrom(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 24,
-                              vertical: 8,
+                              trailing: ElevatedButton(
+                                onPressed: () {
+                                  final id = Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder:
+                                          (context) =>
+                                              const WareHouseContentListScreen(),
+                                    ),
+                                  );
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 24,
+                                    vertical: 8,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  backgroundColor:
+                                      Theme.of(context).primaryColor,
+                                ),
+                                child: Text(
+                                  'Pilih',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
                             ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            backgroundColor: Theme.of(context).primaryColor,
-                          ),
-                          child: Text(
-                            'Pilih',
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ),
-                    );
+                          );
+                        },
+                      );
+                    }
+                    return Container();
                   },
                 ),
               ),
