@@ -14,6 +14,8 @@ import 'data/data_providers/shared-preferences/shared_preferences_manager,dart';
 import 'data/repository/auth_repository.dart';
 import 'data/repository/warehouse_repository.dart';
 import 'environment.dart';
+import 'presentation/qr_code/qr_code_scan_screen.dart';
+import 'presentation/qr_code/qr_code_screen.dart';
 import 'presentation/warehouse/warehouse_select_screen.dart';
 import 'presentation/driver/driver_dashboard_screen.dart';
 import 'utils/interceptors/dio_request_token_interceptor.dart';
@@ -112,7 +114,7 @@ class MyApp extends StatelessWidget {
                 if (state is Authenticated) {
                   final user = state.user;
                   if (true) {
-                    return WarehouseSelectScreen();
+                    return QrCodeScreen();
                   } else if (true) {
                     return DriverDashboardScreen();
                   } else {

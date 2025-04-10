@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
+import '../warehouse/warehouse_select_screen.dart';
 import 'qr_code_scan_screen.dart';
 
 class QrCodeScreen extends StatelessWidget {
@@ -8,7 +9,7 @@ class QrCodeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return const QrCodeView();
   }
 }
 
@@ -19,10 +20,10 @@ class QrCodeView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Color(0xff3B3B3B)),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
+        // leading: IconButton(
+        //   icon: Icon(Icons.arrow_back, color: Color(0xff3B3B3B)),
+        //   onPressed: () => Navigator.of(context).pop(),
+        // ),
       ),
       body: SafeArea(
         child: Column(
@@ -41,13 +42,22 @@ class QrCodeView extends StatelessWidget {
               child: SvgPicture.asset("assets/svg/qr-code-image.svg"),
             ),
             ElevatedButton(
-              onPressed: () {
-                final id = Navigator.push(
+              onPressed: () async {
+                final String id = await Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const QrCodeScanView(),
+                    builder: (context) => const QrCodeScanScreen(),
                   ),
                 );
+
+                if (id != "") {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => WarehouseSelectScreen(batchID: id),
+                    ),
+                  );
+                }
               },
               style: ElevatedButton.styleFrom(
                 padding: EdgeInsets.symmetric(horizontal: 24, vertical: 8),
