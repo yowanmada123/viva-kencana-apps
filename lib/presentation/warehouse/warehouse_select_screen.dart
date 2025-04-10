@@ -1,17 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:vivakencanaapp/data/repository/batch_repository.dart';
 import 'package:vivakencanaapp/data/repository/warehouse_repository.dart';
+import '../../bloc/auth/authentication/authentication_bloc.dart';
+import '../../bloc/auth/logout/logout_bloc.dart';
+import '../../bloc/expedition/batch/batch_bloc.dart';
 import '../../bloc/expedition/list-warehouse/list_warehouse_bloc.dart';
+import '../../data/repository/auth_repository.dart';
+import '../widgets/base_pop_up.dart';
 import 'warehouse_content_list_screen.dart';
 
 class WarehouseSelectScreen extends StatelessWidget {
-  const WarehouseSelectScreen({super.key});
+  const WarehouseSelectScreen({super.key, required this.batchID});
+  final String batchID;
 
   @override
   Widget build(BuildContext context) {
     final warehouseRepository = context.read<WarehouseRepository>();
-    // final authRepository = context.read<AuthRepository>();
+    final batchRepository = context.read<BatchRepository>();
+    final authRepository = context.read<AuthRepository>();
     return MultiBlocProvider(
       providers: [
         BlocProvider(
@@ -19,14 +27,19 @@ class WarehouseSelectScreen extends StatelessWidget {
               (context) =>
                   ListWarehouseBloc(warehouseRepository: warehouseRepository),
         ),
+        BlocProvider(
+          create: (context) => BatchBloc(batchRepository: batchRepository),
+        ),
+        BlocProvider(create: (context) => LogoutBloc(authRepository)),
       ],
-      child: WarehouseSelectView(),
+      child: WarehouseSelectView(batchID: batchID),
     );
   }
 }
 
 class WarehouseSelectView extends StatefulWidget {
-  const WarehouseSelectView({super.key});
+  const WarehouseSelectView({super.key, required this.batchID});
+  final String batchID;
 
   @override
   State<WarehouseSelectView> createState() => _WarehouseSelectViewState();
@@ -38,7 +51,7 @@ class _WarehouseSelectViewState extends State<WarehouseSelectView> {
     // final authState = context.read<AuthenticationBloc>().state as Authenticated;
     // user = authState.user;
     context.read<ListWarehouseBloc>().add(
-      LoadListWarehouse(deliveryId: '5011250200017'),
+      LoadListWarehouse(deliveryId: widget.batchID),
     );
 
     super.initState();
@@ -48,11 +61,50 @@ class _WarehouseSelectViewState extends State<WarehouseSelectView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Loading Dock',
-          style: Theme.of(context).textTheme.headlineLarge,
-        ),
-        actions: [],
+        title: Text('ssss', style: Theme.of(context).textTheme.headlineLarge),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 16.0),
+            // child: Icon(Icons.logout, color: Colors.white),
+            child: BlocConsumer<LogoutBloc, LogoutState>(
+              listener: (context, state) {
+                if (state is LogoutFailure) {
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(SnackBar(content: Text("Logout Not Success")));
+                } else if (state is LogoutSuccess) {
+                  BlocProvider.of<AuthenticationBloc>(
+                    context,
+                  ).add(SetAuthenticationStatus(isAuthenticated: false));
+                }
+              },
+              builder: (context, state) {
+                return GestureDetector(
+                  onTap: () {
+                    showDialog<bool>(
+                      context: context,
+                      builder: (BuildContext childContext) {
+                        return BasePopUpDialog(
+                          noText: "Tidak",
+                          yesText: "Ya",
+                          onNoPressed: () {},
+                          onYesPressed: () {
+                            if (state is! LogoutLoading) {
+                              context.read<LogoutBloc>().add(LogoutPressed());
+                            }
+                          },
+                          question:
+                              "Apakah Anda yakin ingin keluar dari aplikasi?",
+                        );
+                      },
+                    );
+                  },
+                  child: Icon(Icons.logout, color: Colors.white),
+                );
+              },
+            ),
+          ),
+        ],
         backgroundColor: Theme.of(context).primaryColor,
       ),
       backgroundColor: Theme.of(context).hintColor,
@@ -192,25 +244,27 @@ class _WarehouseSelectViewState extends State<WarehouseSelectView> {
             SliverPadding(
               padding: EdgeInsets.symmetric(horizontal: 8.0),
               sliver: SliverToBoxAdapter(
-                child: BlocBuilder<ListWarehouseBloc, ListWarehouseState>(
+                child: BlocBuilder<BatchBloc, BatchState>(
                   builder: (context, state) {
-                    if (state is ListWarehouseLoading) {
+                    if (state is BatchLoading) {
                       return Center(child: CircularProgressIndicator());
-                    } else if (state is ListWarehouseFailure) {
+                    } else if (state is BatchFailure) {
                       return Center(child: Text("Error: ${state.message}"));
-                    } else if (state is ListWarehouseSuccess) {
+                    } else if (state is BatchSuccess) {
                       return ListView.builder(
                         shrinkWrap: true,
                         physics: NeverScrollableScrollPhysics(),
-                        itemCount:
-                            state.warehouses.length, // Jumlah item dalam list
+                        itemCount: state.batch.warehouses.length,
                         itemBuilder: (context, index) {
                           return Card(
                             child: ListTile(
                               leading: FlutterLogo(),
                               title: Text(
-                                state.warehouses[index].descr,
-                                style: TextStyle(fontSize: 12),
+                                state.batch.warehouses[index].whID,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.black,
+                                ),
                               ),
                               trailing: ElevatedButton(
                                 onPressed: () {
@@ -253,6 +307,74 @@ class _WarehouseSelectViewState extends State<WarehouseSelectView> {
                 ),
               ),
             ),
+
+            // SliverPadding(
+            //   padding: EdgeInsets.symmetric(horizontal: 8.0),
+            //   sliver: SliverToBoxAdapter(
+            //     child: BlocBuilder<ListWarehouseBloc, ListWarehouseState>(
+            //       builder: (context, state) {
+            //         if (state is ListWarehouseLoading) {
+            //           return Center(child: CircularProgressIndicator());
+            //         } else if (state is ListWarehouseFailure) {
+            //           return Center(child: Text("Error: ${state.message}"));
+            //         } else if (state is ListWarehouseSuccess) {
+            //           return ListView.builder(
+            //             shrinkWrap: true,
+            //             physics: NeverScrollableScrollPhysics(),
+            //             itemCount:
+            //                 state.warehouses.length, // Jumlah item dalam list
+            //             itemBuilder: (context, index) {
+            //               return Card(
+            //                 child: ListTile(
+            //                   leading: FlutterLogo(),
+            //                   title: Text(
+            //                     state.warehouses[index].whID,
+            //                     style: TextStyle(
+            //                       fontSize: 12,
+            //                       color: Colors.black,
+            //                     ),
+            //                   ),
+            //                   trailing: ElevatedButton(
+            //                     onPressed: () {
+            //                       final id = Navigator.push(
+            //                         context,
+            //                         MaterialPageRoute(
+            //                           builder:
+            //                               (context) =>
+            //                                   const WareHouseContentListScreen(),
+            //                         ),
+            //                       );
+            //                     },
+            //                     style: ElevatedButton.styleFrom(
+            //                       padding: EdgeInsets.symmetric(
+            //                         horizontal: 24,
+            //                         vertical: 8,
+            //                       ),
+            //                       shape: RoundedRectangleBorder(
+            //                         borderRadius: BorderRadius.circular(8),
+            //                       ),
+            //                       backgroundColor:
+            //                           Theme.of(context).primaryColor,
+            //                     ),
+            //                     child: Text(
+            //                       'Pilih',
+            //                       style: TextStyle(
+            //                         fontSize: 12,
+            //                         fontWeight: FontWeight.bold,
+            //                         color: Colors.white,
+            //                       ),
+            //                     ),
+            //                   ),
+            //                 ),
+            //               );
+            //             },
+            //           );
+            //         }
+            //         return Container();
+            //       },
+            //     ),
+            //   ),
+            // ),
           ],
         ),
       ),

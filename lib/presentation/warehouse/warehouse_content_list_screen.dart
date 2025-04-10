@@ -62,10 +62,7 @@ class _WareHouseContentListState extends State<WareHouseContentListView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Loading Dock',
-          style: Theme.of(context).textTheme.headlineLarge,
-        ),
+        title: Text('sss', style: Theme.of(context).textTheme.headlineLarge),
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 16.0),

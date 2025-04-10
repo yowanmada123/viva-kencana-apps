@@ -4,12 +4,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_code_scanner_plus/qr_code_scanner_plus.dart';
 
-class QrCodeScreen extends StatelessWidget {
-  const QrCodeScreen({super.key});
+class QrCodeScanScreen extends StatelessWidget {
+  const QrCodeScanScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return const QrCodeScanView();
   }
 }
 
@@ -24,6 +24,8 @@ class _QrCodeScanViewState extends State<QrCodeScanView> {
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
   Barcode? result;
   QRViewController? controller;
+  bool qrFound = false;
+
   @override
   void reassemble() {
     super.reassemble();
@@ -105,36 +107,36 @@ class _QrCodeScanViewState extends State<QrCodeScanView> {
                         ),
                       ],
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: <Widget>[
-                        Container(
-                          margin: const EdgeInsets.all(8),
-                          child: ElevatedButton(
-                            onPressed: () async {
-                              await controller?.pauseCamera();
-                            },
-                            child: const Text(
-                              'pause',
-                              style: TextStyle(fontSize: 20),
-                            ),
-                          ),
-                        ),
-                        Container(
-                          margin: const EdgeInsets.all(8),
-                          child: ElevatedButton(
-                            onPressed: () async {
-                              await controller?.resumeCamera();
-                            },
-                            child: const Text(
-                              'resume',
-                              style: TextStyle(fontSize: 20),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                    // Row(
+                    //   mainAxisAlignment: MainAxisAlignment.center,
+                    //   crossAxisAlignment: CrossAxisAlignment.center,
+                    //   children: <Widget>[
+                    //     Container(
+                    //       margin: const EdgeInsets.all(8),
+                    //       child: ElevatedButton(
+                    //         onPressed: () async {
+                    //           await controller?.pauseCamera();
+                    //         },
+                    //         child: const Text(
+                    //           'pause',
+                    //           style: TextStyle(fontSize: 20),
+                    //         ),
+                    //       ),
+                    //     ),
+                    //     Container(
+                    //       margin: const EdgeInsets.all(8),
+                    //       child: ElevatedButton(
+                    //         onPressed: () async {
+                    //           await controller?.resumeCamera();
+                    //         },
+                    //         child: const Text(
+                    //           'resume',
+                    //           style: TextStyle(fontSize: 20),
+                    //         ),
+                    //       ),
+                    //     ),
+                    //   ],
+                    // ),
                   ],
                 ),
               ),
@@ -153,7 +155,10 @@ class _QrCodeScanViewState extends State<QrCodeScanView> {
             : 300.0;
     return QRView(
       key: qrKey,
-      onQRViewCreated: _onQRViewCreated,
+
+      onQRViewCreated: (QRViewController controller) {
+        _onQRViewCreated(context, controller);
+      },
       overlay: QrScannerOverlayShape(
         borderColor: Colors.red,
         borderRadius: 10,
@@ -165,14 +170,20 @@ class _QrCodeScanViewState extends State<QrCodeScanView> {
     );
   }
 
-  void _onQRViewCreated(QRViewController controller) {
+  void _onQRViewCreated(BuildContext context, QRViewController controller) {
     setState(() {
       this.controller = controller;
     });
-    controller.scannedDataStream.listen((scanData) {
-      setState(() {
-        result = scanData;
-      });
+
+    controller.scannedDataStream.listen((scanData) async {
+      print(scanData.code);
+      if (!qrFound) {
+        qrFound = true;
+        Navigator.pop(context, scanData.code);
+      }
+      // setState(() {
+      //   result = scanData;
+      // });
     });
   }
 
