@@ -114,6 +114,7 @@ class MyApp extends StatelessWidget {
                 if (state is Authenticated) {
                   final user = state.user;
                   if (true) {
+                    return DriverDashboardScreen();
                     return QrCodeScreen();
                   } else if (true) {
                     return DriverDashboardScreen();
