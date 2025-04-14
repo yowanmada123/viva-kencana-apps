@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+import 'package:dio/src/dio.dart';
 import 'package:vivakencanaapp/models/batch.dart';
 
 import '../../models/errors/custom_exception.dart';
