@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:vivakencanaapp/data/data_providers/rest_api/batch_rest/batch_rest.dart';
 import 'package:vivakencanaapp/presentation/login/login_form_screen.dart';
 import 'bloc/auth/authentication/authentication_bloc.dart';
 import 'data/data_providers/rest_api/auth_rest.dart';
@@ -12,6 +13,7 @@ import 'data/data_providers/rest_api/warehouse_rest/warehouse_rest.dart';
 import 'data/data_providers/shared-preferences/shared_preferences_key.dart';
 import 'data/data_providers/shared-preferences/shared_preferences_manager,dart';
 import 'data/repository/auth_repository.dart';
+import 'data/repository/batch_repository.dart';
 import 'data/repository/warehouse_repository.dart';
 import 'environment.dart';
 import 'presentation/qr_code/qr_code_scan_screen.dart';
@@ -23,7 +25,6 @@ import 'utils/interceptors/dio_request_token_interceptor.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // init Hydrated Storage
   HydratedBloc.storage = await HydratedStorage.build(
     storageDirectory:
         kIsWeb
@@ -31,31 +32,30 @@ void main() async {
             : HydratedStorageDirectory((await getTemporaryDirectory()).path),
   );
 
-  // init shared preferences
   final authSharedPref = SharedPreferencesManager(
     key: SharedPreferencesKey.authKey,
   );
 
-  // init dio http client
   final dioClient = Dio(Environment.dioBaseOptions)
     ..interceptors.addAll([DioRequestTokenInterceptor()]);
 
-  // init data provider layer
   final authRest = AuthRest(dioClient);
   final warehouseRest = WarehouseRest(dioClient);
+  final batchRest = BatchRest(dioClient);
 
-  // init repository layer
   final authRepository = AuthRepository(
     authRest: authRest,
     authSharedPref: authSharedPref,
   );
   final warehouseRepository = WarehouseRepository(warehouseRest: warehouseRest);
+  final batchRepository = BatchRepository(batchRest: batchRest);
 
   runApp(
     MultiRepositoryProvider(
       providers: [
         RepositoryProvider.value(value: authRepository),
         RepositoryProvider.value(value: warehouseRepository),
+        RepositoryProvider.value(value: batchRepository),
       ],
       child: MultiBlocProvider(
         providers: [

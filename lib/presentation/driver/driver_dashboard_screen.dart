@@ -49,13 +49,14 @@ class MyGridLayout extends StatelessWidget {
           icon: Icon(Icons.menu, color: Color(0xffffffff)),
           onPressed: () => print("Menu"),
         ),
-        title: Text('VIVA KENCANA', 
-        textAlign: TextAlign.center, 
-        style: TextStyle(
-          fontFamily: "Poppins", 
-          color: Colors.white, 
-          fontWeight: FontWeight.w600, 
-          fontSize: 18.0
+        title: Text(
+          'VIVA KENCANA',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontFamily: "Poppins",
+            color: Colors.white,
+            fontWeight: FontWeight.w600,
+            fontSize: 18.0,
           ),
         ),
       ),
@@ -69,34 +70,37 @@ class MyGridLayout extends StatelessWidget {
               // margin: EdgeInsets.fromLTRB(0.0, 8.0, 0.0, 0.0),
               child: AspectRatio(
                 aspectRatio: 1.0,
-                child: Container(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Container(
-                        padding: EdgeInsets.all(2.0),
-                        decoration: BoxDecoration(
-                          color: Color(0xff1E4694),
-                          borderRadius: BorderRadius.circular(10.0),
-                        ),
-                        child: IconButton(
-                          icon: Icon(buttons[index]['icon']),
-                          iconSize: 24.0,
-                          color: Colors.white,
-                          onPressed: () {
-                            // Add your onPressed logic here
-                            _navigateToScreen(context, index);
-                          },
-                        ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Container(
+                      padding: EdgeInsets.all(2.0),
+                      decoration: BoxDecoration(
+                        color: Color(0xff1E4694),
+                        borderRadius: BorderRadius.circular(10.0),
                       ),
-                      SizedBox(height: 2.0),
-                      Text(
-                        buttons[index]['text'],
-                        style: TextStyle(fontSize: 12.0, color: Color(0xff1E4694), fontFamily: "Poppins", fontWeight: FontWeight.bold),
+                      child: IconButton(
+                        icon: Icon(buttons[index]['icon']),
+                        iconSize: 24.0,
+                        color: Colors.white,
+                        onPressed: () {
+                          // Add your onPressed logic here
+                          _navigateToScreen(context, index);
+                        },
                       ),
-                    ],
-                  ),
-                )
+                    ),
+                    SizedBox(height: 2.0),
+                    Text(
+                      buttons[index]['text'],
+                      style: TextStyle(
+                        fontSize: 12.0,
+                        color: Color(0xff1E4694),
+                        fontFamily: "Poppins",
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             );
           }),
