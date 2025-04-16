@@ -62,13 +62,15 @@ class FDPITResidencesScreen extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        AspectRatio(
-                          aspectRatio: 16 / 9, // Your desired ratio (width/height)
-                          child: Image.network(
-                            'https://v2.kencana.org/storage/${state.residences[index].imgCluster}',
-                            fit: BoxFit.cover,
+                        if(state.residences[index].imgClusterThumbnail.isNotEmpty ) ... [ 
+                          AspectRatio(
+                            aspectRatio: 16 / 9, // Your desired ratio (width/height)
+                            child: Image.network(
+                              'https://v2.kencana.org/storage/${state.residences[index].imgClusterThumbnail}',
+                              fit: BoxFit.cover,
+                            ),
                           ),
-                        ),
+                        ],
                         Padding(
                           padding: const EdgeInsets.all(8.0),
                           child:Column(

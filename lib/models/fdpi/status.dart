@@ -5,7 +5,7 @@ class Status {
   Status({required this.id, required this.name});
 
   static List<Status> get statusList => [
-        Status(id: 'Active', name: 'Active'),
-        Status(id: 'Inactive', name: 'Inactive'),
+        Status(id: 'Aktif', name: 'Aktif'),
+        Status(id: 'Non-aktif', name: 'Non-aktif'),
       ];
 }

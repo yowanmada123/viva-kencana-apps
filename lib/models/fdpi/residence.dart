@@ -14,6 +14,7 @@ class Residence {
   final String dateModified;
   final String modifiedBy;
   final String imgCluster;
+  final String imgClusterThumbnail;
   final String siteName;
   final String siteAddress;
   final String kelurahanDesa;
@@ -45,6 +46,7 @@ class Residence {
     required this.dateModified,
     required this.modifiedBy,
     required this.imgCluster,
+    required this.imgClusterThumbnail,
     required this.siteName,
     required this.siteAddress,
     required this.kelurahanDesa,
@@ -77,6 +79,7 @@ class Residence {
     String? dateModified,
     String? modifiedBy,
     String? imgCluster,
+    String? imgClusterThumbnail,
     String? siteName,
     String? siteAddress,
     String? kelurahanDesa,
@@ -108,6 +111,7 @@ class Residence {
       dateModified: dateModified ?? this.dateModified,
       modifiedBy: modifiedBy ?? this.modifiedBy,
       imgCluster: imgCluster ?? this.imgCluster,
+      imgClusterThumbnail: imgClusterThumbnail ?? this.imgClusterThumbnail,
       siteName: siteName ?? this.siteName,
       siteAddress: siteAddress ?? this.siteAddress,
       kelurahanDesa: kelurahanDesa ?? this.kelurahanDesa,
@@ -142,6 +146,7 @@ class Residence {
       'dateModified': dateModified,
       'modifiedBy': modifiedBy,
       'imgCluster': imgCluster,
+      'imgClusterThumbnail': imgClusterThumbnail,
       'siteName': siteName,
       'siteAddress': siteAddress,
       'kelurahanDesa': kelurahanDesa,
@@ -176,6 +181,7 @@ class Residence {
       dateModified: map['date_modified'] ,
       modifiedBy: map['modified_by'] ,
       imgCluster: map['img_cluster'] ,
+      imgClusterThumbnail: map['img_cluster_tmb'],
       siteName: map['site_name'] ,
       siteAddress: map['site_address'] != "-" ? map['site_address'] : "",
       kelurahanDesa: map['kelurahan_desa'] ,
@@ -202,7 +208,7 @@ class Residence {
 
   @override
   String toString() {
-    return 'Residence(idCluster: $idCluster, idSite: $idSite, clusterName: $clusterName, houseType: $houseType, houseQty: $houseQty, remark: $remark, stat: $stat, dateCreated: $dateCreated, createdBy: $createdBy, dateModified: $dateModified, modifiedBy: $modifiedBy, imgCluster: $imgCluster, siteName: $siteName, siteAddress: $siteAddress, kelurahanDesa: $kelurahanDesa, kecamatan: $kecamatan, postalCode: $postalCode, phone1: $phone1, phone2: $phone2, email: $email, kaSite: $kaSite, idProvCity: $idProvCity, cityName: $cityName, idProvince: $idProvince, provinceName: $provinceName, houseName: $houseName, buildingArea: $buildingArea, landArea: $landArea, category: $category)';
+    return 'Residence(idCluster: $idCluster, idSite: $idSite, clusterName: $clusterName, houseType: $houseType, houseQty: $houseQty, remark: $remark, stat: $stat, dateCreated: $dateCreated, createdBy: $createdBy, dateModified: $dateModified, modifiedBy: $modifiedBy, imgCluster: $imgCluster, imgClusterThumbnail: $imgClusterThumbnail, siteName: $siteName, siteAddress: $siteAddress, kelurahanDesa: $kelurahanDesa, kecamatan: $kecamatan, postalCode: $postalCode, phone1: $phone1, phone2: $phone2, email: $email, kaSite: $kaSite, idProvCity: $idProvCity, cityName: $cityName, idProvince: $idProvince, provinceName: $provinceName, houseName: $houseName, buildingArea: $buildingArea, landArea: $landArea, category: $category)';
   }
 
   @override
@@ -222,6 +228,7 @@ class Residence {
       other.dateModified == dateModified &&
       other.modifiedBy == modifiedBy &&
       other.imgCluster == imgCluster &&
+      other.imgClusterThumbnail == imgClusterThumbnail &&
       other.siteName == siteName &&
       other.siteAddress == siteAddress &&
       other.kelurahanDesa == kelurahanDesa &&
@@ -255,6 +262,7 @@ class Residence {
       dateModified.hashCode ^
       modifiedBy.hashCode ^
       imgCluster.hashCode ^
+      imgClusterThumbnail.hashCode ^
       siteName.hashCode ^
       siteAddress.hashCode ^
       kelurahanDesa.hashCode ^
