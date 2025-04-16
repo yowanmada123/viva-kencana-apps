@@ -176,7 +176,6 @@ class _QrCodeScanViewState extends State<QrCodeScanView> {
     });
 
     controller.scannedDataStream.listen((scanData) async {
-      print(scanData.code);
       if (!qrFound) {
         qrFound = true;
         Navigator.pop(context, scanData.code);
