@@ -14,8 +14,6 @@ class FDPITResidencesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print("idProvince: $idProvince, idCity: $idCity, status: $status");
-    print("idProvince: ${idProvince is String}, idCity: ${idCity is String}, status: ${status is String}");
     return BlocProvider(
       create: (context) {
         final fdpiRepository = context.read<FdpiRepository>();

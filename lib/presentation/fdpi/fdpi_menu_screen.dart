@@ -91,7 +91,6 @@ class FDPIMenuScreen extends StatelessWidget {
   }
 
   Widget _buildProvinceDropdown(BuildContext context, LocationState state) {
-    print(state.selectedProvince);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

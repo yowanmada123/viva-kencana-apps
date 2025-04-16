@@ -18,20 +18,16 @@ class ResidenceBloc extends Bloc<ResidenceEvent, ResidenceState> {
     Emitter<ResidenceState> emit
   ) async {
       emit(state.copyWith(status: ResidenceStatus.loading));
-      print("Masuk sini boys ${state.status}");
 
       final result = await fdpiRepository.getResidences(
         event.idProvince,
         event.idCity,
         event.status,
       );
-      print("Result: $result");
-
 
       result.fold(
         (error) => emit(state.copyWith(status: ResidenceStatus.failure, errorMessage: error.message)), 
         (data) => emit(state.copyWith(status: ResidenceStatus.success, residences: data))
       );
-      print("Masuk sini boys ${state.status}");
   }
 }

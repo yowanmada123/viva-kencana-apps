@@ -103,7 +103,6 @@ class FdpiRest {
         "api/fpi/cluster/getCluster",
         data: body,
       );
-      print("idProv: $response");
       if (response.statusCode == 200) {
         log('Response body: ${response.data}');
         final body = response.data;

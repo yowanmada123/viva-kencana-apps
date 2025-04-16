@@ -42,7 +42,6 @@ class MyGridLayout extends StatelessWidget {
         );
         break;
       default:
-        print(index);
         break;
     }
   }

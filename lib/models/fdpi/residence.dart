@@ -163,7 +163,6 @@ class Residence {
   }
 
   factory Residence.fromMap(Map<String, dynamic> map) {
-    print("from map: ${map['building_area']}");
     return Residence(
       idCluster: map['id_cluster'] ,
       idSite: map['id_site'] ,

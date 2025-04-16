@@ -21,7 +21,6 @@ class ResidenceState extends Equatable {
     Residence? selectedResidence,
     String? errorMessage
   }) {
-    print("On Copy Status${status}, Residences ${residences}, selectedResidence ${selectedResidence}, errorMessage ${errorMessage}");
     return ResidenceState(
       status: status ?? this.status,
       residences: residences ?? this.residences,
