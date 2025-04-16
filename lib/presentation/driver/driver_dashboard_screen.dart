@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../qr_code/qr_code_screen.dart';
+import '../fdpi/fdpi_menu_screen.dart';
 
 class DriverDashboardScreen extends StatelessWidget {
   const DriverDashboardScreen({super.key});
@@ -32,6 +33,12 @@ class MyGridLayout extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => QrCodeScreen()),
+        );
+        break;
+      case 1:
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => FDPIMenuScreen()),
         );
         break;
       default:

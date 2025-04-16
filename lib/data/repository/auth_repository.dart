@@ -3,7 +3,7 @@ import 'package:dartz/dartz.dart';
 import '../../models/auth.dart';
 import '../../models/errors/custom_exception.dart';
 import '../data_providers/rest_api/auth_rest.dart';
-import '../data_providers/shared-preferences/shared_preferences_manager,dart';
+import '../data_providers/shared-preferences/shared_preferences_manager.dart';
 
 class AuthRepository {
   final AuthRest authRest;
