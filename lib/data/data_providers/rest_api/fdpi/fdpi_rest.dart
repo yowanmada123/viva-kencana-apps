@@ -5,6 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:vivakencanaapp/models/fdpi/city.dart';
 import 'package:vivakencanaapp/models/fdpi/province.dart';
 import 'package:vivakencanaapp/models/fdpi/residence.dart';
+import 'package:vivakencanaapp/models/fdpi/house.dart';
 
 import '../../../../models/errors/custom_exception.dart';
 import '../../../../utils/net_utils.dart';
@@ -112,6 +113,40 @@ class FdpiRest {
           }),
         );
         return Right(residence);
+      } else {
+        return Left(NetUtils.parseErrorResponse(response: response.data));
+      }
+    } on Exception catch (e) {
+      return Future.value(Left(CustomException(message: e.toString())));
+    } catch (e) {
+      return Left(CustomException(message: e.toString()));
+    }
+  }
+
+  Future<Either<CustomException, List<House>>> getHouses(
+    String? idCluster,
+  ) async {
+    try {
+      http.options.headers['requiresToken'] = true;
+      log(
+        'Request to https://v2.kencana.org/api/fpi/houseUnit/getKoordinat (POST)',
+      );
+      final body = {
+        "id_site": idCluster,
+      };
+      final response = await http.post(
+        "api/fpi/houseUnit/getKoordinat",
+        data: body,
+      );
+      if (response.statusCode == 200) {
+        log('Response body: ${response.data}');
+        final body = response.data;
+        final houses = List<House>.from(
+          body['data'].map((e) {
+            return House.fromMap(e);
+          }),
+        );
+        return Right(houses);
       } else {
         return Left(NetUtils.parseErrorResponse(response: response.data));
       }

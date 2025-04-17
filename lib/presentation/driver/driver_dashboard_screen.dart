@@ -51,10 +51,10 @@ class MyGridLayout extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Color(0xff1E4694),
-        leading: IconButton(
-          icon: Icon(Icons.menu, color: Color(0xffffffff)),
-          onPressed: () => print("Menu"),
-        ),
+        // leading: IconButton(
+        //   icon: Icon(Icons.menu, color: Color(0xffffffff)),
+        //   onPressed: () => print("Menu"),
+        // ),
         title: Text(
           'VIVA KENCANA',
           textAlign: TextAlign.center,
