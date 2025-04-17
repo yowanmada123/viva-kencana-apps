@@ -2,29 +2,36 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vivakencanaapp/data/repository/fdpi_repository.dart';
-import 'package:vivakencanaapp/bloc/fdpi/location/location_bloc.dart';
-import 'package:vivakencanaapp/models/fdpi/province.dart';
 import 'package:vivakencanaapp/models/fdpi/city.dart';
+import 'package:vivakencanaapp/models/fdpi/province.dart';
 import 'package:vivakencanaapp/models/fdpi/status.dart';
 import 'package:vivakencanaapp/presentation/fdpi/fdpi_residences_screen.dart';
+
+import '../../bloc/fdpi/location/location_bloc.dart';
 
 class FDPIMenuScreen extends StatelessWidget {
   const FDPIMenuScreen({super.key});
 
-  VoidCallback _navigateToFdpiResidenceScreen(BuildContext context, LocationState state) {
+  VoidCallback _navigateToFdpiResidenceScreen(
+    BuildContext context,
+    LocationState state,
+  ) {
     // Handle form submission
     final province = state.selectedProvince?.idProvince ?? "";
     final city = state.selectedCity?.idCity ?? "";
     final status = state.selectedStatus?.name ?? "Aktif";
-    
+
     return () {
-      Navigator.push(context, MaterialPageRoute(
-        builder: (context) => FDPITResidencesScreen(
-            idProvince: province,
-            idCity: city,
-            status: status
-          )
-        )
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder:
+              (context) => FDPITResidencesScreen(
+                idProvince: province,
+                idCity: city,
+                status: status,
+              ),
+        ),
       );
     };
   }
@@ -34,22 +41,18 @@ class FDPIMenuScreen extends StatelessWidget {
     final fdpiRepository = context.read<FdpiRepository>();
 
     return BlocProvider(
-      create: 
-        (context) => 
-          LocationBloc(fdpiRepository: fdpiRepository)
-          ..add(LoadProvinces())
-          ..add(LoadStatusResidence()),
+      create:
+          (context) =>
+              LocationBloc(fdpiRepository: fdpiRepository)
+                ..add(LoadProvinces())
+                ..add(LoadStatusResidence()),
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: const Color(0xff1E4694),
-          title: const Text(
-            'FDPI', 
-            style: TextStyle(color: Colors.white),
-          ),
+          title: const Text('FDPI', style: TextStyle(color: Colors.white)),
           iconTheme: const IconThemeData(
             color: Colors.white, // This makes back button white
           ),
-          
         ),
 
         body: Padding(
@@ -99,12 +102,13 @@ class FDPIMenuScreen extends StatelessWidget {
           isExpanded: true,
           value: state.selectedProvince,
           hint: const Text('Select Province'),
-          items: state.provinces.map((province) {
-            return DropdownMenuItem<Province>(
-              value: province,
-              child: Text(province.province),
-            );
-          }).toList(),
+          items:
+              state.provinces.map((province) {
+                return DropdownMenuItem<Province>(
+                  value: province,
+                  child: Text(province.province),
+                );
+              }).toList(),
           onChanged: (province) {
             context.read<LocationBloc>().add(ProvinceChanged(province));
           },
@@ -122,17 +126,19 @@ class FDPIMenuScreen extends StatelessWidget {
           isExpanded: true,
           value: state.selectedCity,
           hint: const Text('Select City'),
-          items: state.cities.map((city) {
-            return DropdownMenuItem<City>(
-              value: city,
-              child: Text(city.cityName),
-            );
-          }).toList(),
-          onChanged: state.selectedProvince == null
-              ? null
-              : (city) {
-                  context.read<LocationBloc>().add(CityChanged(city));
-                },
+          items:
+              state.cities.map((city) {
+                return DropdownMenuItem<City>(
+                  value: city,
+                  child: Text(city.cityName),
+                );
+              }).toList(),
+          onChanged:
+              state.selectedProvince == null
+                  ? null
+                  : (city) {
+                    context.read<LocationBloc>().add(CityChanged(city));
+                  },
         ),
         if (state.selectedProvince != null && state.cities.isEmpty)
           const Text(
@@ -152,12 +158,13 @@ class FDPIMenuScreen extends StatelessWidget {
           isExpanded: true,
           value: state.selectedStatus,
           hint: const Text('Select Status'),
-          items: state.statuses.map((status) {
-            return DropdownMenuItem<Status>(
-              value: status,
-              child: Text(status.name),
-            );
-          }).toList(),
+          items:
+              state.statuses.map((status) {
+                return DropdownMenuItem<Status>(
+                  value: status,
+                  child: Text(status.name),
+                );
+              }).toList(),
           onChanged: (status) {
             context.read<LocationBloc>().add(StatusChanged(status));
           },

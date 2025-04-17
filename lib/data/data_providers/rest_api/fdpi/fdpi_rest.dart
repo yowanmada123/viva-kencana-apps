@@ -2,11 +2,12 @@ import 'dart:developer';
 
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
-import 'package:vivakencanaapp/models/fdpi/city.dart';
-import 'package:vivakencanaapp/models/fdpi/province.dart';
-import 'package:vivakencanaapp/models/fdpi/residence.dart';
 
 import '../../../../models/errors/custom_exception.dart';
+import '../../../../models/fdpi/city.dart';
+import '../../../../models/fdpi/house.dart';
+import '../../../../models/fdpi/province.dart';
+import '../../../../models/fdpi/residence.dart';
 import '../../../../utils/net_utils.dart';
 
 class FdpiRest {
@@ -30,9 +31,7 @@ class FdpiRest {
       log(
         'Request to https://v2.kencana.org/api/fpi/master/getProvince (POST)',
       );
-      final response = await http.post(
-        "api/fpi/master/getProvince",
-      );
+      final response = await http.post("api/fpi/master/getProvince");
       if (response.statusCode == 200) {
         log('Response body: ${response.data}');
         final body = response.data;
@@ -55,14 +54,9 @@ class FdpiRest {
   Future<Either<CustomException, List<City>>> getCities(String id) async {
     try {
       http.options.headers['requiresToken'] = true;
-      log(
-        'Request to https://v2.kencana.org/api/fpi/master/getCity (POST)',
-      );
+      log('Request to https://v2.kencana.org/api/fpi/master/getCity (POST)');
       final body = {"id_province": id};
-      final response = await http.post(
-        "api/fpi/master/getCity",
-        data: body,
-      );
+      final response = await http.post("api/fpi/master/getCity", data: body);
       if (response.statusCode == 200) {
         log('Response body: ${response.data}');
         final body = response.data;
@@ -75,6 +69,8 @@ class FdpiRest {
       } else {
         return Left(NetUtils.parseErrorResponse(response: response.data));
       }
+    } on DioException catch (e) {
+      return Left(NetUtils.parseDioException(e));
     } on Exception catch (e) {
       return Future.value(Left(CustomException(message: e.toString())));
     } catch (e) {
@@ -115,6 +111,42 @@ class FdpiRest {
       } else {
         return Left(NetUtils.parseErrorResponse(response: response.data));
       }
+    } on DioException catch (e) {
+      return Left(NetUtils.parseDioException(e));
+    } on Exception catch (e) {
+      return Future.value(Left(CustomException(message: e.toString())));
+    } catch (e) {
+      return Left(CustomException(message: e.toString()));
+    }
+  }
+
+  Future<Either<CustomException, List<House>>> getHouses(
+    String? idCluster,
+  ) async {
+    try {
+      http.options.headers['requiresToken'] = true;
+      log(
+        'Request to https://v2.kencana.org/api/fpi/houseUnit/getKoordinat (POST)',
+      );
+      final body = {"id_site": idCluster};
+      final response = await http.post(
+        "api/fpi/houseUnit/getKoordinat",
+        data: body,
+      );
+      if (response.statusCode == 200) {
+        log('Response body: ${response.data}');
+        final body = response.data;
+        final houses = List<House>.from(
+          body['data'].map((e) {
+            return House.fromMap(e);
+          }),
+        );
+        return Right(houses);
+      } else {
+        return Left(NetUtils.parseErrorResponse(response: response.data));
+      }
+    } on DioException catch (e) {
+      return Left(NetUtils.parseDioException(e));
     } on Exception catch (e) {
       return Future.value(Left(CustomException(message: e.toString())));
     } catch (e) {
