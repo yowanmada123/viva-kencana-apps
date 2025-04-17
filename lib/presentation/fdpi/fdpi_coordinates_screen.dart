@@ -4,10 +4,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import '../../bloc/auth/authentication/authentication_bloc.dart';
 
-import 'package:vivakencanaapp/bloc/fdpi/map/map_bloc.dart';
-import 'package:vivakencanaapp/data/repository/fdpi_repository.dart';
-import 'package:vivakencanaapp/models/fdpi/house.dart';
+import '../../bloc/fdpi/map/map_bloc.dart';
+import '../../data/repository/fdpi_repository.dart';
+import '../../models/errors/custom_exception.dart';
+import '../../models/fdpi/house.dart';
 
 class FDPICoordinatesScreen extends StatelessWidget {
   final String idCluster;
@@ -31,7 +33,10 @@ class FDPICoordinatesScreen extends StatelessWidget {
           return MapBloc(fdpiRepository: fdpiRepository)
             ..add(LoadMap(idCluster));
         },
-        child: MapCoordinatsView(clusterImg: clusterImg, clusterName: clusterName),
+        child: MapCoordinatsView(
+          clusterImg: clusterImg,
+          clusterName: clusterName,
+        ),
       ),
     );
   }
@@ -41,7 +46,11 @@ class MapCoordinatsView extends StatelessWidget {
   final String clusterImg;
   final String clusterName;
 
-  const MapCoordinatsView({super.key, required this.clusterImg, required this.clusterName});
+  const MapCoordinatsView({
+    super.key,
+    required this.clusterImg,
+    required this.clusterName,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -49,34 +58,33 @@ class MapCoordinatsView extends StatelessWidget {
       appBar: AppBar(
         title: Text(
           clusterName,
-          style: TextStyle(
-            fontFamily: "Poppins",
-            color: Colors.white,
-          ),
+          style: TextStyle(fontFamily: "Poppins", color: Colors.white),
         ),
-        iconTheme: const IconThemeData(
-          color: Colors.white,
-        ),
+        iconTheme: const IconThemeData(color: Colors.white),
         backgroundColor: Colors.blue[900],
         centerTitle: true,
       ),
       body: BlocConsumer<MapBloc, MapState>(
         listener: (context, state) {
-          if (state.status == MapStatus.failure) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.errorMessage ?? ''),
-              ),
-            );
+          if (state is MapLoadFailure) {
+            if (state.exception is UnauthorizedException) {
+              context.read<AuthenticationBloc>().add(
+                SetAuthenticationStatus(isAuthenticated: false),
+              );
+            }
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(state.errorMessage)));
           }
         },
         builder: (context, state) {
-          if (state.status == MapStatus.loading) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
+          if (state is MapLoading) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (state is MapLoadSuccess) {
+            return MapView(clusterImg: clusterImg, units: state.units);
+          } else {
+            return Container();
           }
-          return MapView(clusterImg: clusterImg, units: state.units);
         },
       ),
     );
@@ -87,11 +95,7 @@ class MapView extends StatefulWidget {
   final String clusterImg;
   final List<House> units;
 
-  const MapView({
-    super.key,
-    required this.clusterImg,
-    required this.units,
-  });
+  const MapView({super.key, required this.clusterImg, required this.units});
 
   @override
   State<MapView> createState() => _MapViewState();
@@ -115,16 +119,19 @@ class _MapViewState extends State<MapView> {
 
   List<Polygon> _mapToPolygons(List<House> units) {
     return units
-        .where((unit) => unit.coordinates != null && unit.coordinates!.isNotEmpty)
+        .where(
+          (unit) => unit.coordinates != null && unit.coordinates!.isNotEmpty,
+        )
         .map((unit) {
-      return Polygon(
-        points: unit.coordinates!,
-        color: _getColorWithOpacity(unit.color, 0.15),
-        borderColor: _getColorWithOpacity(unit.color, 1.0),
-        borderStrokeWidth: 1.0,
-        hitValue: unit, // Each polygon gets its associated House object
-      );
-    }).toList();
+          return Polygon(
+            points: unit.coordinates!,
+            color: _getColorWithOpacity(unit.color, 0.15),
+            borderColor: _getColorWithOpacity(unit.color, 1.0),
+            borderStrokeWidth: 1.0,
+            hitValue: unit, // Each polygon gets its associated House object
+          );
+        })
+        .toList();
   }
 
   void _handlePolygonTap() {
@@ -162,14 +169,13 @@ class _MapViewState extends State<MapView> {
           ],
         ),
         GestureDetector(
-          onTap:_handlePolygonTap,
+          onTap: _handlePolygonTap,
           child: PolygonLayer(
             hitNotifier: _hitNotifier,
             polygonCulling: true,
             polygons: _mapToPolygons(widget.units),
           ),
-        )
-        
+        ),
       ],
     );
   }

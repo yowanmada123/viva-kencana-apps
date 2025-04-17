@@ -15,12 +15,3 @@ class LoadMap extends MapEvent {
   @override
   List<Object> get props => [idCluster];
 }
-
-class UnitChanged extends MapEvent {
-  final House? unit;
-
-  const UnitChanged(this.unit);
-
-  @override
-  List<Object> get props => [unit ?? ''];
-}

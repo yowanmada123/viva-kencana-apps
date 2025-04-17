@@ -1,10 +1,10 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:vivakencanaapp/data/repository/fdpi_repository.dart';
 
-import 'package:vivakencanaapp/models/fdpi/city.dart';
-import 'package:vivakencanaapp/models/fdpi/province.dart';
-import 'package:vivakencanaapp/models/fdpi/status.dart';
+import '../../../data/repository/fdpi_repository.dart';
+import '../../../models/fdpi/city.dart';
+import '../../../models/fdpi/province.dart';
+import '../../../models/fdpi/status.dart';
 
 part 'location_event.dart';
 part 'location_state.dart';
@@ -34,10 +34,17 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
   ) async {
     emit(state.copyWith(status: LocationStatus.loading));
     final result = await fdpiRepository.getProvinces();
-    
+
     result.fold(
-      (error) => emit(state.copyWith(status: LocationStatus.failure, errorMessage: error.message)), 
-      (data) => emit(state.copyWith(status: LocationStatus.success, provinces: data)));
+      (error) => emit(
+        state.copyWith(
+          status: LocationStatus.failure,
+          errorMessage: error.message,
+        ),
+      ),
+      (data) =>
+          emit(state.copyWith(status: LocationStatus.success, provinces: data)),
+    );
   }
 
   Future<void> _onLoadCities(
@@ -49,35 +56,35 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
     final result = await fdpiRepository.getCities(event.provinceId);
 
     result.fold(
-      (error) => emit(state.copyWith(status: LocationStatus.failure, errorMessage: error.message)), 
-      (data) => emit(state.copyWith(status: LocationStatus.success, cities: data)));
+      (error) => emit(
+        state.copyWith(
+          status: LocationStatus.failure,
+          errorMessage: error.message,
+        ),
+      ),
+      (data) =>
+          emit(state.copyWith(status: LocationStatus.success, cities: data)),
+    );
   }
 
-  void _onProvinceChanged(
-    ProvinceChanged event,
-    Emitter<LocationState> emit,
-  ) {
-    emit(state.copyWith(
-      selectedProvince: event.province,
-      selectedCity: null, // Reset city when province changes
-    ));
+  void _onProvinceChanged(ProvinceChanged event, Emitter<LocationState> emit) {
+    emit(
+      state.copyWith(
+        selectedProvince: event.province,
+        selectedCity: null, // Reset city when province changes
+      ),
+    );
 
     if (event.province != null) {
       add(LoadCities(event.province!.idProvince));
     }
   }
 
-  void _onCityChanged(
-    CityChanged event,
-    Emitter<LocationState> emit,
-  ) {
+  void _onCityChanged(CityChanged event, Emitter<LocationState> emit) {
     emit(state.copyWith(selectedCity: event.city));
   }
 
-  void _onStatusChanged(
-    StatusChanged event,
-    Emitter<LocationState> emit,
-  ) {
+  void _onStatusChanged(StatusChanged event, Emitter<LocationState> emit) {
     emit(state.copyWith(selectedStatus: event.status));
   }
 }

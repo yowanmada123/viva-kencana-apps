@@ -88,6 +88,7 @@ class House {
     }
   }
 
+  // In case in the future feature, the coordinates needs to be parse to String and multiply with 1000
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'id_house': idHouse,

@@ -4,8 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:vivakencanaapp/models/user.dart';
-import 'package:vivakencanaapp/models/vehicle.dart';
 
 import '../../bloc/auth/authentication/authentication_bloc.dart';
 import '../../bloc/auth/logout/logout_bloc.dart';
@@ -13,6 +11,8 @@ import '../../bloc/expedition/list-vehicle/list_vehicle_bloc.dart';
 import '../../bloc/expedition/update-vehicle-status/update_vehicle_status_bloc.dart';
 import '../../data/repository/auth_repository.dart';
 import '../../data/repository/expedition_repository.dart';
+import '../../models/user.dart';
+import '../../models/vehicle.dart';
 import '../widgets/base_pop_up.dart';
 
 class WareHouseContentListScreen extends StatelessWidget {
