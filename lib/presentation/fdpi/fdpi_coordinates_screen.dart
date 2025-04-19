@@ -4,12 +4,13 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
-import '../../bloc/auth/authentication/authentication_bloc.dart';
 
+import '../../bloc/auth/authentication/authentication_bloc.dart';
 import '../../bloc/fdpi/map/map_bloc.dart';
 import '../../data/repository/fdpi_repository.dart';
 import '../../models/errors/custom_exception.dart';
 import '../../models/fdpi/house.dart';
+import 'fdpi_detail_unit.dart';
 
 class FDPICoordinatesScreen extends StatelessWidget {
   final String idCluster;
@@ -140,8 +141,14 @@ class _MapViewState extends State<MapView> {
       return;
     }
 
-    final tappedUnit = hitResult.hitValues.first;
-    print('Tapped unit ID: ${tappedUnit}');
+    final tappedUnit = hitResult.hitValues.first as House;
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => FDPIDetailUnitScreen(selectedHouse: tappedUnit),
+      ),
+    );
   }
 
   @override
