@@ -56,7 +56,7 @@ class RegisterFormScreen extends StatelessWidget {
                       LoginFormSubmitted(
                         username: username,
                         password: password,
-                        shif: shif,
+                        // shif: shif,
                       ),
                     );
                   },
