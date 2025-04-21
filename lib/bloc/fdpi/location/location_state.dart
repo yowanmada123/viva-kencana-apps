@@ -12,6 +12,7 @@ class LocationState extends Equatable {
   final City? selectedCity;
   final Status? selectedStatus;
   final String? errorMessage;
+  final Exception? exception;
 
   const LocationState({
     this.status = LocationStatus.initial,
@@ -22,6 +23,7 @@ class LocationState extends Equatable {
     this.selectedCity,
     this.selectedStatus,
     this.errorMessage,
+    this.exception,
   });
 
   LocationState copyWith({
@@ -33,6 +35,7 @@ class LocationState extends Equatable {
     City? selectedCity,
     Status? selectedStatus,
     String? errorMessage,
+    Exception? exception,
   }) {
     return LocationState(
       status: status ?? this.status,
@@ -43,18 +46,41 @@ class LocationState extends Equatable {
       selectedCity: selectedCity ?? this.selectedCity,
       selectedStatus: selectedStatus ?? this.selectedStatus,
       errorMessage: errorMessage ?? this.errorMessage,
+      exception: exception ?? this.exception,
     );
   }
 
   @override
   List<Object?> get props => [
-        status,
-        provinces,
-        cities,
-        statuses,
-        selectedProvince,
-        selectedCity,
-        selectedStatus,
-        errorMessage,
-      ];
+    status,
+    provinces,
+    cities,
+    statuses,
+    selectedProvince,
+    selectedCity,
+    selectedStatus,
+    errorMessage,
+    exception,
+  ];
+}
+
+class LocationProvinceLoading extends LocationState {}
+
+class LocationProvinceLoadSuccess extends LocationState {
+  final List<Province> provinces;
+
+  const LocationProvinceLoadSuccess(this.provinces);
+
+  @override
+  List<Object?> get props => [provinces];
+}
+
+class LocationLoadFailed extends LocationState {
+  final String message;
+  final Exception exception;
+
+  const LocationLoadFailed(this.message, this.exception);
+
+  @override
+  List<Object?> get props => [message, exception];
 }

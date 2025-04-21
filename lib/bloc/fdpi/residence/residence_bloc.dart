@@ -15,7 +15,7 @@ class ResidenceBloc extends Bloc<ResidenceEvent, ResidenceState> {
   }
 
   void _loadResidence(LoadResidence event, Emitter<ResidenceState> emit) async {
-    emit(state.copyWith(status: ResidenceStatus.loading));
+    emit(ResidenceLoading());
 
     final result = await fdpiRepository.getResidences(
       event.idProvince,
@@ -25,14 +25,9 @@ class ResidenceBloc extends Bloc<ResidenceEvent, ResidenceState> {
 
     result.fold(
       (error) => emit(
-        state.copyWith(
-          status: ResidenceStatus.failure,
-          errorMessage: error.message,
-        ),
+        ResidenceLoadFailure(errorMessage: error.message!, exception: error),
       ),
-      (data) => emit(
-        state.copyWith(status: ResidenceStatus.success, residences: data),
-      ),
+      (data) => emit(ResidenceLoadSuccess(residences: data)),
     );
   }
 }

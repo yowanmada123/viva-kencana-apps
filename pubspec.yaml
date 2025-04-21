@@ -53,6 +53,14 @@ dependencies:
   latlong2: ^0.9.0
   flutter_map: ^8.0.0
   cached_network_image: ^3.3.0
+  flutter_launcher_icons: "^0.13.1"
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/icons/android/play_store.png"
+  adaptive_icon_foreground: "assets/icons/android/adaptive_foreground.png"
+  adaptive_icon_background: "assets/icons/android/adaptive_background.png"
 
 dev_dependencies:
   flutter_test:

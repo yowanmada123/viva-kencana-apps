@@ -1,45 +1,34 @@
 part of 'residence_bloc.dart';
 
-enum ResidenceStatus { initial, loading, success, failure }
-
 class ResidenceState extends Equatable {
-  final List<Residence> residences;
-  final ResidenceStatus status;
-  final Residence? selectedResidence;
-  final String? errorMessage;
+  const ResidenceState();
 
-  const ResidenceState({
-    this.residences = const [],
-    this.status = ResidenceStatus.initial,
-    this.selectedResidence = null,
-    this.errorMessage = ''
-  });
-
-  ResidenceState copyWith({
-    ResidenceStatus? status,
-    List<Residence>? residences,
-    Residence? selectedResidence,
-    String? errorMessage
-  }) {
-    return ResidenceState(
-      status: status ?? this.status,
-      residences: residences ?? this.residences,
-      selectedResidence: selectedResidence ?? this.selectedResidence,
-      errorMessage: errorMessage ?? this.errorMessage
-    );
-  }
-  
   @override
-  List<Object?> get props => [
-    residences,
-    status,
-    selectedResidence,
-    errorMessage,
-  ];
+  List<Object?> get props => [];
 }
 
+class ResidenceInitial extends ResidenceState {}
 
-  
+class ResidenceLoading extends ResidenceState {}
 
+class ResidenceLoadSuccess extends ResidenceState {
+  final List<Residence> residences;
 
+  const ResidenceLoadSuccess({required this.residences});
 
+  @override
+  List<Object?> get props => [residences];
+}
+
+class ResidenceLoadFailure extends ResidenceState {
+  final String errorMessage;
+  final Exception exception;
+
+  const ResidenceLoadFailure({
+    required this.errorMessage,
+    required this.exception,
+  });
+
+  @override
+  List<Object?> get props => [errorMessage, exception];
+}

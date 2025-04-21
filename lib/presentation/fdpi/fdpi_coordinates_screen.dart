@@ -65,28 +65,31 @@ class MapCoordinatsView extends StatelessWidget {
         backgroundColor: Colors.blue[900],
         centerTitle: true,
       ),
-      body: BlocConsumer<MapBloc, MapState>(
-        listener: (context, state) {
-          if (state is MapLoadFailure) {
-            if (state.exception is UnauthorizedException) {
-              context.read<AuthenticationBloc>().add(
-                SetAuthenticationStatus(isAuthenticated: false),
-              );
+      body: Container(
+        color: Colors.black,
+        child: BlocConsumer<MapBloc, MapState>(
+          listener: (context, state) {
+            if (state is MapLoadFailure) {
+              if (state.exception is UnauthorizedException) {
+                context.read<AuthenticationBloc>().add(
+                  SetAuthenticationStatus(isAuthenticated: false),
+                );
+              }
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text(state.errorMessage)));
             }
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(SnackBar(content: Text(state.errorMessage)));
-          }
-        },
-        builder: (context, state) {
-          if (state is MapLoading) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (state is MapLoadSuccess) {
-            return MapView(clusterImg: clusterImg, units: state.units);
-          } else {
-            return Container();
-          }
-        },
+          },
+          builder: (context, state) {
+            if (state is MapLoading) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (state is MapLoadSuccess) {
+              return MapView(clusterImg: clusterImg, units: state.units);
+            } else {
+              return Container();
+            }
+          },
+        ),
       ),
     );
   }
@@ -156,6 +159,7 @@ class _MapViewState extends State<MapView> {
     return FlutterMap(
       mapController: _mapController,
       options: MapOptions(
+        backgroundColor: Colors.black.withOpacity(0.1),
         crs: const CrsSimple(), // Required for custom coordinates
         initialCenter: _imageBounds.center,
         initialZoom: 0,

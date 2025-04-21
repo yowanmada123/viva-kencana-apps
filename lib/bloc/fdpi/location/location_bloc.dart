@@ -40,6 +40,7 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
         state.copyWith(
           status: LocationStatus.failure,
           errorMessage: error.message,
+          exception: error,
         ),
       ),
       (data) =>
@@ -60,6 +61,7 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
         state.copyWith(
           status: LocationStatus.failure,
           errorMessage: error.message,
+          exception: error,
         ),
       ),
       (data) =>
