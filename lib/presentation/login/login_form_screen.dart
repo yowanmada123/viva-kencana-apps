@@ -84,6 +84,7 @@ class LoginFormView extends StatelessWidget {
                         context,
                       ).showSnackBar(SnackBar(content: Text(state.message)));
                     } else if (state is LoginFormSuccess) {
+                      print("masuk Sini login success");
                       BlocProvider.of<AuthenticationBloc>(context).add(
                         SetAuthenticationStatus(
                           isAuthenticated: true,

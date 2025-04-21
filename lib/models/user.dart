@@ -34,7 +34,7 @@ class User {
   final String userID;
   final String deptID;
   final String waGroupID;
-  final String oldUserID;
+  final String? oldUserID;
   // final Avatar avatar;
   final String lastShiftID;
   final String idemployee;
@@ -75,7 +75,7 @@ class User {
     required this.userID,
     required this.deptID,
     required this.waGroupID,
-    required this.oldUserID,
+    this.oldUserID,
     // required this.avatar,
     required this.lastShiftID,
     required this.idemployee,
@@ -250,7 +250,7 @@ class User {
       // avatar: Avatar.fromMap(map['avatar'] as Map<String,dynamic>),
       lastShiftID: map['last_shift_id'] as String,
       idemployee: map['idemployee'] as String,
-      updatedAt: map['updated_at'] as String,
+      updatedAt: map['updated_at'] ?? "",
       // avatar2: Avatar2.fromMap(map['avatar2'] as Map<String,dynamic>),
     );
   }

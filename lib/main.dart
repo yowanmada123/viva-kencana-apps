@@ -119,16 +119,11 @@ class MyApp extends StatelessWidget {
                 if (state is Authenticated) {
                   final user = state.user;
                   if (true) {
+                    print("masuk sini authenticated");
                     return DriverDashboardScreen();
-                    return QrCodeScreen();
-                  } else if (true) {
-                    return DriverDashboardScreen();
-                  } else {
-                    return Container();
                   }
-                } else {
-                  return LoginFormScreen();
                 }
+                return LoginFormScreen();
               },
             ),
           ),

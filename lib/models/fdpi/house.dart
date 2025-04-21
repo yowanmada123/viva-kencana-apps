@@ -78,11 +78,13 @@ class House {
     if (coordString == null || coordString.isEmpty || coordString == '""') {
       return null;
     }
-    
+
     try {
       final double ratio = 1000.0;
       final List<dynamic> coords = jsonDecode(coordString);
-      return coords.map((e) => LatLng(e[0].toDouble() / ratio, e[1].toDouble() / ratio)).toList();
+      return coords
+          .map((e) => LatLng(e[0].toDouble() / ratio, e[1].toDouble() / ratio))
+          .toList();
     } catch (e) {
       return null;
     }
@@ -113,9 +115,9 @@ class House {
     return House(
       idHouse: map['id_house'] as String,
       name: map['name'] as String,
-      description: map['description'] as String,
+      description: map['description'] ?? "",
       clusterName: map['cluster_name'] as String,
-      commonName: map['common_name'] as String,
+      commonName: map['common_name'] ?? "",
       buildingArea: map['building_area'] as String,
       landArea: map['land_area'] as String,
       statName: map['stat_name'] as String,
@@ -131,7 +133,8 @@ class House {
 
   String toJson() => json.encode(toMap());
 
-  factory House.fromJson(String source) => House.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory House.fromJson(String source) =>
+      House.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
   String toString() {
@@ -141,41 +144,40 @@ class House {
   @override
   bool operator ==(covariant House other) {
     if (identical(this, other)) return true;
-  
-    return 
-      other.idHouse == idHouse &&
-      other.name == name &&
-      other.description == description &&
-      other.clusterName == clusterName &&
-      other.commonName == commonName &&
-      other.buildingArea == buildingArea &&
-      other.landArea == landArea &&
-      other.statName == statName &&
-      other.dateBuild == dateBuild &&
-      other.dateFinish == dateFinish &&
-      other.soldStatName == soldStatName &&
-      other.dateSold == dateSold &&
-      other.coordinates == coordinates &&
-      other.color == color &&
-      other.colorName == colorName;
+
+    return other.idHouse == idHouse &&
+        other.name == name &&
+        other.description == description &&
+        other.clusterName == clusterName &&
+        other.commonName == commonName &&
+        other.buildingArea == buildingArea &&
+        other.landArea == landArea &&
+        other.statName == statName &&
+        other.dateBuild == dateBuild &&
+        other.dateFinish == dateFinish &&
+        other.soldStatName == soldStatName &&
+        other.dateSold == dateSold &&
+        other.coordinates == coordinates &&
+        other.color == color &&
+        other.colorName == colorName;
   }
 
   @override
   int get hashCode {
     return idHouse.hashCode ^
-      name.hashCode ^
-      description.hashCode ^
-      clusterName.hashCode ^
-      commonName.hashCode ^
-      buildingArea.hashCode ^
-      landArea.hashCode ^
-      statName.hashCode ^
-      dateBuild.hashCode ^
-      dateFinish.hashCode ^
-      soldStatName.hashCode ^
-      dateSold.hashCode ^
-      coordinates.hashCode ^
-      color.hashCode ^
-      colorName.hashCode;
+        name.hashCode ^
+        description.hashCode ^
+        clusterName.hashCode ^
+        commonName.hashCode ^
+        buildingArea.hashCode ^
+        landArea.hashCode ^
+        statName.hashCode ^
+        dateBuild.hashCode ^
+        dateFinish.hashCode ^
+        soldStatName.hashCode ^
+        dateSold.hashCode ^
+        coordinates.hashCode ^
+        color.hashCode ^
+        colorName.hashCode;
   }
 }

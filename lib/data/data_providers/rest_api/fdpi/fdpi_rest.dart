@@ -15,16 +15,6 @@ class FdpiRest {
 
   FdpiRest(this.http);
 
-  Future<Either<CustomException, String>> helloWorld() async {
-    try {
-      return Future.value(Right("Hello World"));
-    } on Exception catch (e) {
-      return Future.value(Left(CustomException(message: e.toString())));
-    } catch (e) {
-      return Left(CustomException(message: e.toString()));
-    }
-  }
-
   Future<Either<CustomException, List<Province>>> getProvinces() async {
     try {
       http.options.headers['requiresToken'] = true;
@@ -44,6 +34,8 @@ class FdpiRest {
       } else {
         return Left(NetUtils.parseErrorResponse(response: response.data));
       }
+    } on DioException catch (e) {
+      return Left(NetUtils.parseDioException(e));
     } on Exception catch (e) {
       return Future.value(Left(CustomException(message: e.toString())));
     } catch (e) {

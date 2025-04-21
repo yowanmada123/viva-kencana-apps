@@ -12,10 +12,6 @@ class FdpiRepository {
 
   FdpiRepository({required this.fdpiRest});
 
-  Future<Either<CustomException, String>> helloWorld() async {
-    return fdpiRest.helloWorld();
-  }
-
   Future<Either<CustomException, List<Province>>> getProvinces() async {
     return fdpiRest.getProvinces();
   }
