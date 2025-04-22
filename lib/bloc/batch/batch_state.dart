@@ -21,10 +21,10 @@ class BatchSuccess extends BatchState {
 }
 
 class BatchFailure extends BatchState {
-  final String message;
+  final Exception exception;
 
-  const BatchFailure(this.message);
+  const BatchFailure(this.exception);
 
   @override
-  List<Object> get props => [message];
+  List<Object> get props => [exception];
 }

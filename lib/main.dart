@@ -9,14 +9,11 @@ import 'package:vivakencanaapp/data/data_providers/rest_api/batch_rest/batch_res
 import 'package:vivakencanaapp/presentation/login/login_form_screen.dart';
 import 'bloc/auth/authentication/authentication_bloc.dart';
 import 'data/data_providers/rest_api/auth_rest.dart';
-import 'data/data_providers/rest_api/warehouse_rest/warehouse_rest.dart';
 import 'data/data_providers/shared-preferences/shared_preferences_key.dart';
 import 'data/data_providers/shared-preferences/shared_preferences_manager,dart';
 import 'data/repository/auth_repository.dart';
 import 'data/repository/batch_repository.dart';
-import 'data/repository/warehouse_repository.dart';
 import 'environment.dart';
-import 'presentation/qr_code/qr_code_scan_screen.dart';
 import 'presentation/qr_code/qr_code_screen.dart';
 import 'presentation/warehouse/warehouse_select_screen.dart';
 import 'presentation/driver/driver_dashboard_screen.dart';
@@ -40,21 +37,18 @@ void main() async {
     ..interceptors.addAll([DioRequestTokenInterceptor()]);
 
   final authRest = AuthRest(dioClient);
-  final warehouseRest = WarehouseRest(dioClient);
   final batchRest = BatchRest(dioClient);
 
   final authRepository = AuthRepository(
     authRest: authRest,
     authSharedPref: authSharedPref,
   );
-  final warehouseRepository = WarehouseRepository(warehouseRest: warehouseRest);
   final batchRepository = BatchRepository(batchRest: batchRest);
 
   runApp(
     MultiRepositoryProvider(
       providers: [
         RepositoryProvider.value(value: authRepository),
-        RepositoryProvider.value(value: warehouseRepository),
         RepositoryProvider.value(value: batchRepository),
       ],
       child: MultiBlocProvider(
@@ -108,7 +102,6 @@ class MyApp extends StatelessWidget {
                 ),
               ),
             ),
-
             home: BlocBuilder<AuthenticationBloc, AuthenticationState>(
               builder: (context, state) {
                 if (state is Authenticated) {

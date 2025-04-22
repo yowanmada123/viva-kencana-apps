@@ -250,7 +250,7 @@ class User {
       // avatar: Avatar.fromMap(map['avatar'] as Map<String,dynamic>),
       lastShiftID: map['last_shift_id'] as String,
       idemployee: map['idemployee'] as String,
-      updatedAt: map['updated_at'] as String,
+      updatedAt: map['updated_at'] ?? "",
       // avatar2: Avatar2.fromMap(map['avatar2'] as Map<String,dynamic>),
     );
   }

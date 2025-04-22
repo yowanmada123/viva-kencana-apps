@@ -4,8 +4,8 @@ import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 
 import '../../../../models/batch.dart';
+import '../../../../models/delivery_detail.dart';
 import '../../../../models/errors/custom_exception.dart';
-import '../../../../models/warehouse.dart';
 import '../../../../utils/net_utils.dart';
 
 class BatchRest {
@@ -13,32 +13,43 @@ class BatchRest {
 
   BatchRest(this.http);
 
-  Future<Either<CustomException, List<Warehouse>>> getWarehouse({
-    required String deliveryID,
+  Future<Either<CustomException, List<DeliveryDetail>>> getDeliveryDetail({
+    required String batchID,
+    required String companyID,
+    required String millID,
+    required String whID,
   }) async {
     try {
       http.options.headers['requiresToken'] = true;
-      final body = {'batch_id': deliveryID};
+      final body = {
+        'batch_id': batchID,
+        "company_id": companyID,
+        "mill_id": millID,
+        "wh_id": whID,
+      };
       log(
-        'Request to https://v2.kencana.org/api/viva/confirm_muat/getDataWh (POST)',
+        'Request to https://v2.kencana.org/api/viva/confirm_muat/getDelivDtl (POST)',
       );
       final response = await http.post(
-        "api/viva/confirm_muat/getDataWh",
+        "api/viva/confirm_muat/getDelivDtl",
         data: body,
       );
       if (response.statusCode == 200) {
         log('Response body: ${response.data}');
         final body = response.data;
-        final warehouse = List<Warehouse>.from(
-          body['data']['warehouses'].map((e) {
-            return Warehouse.fromMap(e);
+        final deliveryDetail = List<DeliveryDetail>.from(
+          body['data'].map((e) {
+            return DeliveryDetail.fromMap(e);
           }),
         );
-        return Right(warehouse);
+        return Right(deliveryDetail);
       } else {
         return Left(NetUtils.parseErrorResponse(response: response.data));
       }
     } on Exception catch (e) {
+      if (e is DioException) {
+        return Left(NetUtils.parseDioException(e));
+      }
       return Future.value(Left(CustomException(message: e.toString())));
     } catch (e) {
       return Left(CustomException(message: e.toString()));
@@ -61,7 +72,7 @@ class BatchRest {
       if (response.statusCode == 200) {
         log('Response body: ${response.data}');
         final body = response.data;
-        final batch = Batch.fromMap(body);
+        final batch = Batch.fromMap(body['data']);
         // final warehouse = List<Warehouse>.from(
         //   body['data'].map((e) {
         //     return Warehouse.fromMap(e);
@@ -72,6 +83,99 @@ class BatchRest {
         return Left(NetUtils.parseErrorResponse(response: response.data));
       }
     } on Exception catch (e) {
+      if (e is DioException) {
+        return Left(NetUtils.parseDioException(e));
+      }
+      return Future.value(Left(CustomException(message: e.toString())));
+    } catch (e) {
+      return Left(CustomException(message: e.toString()));
+    }
+  }
+
+  Future<Either<CustomException, List<DeliveryDetail>>> confirmLoad({
+    required String batchID,
+    required String companyID,
+    required String millID,
+    required String whID,
+  }) async {
+    try {
+      http.options.headers['requiresToken'] = true;
+      final body = {
+        'batch_id': batchID,
+        "company_id": companyID,
+        "mill_id": millID,
+        "wh_id": whID,
+      };
+      log(
+        'Request to https://v2.kencana.org/api/viva/confirm_muat/confirmLoad (POST)',
+      );
+      final response = await http.post(
+        "api/viva/confirm_muat/confirmLoad",
+        data: body,
+      );
+      if (response.statusCode == 200) {
+        log('Response body: ${response.data}');
+        final body = response.data;
+        final deliveryDetail = List<DeliveryDetail>.from(
+          body['data'].map((e) {
+            return DeliveryDetail.fromMap(e);
+          }),
+        );
+        return Right(deliveryDetail);
+      } else {
+        return Left(NetUtils.parseErrorResponse(response: response.data));
+      }
+    } on Exception catch (e) {
+      if (e is DioException) {
+        return Left(NetUtils.parseDioException(e));
+      }
+      return Future.value(Left(CustomException(message: e.toString())));
+    } catch (e) {
+      return Left(CustomException(message: e.toString()));
+    }
+  }
+
+  Future<Either<CustomException, List<DeliveryDetail>>> cancelLoad({
+    required String batchID,
+    required String delivID,
+    required String companyID,
+    required String millID,
+    required String whID,
+    required String itemNum,
+  }) async {
+    try {
+      http.options.headers['requiresToken'] = true;
+      final body = {
+        'batch_id': batchID,
+        "deliv_id": delivID,
+        "company_id": companyID,
+        "mill_id": millID,
+        "wh_id": whID,
+        "item_num": itemNum,
+      };
+      log(
+        'Request to https://v2.kencana.org/api/viva/confirm_muat/cancelLoad (POST)',
+      );
+      final response = await http.post(
+        "api/viva/confirm_muat/cancelLoad",
+        data: body,
+      );
+      if (response.statusCode == 200) {
+        log('Response body: ${response.data}');
+        final body = response.data;
+        final deliveryDetail = List<DeliveryDetail>.from(
+          body['data'].map((e) {
+            return DeliveryDetail.fromMap(e);
+          }),
+        );
+        return Right(deliveryDetail);
+      } else {
+        return Left(NetUtils.parseErrorResponse(response: response.data));
+      }
+    } on Exception catch (e) {
+      if (e is DioException) {
+        return Left(NetUtils.parseDioException(e));
+      }
       return Future.value(Left(CustomException(message: e.toString())));
     } catch (e) {
       return Left(CustomException(message: e.toString()));
