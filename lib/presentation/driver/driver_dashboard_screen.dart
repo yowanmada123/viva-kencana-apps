@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vivakencanaapp/bloc/auth/authentication/authentication_bloc.dart';
-import 'package:vivakencanaapp/bloc/auth/logout/logout_bloc.dart';
-import 'package:vivakencanaapp/data/repository/auth_repository.dart';
-import 'package:vivakencanaapp/presentation/widgets/base_pop_up.dart';
+
+import '../../bloc/auth/authentication/authentication_bloc.dart';
+import '../../bloc/auth/logout/logout_bloc.dart';
+import '../../data/repository/auth_repository.dart';
 import '../qr_code/qr_code_screen.dart';
-import '../fdpi/fdpi_menu_screen.dart';
+import '../widgets/base_pop_up.dart';
 
 class DriverDashboardScreen extends StatelessWidget {
   const DriverDashboardScreen({super.key});
@@ -24,7 +24,6 @@ class DriverDashboardScreen extends StatelessWidget {
 class MyGridLayout extends StatelessWidget {
   final List<Map<String, dynamic>> buttons = [
     {'icon': Icons.local_shipping, 'text': 'Loading'},
-    {'icon': Icons.real_estate_agent, 'text': 'FDPI'},
     // {'icon': Icons.diversity_2, 'text': 'CRM'},
     // {'icon': Icons.supervisor_account, 'text': 'HRIS'},
     // {'icon': Icons.storage, 'text': 'Master'},
@@ -43,12 +42,6 @@ class MyGridLayout extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => QrCodeScreen()),
-        );
-        break;
-      case 1:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => FDPIMenuScreen()),
         );
         break;
       default:
