@@ -34,7 +34,7 @@ class User {
   final String userID;
   final String deptID;
   final String waGroupID;
-  final String oldUserID;
+  final String? oldUserID;
   // final Avatar avatar;
   final String lastShiftID;
   final String idemployee;
@@ -75,7 +75,7 @@ class User {
     required this.userID,
     required this.deptID,
     required this.waGroupID,
-    required this.oldUserID,
+    this.oldUserID,
     // required this.avatar,
     required this.lastShiftID,
     required this.idemployee,

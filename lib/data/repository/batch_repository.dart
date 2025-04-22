@@ -1,7 +1,7 @@
 import 'package:dartz/dartz.dart';
-import 'package:vivakencanaapp/models/batch.dart';
-import 'package:vivakencanaapp/models/delivery_detail.dart';
 
+import '../../models/batch.dart';
+import '../../models/delivery_detail.dart';
 import '../../models/errors/custom_exception.dart';
 import '../data_providers/rest_api/batch_rest/batch_rest.dart';
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../../bloc/auth/login-form/login_form_bloc.dart';
 
 class RegisterFormScreen extends StatelessWidget {
@@ -55,7 +56,7 @@ class RegisterFormScreen extends StatelessWidget {
                       LoginFormSubmitted(
                         username: username,
                         password: password,
-                        shif: shif,
+                        // shif: shif,
                       ),
                     );
                   },

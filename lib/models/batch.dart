@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 
-import 'package:vivakencanaapp/models/warehouse.dart';
+import 'warehouse.dart';
 
 class Batch {
   final String companyID;

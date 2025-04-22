@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 
 import '../../data/data_providers/shared-preferences/shared_preferences_key.dart';
-import '../../data/data_providers/shared-preferences/shared_preferences_manager,dart';
+import '../../data/data_providers/shared-preferences/shared_preferences_manager.dart';
 import '../../models/auth.dart';
 
 class DioRequestTokenInterceptor extends InterceptorsWrapper {

@@ -1,19 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../bloc/auth/authentication/authentication_bloc.dart';
+import '../../bloc/auth/logout/logout_bloc.dart';
+import '../../data/repository/auth_repository.dart';
 import '../qr_code/qr_code_screen.dart';
+import '../widgets/base_pop_up.dart';
 
 class DriverDashboardScreen extends StatelessWidget {
   const DriverDashboardScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MyGridLayout();
+    final authRepository = context.read<AuthRepository>();
+
+    return BlocProvider(
+      create: (context) => LogoutBloc(authRepository),
+      child: MyGridLayout(),
+    );
   }
 }
 
 class MyGridLayout extends StatelessWidget {
   final List<Map<String, dynamic>> buttons = [
     {'icon': Icons.local_shipping, 'text': 'Loading'},
-    {'icon': Icons.real_estate_agent, 'text': 'FDPI'},
     // {'icon': Icons.diversity_2, 'text': 'CRM'},
     // {'icon': Icons.supervisor_account, 'text': 'HRIS'},
     // {'icon': Icons.storage, 'text': 'Master'},
@@ -35,7 +45,6 @@ class MyGridLayout extends StatelessWidget {
         );
         break;
       default:
-        print(index);
         break;
     }
   }
@@ -45,10 +54,11 @@ class MyGridLayout extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Color(0xff1E4694),
-        leading: IconButton(
-          icon: Icon(Icons.menu, color: Color(0xffffffff)),
-          onPressed: () => print("Menu"),
-        ),
+        iconTheme: const IconThemeData(color: Colors.white),
+        // leading: IconButton(
+        //   icon: Icon(Icons.menu, color: Color(0xffffffff)),
+        //   onPressed: () => print("Menu"),
+        // ),
         title: Text(
           'VIVA KENCANA',
           textAlign: TextAlign.center,
@@ -59,6 +69,49 @@ class MyGridLayout extends StatelessWidget {
             fontSize: 18.0,
           ),
         ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 16.0),
+            // child: Icon(Icons.logout, color: Colors.white),
+            child: BlocConsumer<LogoutBloc, LogoutState>(
+              listener: (context, state) {
+                if (state is LogoutFailure) {
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(SnackBar(content: Text("Logout Not Success")));
+                } else if (state is LogoutSuccess) {
+                  BlocProvider.of<AuthenticationBloc>(
+                    context,
+                  ).add(SetAuthenticationStatus(isAuthenticated: false));
+                }
+              },
+              builder: (context, state) {
+                return GestureDetector(
+                  onTap: () {
+                    showDialog<bool>(
+                      context: context,
+                      builder: (BuildContext childContext) {
+                        return BasePopUpDialog(
+                          noText: "Tidak",
+                          yesText: "Ya",
+                          onNoPressed: () {},
+                          onYesPressed: () {
+                            if (state is! LogoutLoading) {
+                              context.read<LogoutBloc>().add(LogoutPressed());
+                            }
+                          },
+                          question:
+                              "Apakah Anda yakin ingin keluar dari aplikasi?",
+                        );
+                      },
+                    );
+                  },
+                  child: Icon(Icons.logout, color: Colors.white),
+                );
+              },
+            ),
+          ),
+        ],
       ),
       body: Container(
         margin: EdgeInsets.fromLTRB(0.0, 8.0, 0.0, 0.0),

@@ -5,18 +5,19 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:vivakencanaapp/data/data_providers/rest_api/batch_rest/batch_rest.dart';
-import 'package:vivakencanaapp/presentation/login/login_form_screen.dart';
+
 import 'bloc/auth/authentication/authentication_bloc.dart';
 import 'data/data_providers/rest_api/auth_rest.dart';
+
+import 'data/data_providers/rest_api/batch_rest/batch_rest.dart';
 import 'data/data_providers/shared-preferences/shared_preferences_key.dart';
-import 'data/data_providers/shared-preferences/shared_preferences_manager,dart';
+import 'data/data_providers/shared-preferences/shared_preferences_manager.dart';
 import 'data/repository/auth_repository.dart';
 import 'data/repository/batch_repository.dart';
 import 'environment.dart';
-import 'presentation/qr_code/qr_code_screen.dart';
-import 'presentation/warehouse/warehouse_select_screen.dart';
+
 import 'presentation/driver/driver_dashboard_screen.dart';
+import 'presentation/login/login_form_screen.dart';
 import 'utils/interceptors/dio_request_token_interceptor.dart';
 
 void main() async {
@@ -107,16 +108,11 @@ class MyApp extends StatelessWidget {
                 if (state is Authenticated) {
                   final user = state.user;
                   if (true) {
+                    print("masuk sini authenticated");
                     return DriverDashboardScreen();
-                    return QrCodeScreen();
-                  } else if (true) {
-                    return DriverDashboardScreen();
-                  } else {
-                    return Container();
                   }
-                } else {
-                  return LoginFormScreen();
                 }
+                return LoginFormScreen();
               },
             ),
           ),

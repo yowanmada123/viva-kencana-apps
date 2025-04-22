@@ -15,10 +15,14 @@ class AuthRest {
   Future<Either<CustomException, Auth>> login({
     required String username,
     required String password,
-    required String shif,
+    // required String shif,
   }) async {
     try {
-      final body = {'username': username, 'password': password, 'shif': shif};
+      final body = {
+        'username': username,
+        'password': password,
+        // 'shif': shif
+      };
       log('Request to https://v2.kencana.org/api/login (POST)');
       final response = await http.post('api/login', data: body);
       if (response.statusCode == 200) {

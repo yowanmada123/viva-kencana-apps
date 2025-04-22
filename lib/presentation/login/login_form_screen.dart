@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:vivakencanaapp/data/repository/auth_repository.dart';
+import '../../data/repository/auth_repository.dart';
 
 import '../../bloc/auth/authentication/authentication_bloc.dart';
 import '../../bloc/auth/login-form/login_form_bloc.dart';
@@ -64,26 +64,27 @@ class LoginFormView extends StatelessWidget {
                   ),
                   obscureText: true,
                 ),
-                SizedBox(height: 20.w),
-                TextField(
-                  controller: shifController,
-                  decoration: InputDecoration(
-                    hintText: 'Shift',
-                    hintStyle: TextStyle(fontSize: 14),
-                    isCollapsed: true,
-                  ),
-                ),
+                // SizedBox(height: 20.w),
+                // TextField(
+                //   controller: shifController,
+                //   decoration: InputDecoration(
+                //     hintText: 'Shift',
+                //     hintStyle: TextStyle(fontSize: 14),
+                //     isCollapsed: true,
+                //   ),
+                // ),
                 SizedBox(height: 30.w),
                 BlocConsumer<LoginFormBloc, LoginFormState>(
                   listener: (context, state) {
                     if (state is LoginFormError) {
                       usernameController.clear();
                       passwordController.clear();
-                      shifController.clear();
+                      // shifController.clear();
                       ScaffoldMessenger.of(
                         context,
                       ).showSnackBar(SnackBar(content: Text(state.message)));
                     } else if (state is LoginFormSuccess) {
+                      print("masuk Sini login success");
                       BlocProvider.of<AuthenticationBloc>(context).add(
                         SetAuthenticationStatus(
                           isAuthenticated: true,
@@ -98,12 +99,12 @@ class LoginFormView extends StatelessWidget {
                         if (state is! LoginFormLoading) {
                           final username = usernameController.text;
                           final password = passwordController.text;
-                          final shif = shifController.text;
+                          // final shif = shifController.text;
                           context.read<LoginFormBloc>().add(
                             LoginFormSubmitted(
                               username: username,
                               password: password,
-                              shif: shif,
+                              // shif: "1",
                             ),
                           );
                         }

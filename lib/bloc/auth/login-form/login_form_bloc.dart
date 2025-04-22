@@ -1,7 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:vivakencanaapp/data/repository/auth_repository.dart';
 
+import '../../../data/repository/auth_repository.dart';
 import '../../../models/user.dart';
 
 part 'login_form_event.dart';
@@ -17,7 +17,7 @@ class LoginFormBloc extends Bloc<LoginFormEvent, LoginFormState> {
       final result = await authRest.login(
         username: event.username,
         password: event.password,
-        shif: event.shif,
+        // shif: event.shif,
       );
 
       result.fold(
