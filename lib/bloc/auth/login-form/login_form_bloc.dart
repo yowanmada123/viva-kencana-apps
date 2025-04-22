@@ -17,7 +17,7 @@ class LoginFormBloc extends Bloc<LoginFormEvent, LoginFormState> {
       final result = await authRest.login(
         username: event.username,
         password: event.password,
-        shif: event.shif,
+        // shif: event.shif,
       );
 
       result.fold(

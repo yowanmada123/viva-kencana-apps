@@ -10,16 +10,20 @@ sealed class LoginFormEvent extends Equatable {
 final class LoginFormSubmitted extends LoginFormEvent {
   final String username;
   final String password;
-  final String shif;
+  // final String shif;
 
   const LoginFormSubmitted({
     required this.username,
     required this.password,
-    required this.shif,
+    // required this.shif,
   });
 
   @override
-  List<Object> get props => [username, password, shif];
+  List<Object> get props => [
+    username,
+    password,
+    // shif,
+  ];
 }
 
 final class LoginFormLogout extends LoginFormEvent {}

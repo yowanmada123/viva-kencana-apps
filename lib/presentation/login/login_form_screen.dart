@@ -64,22 +64,22 @@ class LoginFormView extends StatelessWidget {
                   ),
                   obscureText: true,
                 ),
-                SizedBox(height: 20.w),
-                TextField(
-                  controller: shifController,
-                  decoration: InputDecoration(
-                    hintText: 'Shift',
-                    hintStyle: TextStyle(fontSize: 14),
-                    isCollapsed: true,
-                  ),
-                ),
+                // SizedBox(height: 20.w),
+                // TextField(
+                //   controller: shifController,
+                //   decoration: InputDecoration(
+                //     hintText: 'Shift',
+                //     hintStyle: TextStyle(fontSize: 14),
+                //     isCollapsed: true,
+                //   ),
+                // ),
                 SizedBox(height: 30.w),
                 BlocConsumer<LoginFormBloc, LoginFormState>(
                   listener: (context, state) {
                     if (state is LoginFormError) {
                       usernameController.clear();
                       passwordController.clear();
-                      shifController.clear();
+                      // shifController.clear();
                       ScaffoldMessenger.of(
                         context,
                       ).showSnackBar(SnackBar(content: Text(state.message)));
@@ -99,12 +99,12 @@ class LoginFormView extends StatelessWidget {
                         if (state is! LoginFormLoading) {
                           final username = usernameController.text;
                           final password = passwordController.text;
-                          final shif = shifController.text;
+                          // final shif = shifController.text;
                           context.read<LoginFormBloc>().add(
                             LoginFormSubmitted(
                               username: username,
                               password: password,
-                              shif: shif,
+                              // shif: "1",
                             ),
                           );
                         }
