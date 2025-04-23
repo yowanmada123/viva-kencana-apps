@@ -51,12 +51,10 @@ class RegisterFormScreen extends StatelessWidget {
                   onPressed: () {
                     final username = usernameController.text;
                     final password = passwordController.text;
-                    final shif = shifController.text;
                     context.read<LoginFormBloc>().add(
                       LoginFormSubmitted(
                         username: username,
                         password: password,
-                        // shif: shif,
                       ),
                     );
                   },

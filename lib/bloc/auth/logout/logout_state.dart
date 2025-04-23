@@ -13,4 +13,8 @@ final class LogoutLoading extends LogoutState {}
 
 final class LogoutSuccess extends LogoutState {}
 
-final class LogoutFailure extends LogoutState {}
+final class LogoutFailure extends LogoutState {
+  final Exception? exception;
+
+  const LogoutFailure({this.exception});
+}

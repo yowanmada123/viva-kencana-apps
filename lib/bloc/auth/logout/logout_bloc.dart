@@ -16,8 +16,8 @@ class LogoutBloc extends Bloc<LogoutEvent, LogoutState> {
       final result = await authRepository.logout();
 
       result.fold(
-        (error) {
-          emit(LogoutFailure());
+        (exception) {
+          emit(LogoutFailure(exception: exception));
         },
         (_) {
           emit(LogoutSuccess());

@@ -1,15 +1,11 @@
-import 'dart:convert';
-
-import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SharedPreferencesManager {
   final String key;
 
   SharedPreferencesManager({required this.key});
-  
-  Future<void> write(String data
-  ) async {
+
+  Future<void> write(String data) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(key, data);
   }
@@ -17,7 +13,7 @@ class SharedPreferencesManager {
   Future<String?> read() async {
     final prefs = await SharedPreferences.getInstance();
     final dataString = prefs.getString(key);
-    // if (dataString != null) {   
+    // if (dataString != null) {
     //   final data = json.decode(dataString);
     //   return data;
     // }
