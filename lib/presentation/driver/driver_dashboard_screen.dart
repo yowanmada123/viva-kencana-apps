@@ -36,12 +36,15 @@ class MyGridLayout extends StatelessWidget {
     // {'icon': Icons.people, 'text': 'HRIS'},
   ];
 
-  void _navigateToScreen(BuildContext context, int index) {
+  void _navigateToScreen(BuildContext context, int index, String? name) {
     switch (index) {
       case 0:
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => QrCodeScreen()),
+          MaterialPageRoute(
+            settings: RouteSettings(name: name),
+            builder: (context) => QrCodeScreen(),
+          ),
         );
         break;
       default:
@@ -138,7 +141,11 @@ class MyGridLayout extends StatelessWidget {
                         color: Colors.white,
                         onPressed: () {
                           // Add your onPressed logic here
-                          _navigateToScreen(context, index);
+                          _navigateToScreen(
+                            context,
+                            index,
+                            QrCodeScreen.routeName,
+                          );
                         },
                       ),
                     ),

@@ -7,12 +7,15 @@ import 'package:flutter_svg/svg.dart';
 
 import '../../bloc/auth/authentication/authentication_bloc.dart';
 import '../../bloc/auth/logout/logout_bloc.dart';
+import '../../bloc/cancel_load/cancel_load_bloc.dart';
+import '../../bloc/confirm_load/confirm_load_bloc.dart';
 import '../../bloc/delivery_detail/delivery_detail_bloc.dart';
 import '../../data/repository/auth_repository.dart';
 import '../../data/repository/batch_repository.dart';
 import '../../models/errors/custom_exception.dart';
 import '../../models/user.dart';
 import '../../models/vehicle.dart';
+import '../qr_code/qr_code_screen.dart';
 import '../widgets/base_pop_up.dart';
 
 class WareHouseContentListScreen extends StatelessWidget {
@@ -38,6 +41,13 @@ class WareHouseContentListScreen extends StatelessWidget {
         BlocProvider(
           create:
               (context) => DeliveryDetailBloc(batchRepository: batchRepository),
+        ),
+        BlocProvider(
+          create:
+              (context) => ConfirmLoadBloc(batchRepository: batchRepository),
+        ),
+        BlocProvider(
+          create: (context) => CancelLoadBloc(batchRepository: batchRepository),
         ),
         BlocProvider(create: (context) => LogoutBloc(authRepository)),
       ],
@@ -366,41 +376,141 @@ class _WareHouseContentListState extends State<WareHouseContentListView> {
                               ),
                             ),
                             SizedBox(height: 8.0),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.red,
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  child: TextButton(
-                                    onPressed: () {},
-                                    child: Text(
-                                      "Cancel Load",
-                                      style: TextStyle(color: Colors.white),
+
+                            if (state.isConfirmed) ...[
+                              BlocConsumer<CancelLoadBloc, CancelLoadState>(
+                                listener: (context, state) {
+                                  if (state is CancelLoadError) {
+                                    if (state.message != null) {
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        SnackBar(content: Text(state.message!)),
+                                      );
+                                    } else {
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            "Terjadi kesalahan, coba beberapa saat lagi",
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                  } else if (state is CancelLoadSuccess) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text("Cancel Load Success"),
+                                      ),
+                                    );
+                                    Navigator.of(context).popUntil(
+                                      ModalRoute.withName(
+                                        QrCodeScreen.routeName,
+                                      ),
+                                    );
+                                  }
+                                },
+                                builder: (context, state) {
+                                  return Container(
+                                    height: 35,
+                                    width: double.infinity,
+                                    decoration: BoxDecoration(
+                                      color: Colors.red,
+                                      borderRadius: BorderRadius.circular(8),
                                     ),
-                                  ),
-                                ),
-                                Container(
-                                  decoration: BoxDecoration(
-                                    color:
-                                        Colors
-                                            .green, // Warna latar belakang tombol
-                                    borderRadius: BorderRadius.circular(
-                                      10,
-                                    ), // Mengatur radius sudut
-                                  ),
-                                  child: TextButton(
-                                    onPressed: () {},
-                                    child: Text(
-                                      "Confirm Load",
-                                      style: TextStyle(color: Colors.white),
+                                    child: TextButton(
+                                      onPressed: () {
+                                        if (state is! CancelLoadLoading) {
+                                          context.read<CancelLoadBloc>().add(
+                                            CancelLoadSubmitted(
+                                              batchID: widget.batchID,
+                                              companyID: widget.companyID,
+                                              millID: widget.millID,
+                                              whID: widget.whID,
+                                            ),
+                                          );
+                                        }
+                                      },
+                                      child: Text(
+                                        "Cancel Load",
+                                        style: TextStyle(color: Colors.white),
+                                      ),
                                     ),
-                                  ),
+                                  );
+                                },
+                              ),
+                            ] else if (!state.isConfirmed) ...[
+                              Container(
+                                width: double.infinity,
+                                height: 35,
+                                decoration: BoxDecoration(
+                                  color: Colors.green,
+                                  borderRadius: BorderRadius.circular(8),
                                 ),
-                              ],
-                            ),
+                                child: BlocConsumer<
+                                  ConfirmLoadBloc,
+                                  ConfirmLoadState
+                                >(
+                                  listener: (context, state) {
+                                    if (state is ConfirmLoadError) {
+                                      if (state.message != null) {
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          SnackBar(
+                                            content: Text(state.message!),
+                                          ),
+                                        );
+                                      } else {
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              "Terjadi kesalahan, coba beberapa saat lagi",
+                                            ),
+                                          ),
+                                        );
+                                      }
+                                    } else if (state is ConfirmLoadSuccess) {
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        SnackBar(
+                                          content: Text("Confirm Load Success"),
+                                        ),
+                                      );
+                                      Navigator.of(context).popUntil(
+                                        ModalRoute.withName(
+                                          QrCodeScreen.routeName,
+                                        ),
+                                      );
+                                    }
+                                  },
+                                  builder: (context, state) {
+                                    return TextButton(
+                                      onPressed: () {
+                                        if (state is! ConfirmLoadLoading) {
+                                          context.read<ConfirmLoadBloc>().add(
+                                            ConfirmLoadSubmitted(
+                                              batchID: widget.batchID,
+                                              companyID: widget.companyID,
+                                              millID: widget.millID,
+                                              whID: widget.whID,
+                                            ),
+                                          );
+                                        }
+                                      },
+                                      child: Text(
+                                        "Confirm Load",
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ],
 
                             // Row(
                             //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -722,8 +832,6 @@ class BuildGridItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () async {
-        final authState =
-            context.read<AuthenticationBloc>().state as Authenticated;
         if (!vehicle.isBanned) {
           // final listVehicleBloc = context.read<ListVehicleBloc>();
           final reload = await showDialog<bool>(

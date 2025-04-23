@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart' hide Response;
 import 'package:http/http.dart';
-import 'package:dio/dio.dart' hide Response;
 
 import '../models/errors/custom_exception.dart';
 

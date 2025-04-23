@@ -21,11 +21,9 @@ class CancelLoadBloc extends Bloc<CancelLoadEvent, CancelLoadState> {
 
     final res = await batchRepository.cancelLoad(
       batchID: event.batchID,
-      delivID: event.delivID,
       companyID: event.companyID,
       millID: event.millID,
       whID: event.whID,
-      itemNum: event.itemNum,
     );
 
     res.fold(

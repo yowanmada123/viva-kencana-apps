@@ -2,7 +2,6 @@ import 'dart:developer';
 
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
-import '../../../../models/batch.dart';
 
 import '../../../../models/errors/custom_exception.dart';
 import '../../../../models/warehouse.dart';

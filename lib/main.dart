@@ -106,7 +106,7 @@ class MyApp extends StatelessWidget {
             home: BlocBuilder<AuthenticationBloc, AuthenticationState>(
               builder: (context, state) {
                 if (state is Authenticated) {
-                  final user = state.user;
+                  // final user = state.user;
                   if (true) {
                     print("masuk sini authenticated");
                     return DriverDashboardScreen();

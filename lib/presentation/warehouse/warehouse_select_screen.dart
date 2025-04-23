@@ -54,6 +54,8 @@ class _WarehouseSelectViewState extends State<WarehouseSelectView> {
 
   @override
   Widget build(BuildContext context) {
+    final deviceSize = MediaQuery.of(context).size;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -167,41 +169,48 @@ class _WarehouseSelectViewState extends State<WarehouseSelectView> {
                                   ),
                                 ),
                                 SizedBox(width: 10),
-                                Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      state.batch.driverID,
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 18,
-                                        color: Color(0xff575353),
-                                      ),
-                                      textAlign: TextAlign.left,
-                                    ),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: [
-                                        Icon(
-                                          Icons.directions_car,
-                                          size: 24,
-                                          color:
-                                              Theme.of(context).disabledColor,
+                                Expanded(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        state.batch.driverID,
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
+                                          color: Color(0xff575353),
                                         ),
-                                        SizedBox(width: 8),
-                                        Text(
-                                          state.batch.vehicleID,
-                                          style: TextStyle(
-                                            fontSize: 16,
+                                        textAlign: TextAlign.left,
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 1,
+                                      ),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          Icon(
+                                            Icons.directions_car,
+                                            size: 24,
                                             color:
                                                 Theme.of(context).disabledColor,
                                           ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
+                                          SizedBox(width: 8),
+                                          Text(
+                                            state.batch.vehicleID,
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              color:
+                                                  Theme.of(
+                                                    context,
+                                                  ).disabledColor,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ],
                             ),
@@ -320,7 +329,7 @@ class _WarehouseSelectViewState extends State<WarehouseSelectView> {
                               ),
                               trailing: ElevatedButton(
                                 onPressed: () {
-                                  final id = Navigator.push(
+                                  Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                       builder:
@@ -365,74 +374,6 @@ class _WarehouseSelectViewState extends State<WarehouseSelectView> {
                       ),
                     ),
                   ),
-
-                  // SliverPadding(
-                  //   padding: EdgeInsets.symmetric(horizontal: 8.0),
-                  //   sliver: SliverToBoxAdapter(
-                  //     child: BlocBuilder<ListWarehouseBloc, ListWarehouseState>(
-                  //       builder: (context, state) {
-                  //         if (state is ListWarehouseLoading) {
-                  //           return Center(child: CircularProgressIndicator());
-                  //         } else if (state is ListWarehouseFailure) {
-                  //           return Center(child: Text("Error: ${state.message}"));
-                  //         } else if (state is ListWarehouseSuccess) {
-                  //           return ListView.builder(
-                  //             shrinkWrap: true,
-                  //             physics: NeverScrollableScrollPhysics(),
-                  //             itemCount:
-                  //                 state.warehouses.length, // Jumlah item dalam list
-                  //             itemBuilder: (context, index) {
-                  //               return Card(
-                  //                 child: ListTile(
-                  //                   leading: FlutterLogo(),
-                  //                   title: Text(
-                  //                     state.warehouses[index].whID,
-                  //                     style: TextStyle(
-                  //                       fontSize: 12,
-                  //                       color: Colors.black,
-                  //                     ),
-                  //                   ),
-                  //                   trailing: ElevatedButton(
-                  //                     onPressed: () {
-                  //                       final id = Navigator.push(
-                  //                         context,
-                  //                         MaterialPageRoute(
-                  //                           builder:
-                  //                               (context) =>
-                  //                                   const WareHouseContentListScreen(),
-                  //                         ),
-                  //                       );
-                  //                     },
-                  //                     style: ElevatedButton.styleFrom(
-                  //                       padding: EdgeInsets.symmetric(
-                  //                         horizontal: 24,
-                  //                         vertical: 8,
-                  //                       ),
-                  //                       shape: RoundedRectangleBorder(
-                  //                         borderRadius: BorderRadius.circular(8),
-                  //                       ),
-                  //                       backgroundColor:
-                  //                           Theme.of(context).primaryColor,
-                  //                     ),
-                  //                     child: Text(
-                  //                       'Pilih',
-                  //                       style: TextStyle(
-                  //                         fontSize: 12,
-                  //                         fontWeight: FontWeight.bold,
-                  //                         color: Colors.white,
-                  //                       ),
-                  //                     ),
-                  //                   ),
-                  //                 ),
-                  //               );
-                  //             },
-                  //           );
-                  //         }
-                  //         return Container();
-                  //       },
-                  //     ),
-                  //   ),
-                  // ),
                 ],
               );
             } else {

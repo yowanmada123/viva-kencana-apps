@@ -137,21 +137,17 @@ class BatchRest {
 
   Future<Either<CustomException, List<DeliveryDetail>>> cancelLoad({
     required String batchID,
-    required String delivID,
     required String companyID,
     required String millID,
     required String whID,
-    required String itemNum,
   }) async {
     try {
       http.options.headers['requiresToken'] = true;
       final body = {
         'batch_id': batchID,
-        "deliv_id": delivID,
         "company_id": companyID,
         "mill_id": millID,
         "wh_id": whID,
-        "item_num": itemNum,
       };
       log(
         'Request to https://v2.kencana.org/api/viva/confirm_muat/cancelLoad (POST)',

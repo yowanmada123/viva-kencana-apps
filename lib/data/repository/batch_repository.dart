@@ -46,19 +46,15 @@ class BatchRepository {
 
   Future<Either<CustomException, List<DeliveryDetail>>> cancelLoad({
     required String batchID,
-    required String delivID,
     required String companyID,
     required String millID,
     required String whID,
-    required String itemNum,
   }) async {
     return batchRest.cancelLoad(
       batchID: batchID,
-      delivID: delivID,
       companyID: companyID,
       millID: millID,
       whID: whID,
-      itemNum: itemNum,
     );
   }
 

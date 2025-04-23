@@ -14,7 +14,18 @@ class DeliveryDetailLoading extends DeliveryDetailState {}
 class DeliveryDetailSuccess extends DeliveryDetailState {
   final List<DeliveryDetail> deliveryDetail;
 
-  const DeliveryDetailSuccess(this.deliveryDetail);
+  late final bool isConfirmed;
+
+  DeliveryDetailSuccess(this.deliveryDetail) {
+    bool confirm = true;
+    for (int i = 0; i < deliveryDetail.length; i++) {
+      if (deliveryDetail[i].endLoad == "1900-01-01 00:00:00.000") {
+        confirm = false;
+        break;
+      }
+    }
+    isConfirmed = confirm;
+  }
 
   @override
   List<Object> get props => [deliveryDetail];
