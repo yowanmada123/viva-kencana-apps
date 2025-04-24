@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../bloc/auth/login-form/login_form_bloc.dart';
 
 class RegisterFormScreen extends StatelessWidget {
@@ -15,7 +15,7 @@ class RegisterFormScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: Text('Login')),
       body: Padding(
-        padding: EdgeInsets.all(20.0),
+        padding: EdgeInsets.all(20.w),
         child: BlocBuilder<LoginFormBloc, LoginFormState>(
           builder: (context, state) {
             if (state is LoginFormLoading) {

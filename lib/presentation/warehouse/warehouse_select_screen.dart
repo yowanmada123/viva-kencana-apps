@@ -10,7 +10,6 @@ import '../../models/errors/custom_exception.dart';
 
 import '../../data/repository/batch_repository.dart';
 
-import '../widgets/base_pop_up.dart';
 import 'warehouse_content_list_screen.dart';
 
 class WarehouseSelectScreen extends StatelessWidget {
@@ -54,8 +53,6 @@ class _WarehouseSelectViewState extends State<WarehouseSelectView> {
 
   @override
   Widget build(BuildContext context) {
-    final deviceSize = MediaQuery.of(context).size;
-
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -65,58 +62,7 @@ class _WarehouseSelectViewState extends State<WarehouseSelectView> {
         iconTheme: IconThemeData(
           color: Colors.white, // Ganti warna tombol back menjadi hijau
         ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16.0),
-            child: BlocConsumer<LogoutBloc, LogoutState>(
-              listener: (context, state) {
-                if (state is LogoutFailure) {
-                  if (state.exception is UnauthorizedException) {
-                    context.read<AuthenticationBloc>().add(
-                      SetAuthenticationStatus(isAuthenticated: false),
-                    );
-                    Navigator.of(context).popUntil((route) => route.isFirst);
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text("Unknown error, please contact admin"),
-                      ),
-                    );
-                  }
-                } else if (state is LogoutSuccess) {
-                  BlocProvider.of<AuthenticationBloc>(
-                    context,
-                  ).add(SetAuthenticationStatus(isAuthenticated: false));
-                  Navigator.of(context).popUntil((route) => route.isFirst);
-                }
-              },
-              builder: (context, state) {
-                return GestureDetector(
-                  onTap: () {
-                    showDialog<bool>(
-                      context: context,
-                      builder: (BuildContext childContext) {
-                        return BasePopUpDialog(
-                          noText: "Tidak",
-                          yesText: "Ya",
-                          onNoPressed: () {},
-                          onYesPressed: () {
-                            if (state is! LogoutLoading) {
-                              context.read<LogoutBloc>().add(LogoutPressed());
-                            }
-                          },
-                          question:
-                              "Apakah Anda yakin ingin keluar dari aplikasi?",
-                        );
-                      },
-                    );
-                  },
-                  child: Icon(Icons.logout, color: Colors.white),
-                );
-              },
-            ),
-          ),
-        ],
+
         backgroundColor: Theme.of(context).primaryColor,
       ),
       backgroundColor: Theme.of(context).hintColor,
@@ -149,7 +95,7 @@ class _WarehouseSelectViewState extends State<WarehouseSelectView> {
                   SliverList(
                     delegate: SliverChildListDelegate([
                       Padding(
-                        padding: EdgeInsets.all(8.0),
+                        padding: EdgeInsets.all(8.w),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -165,10 +111,10 @@ class _WarehouseSelectViewState extends State<WarehouseSelectView> {
                                   child: Icon(
                                     Icons.person,
                                     color: Theme.of(context).hintColor,
-                                    size: 40,
+                                    size: 40.w,
                                   ),
                                 ),
-                                SizedBox(width: 10),
+                                SizedBox(width: 10.w),
                                 Expanded(
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.start,
@@ -179,7 +125,7 @@ class _WarehouseSelectViewState extends State<WarehouseSelectView> {
                                         state.batch.driverID,
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
-                                          fontSize: 16,
+                                          fontSize: 16.w,
                                           color: Color(0xff575353),
                                         ),
                                         textAlign: TextAlign.left,
@@ -192,15 +138,15 @@ class _WarehouseSelectViewState extends State<WarehouseSelectView> {
                                         children: [
                                           Icon(
                                             Icons.directions_car,
-                                            size: 24,
+                                            size: 24.w,
                                             color:
                                                 Theme.of(context).disabledColor,
                                           ),
-                                          SizedBox(width: 8),
+                                          SizedBox(width: 8.w),
                                           Text(
                                             state.batch.vehicleID,
                                             style: TextStyle(
-                                              fontSize: 16,
+                                              fontSize: 16.w,
                                               color:
                                                   Theme.of(
                                                     context,
@@ -214,18 +160,20 @@ class _WarehouseSelectViewState extends State<WarehouseSelectView> {
                                 ),
                               ],
                             ),
-                            SizedBox(height: 8.0),
+                            SizedBox(height: 8.w),
                             Center(
                               child: Container(
-                                padding: EdgeInsets.symmetric(vertical: 8.0),
+                                padding: EdgeInsets.symmetric(vertical: 8.w),
                                 decoration: BoxDecoration(
                                   color: Color(0xff8AC8FA),
                                   borderRadius: BorderRadius.circular(8),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors.grey.withValues(alpha: 0.3),
-                                      blurRadius: 5,
-                                      offset: Offset(0, 2),
+                                      color: Colors.grey.withValues(
+                                        alpha: 0.3.w,
+                                      ),
+                                      blurRadius: 5.w,
+                                      offset: Offset(0, 2.w),
                                     ),
                                   ],
                                 ),
@@ -239,7 +187,7 @@ class _WarehouseSelectViewState extends State<WarehouseSelectView> {
                                           Text(
                                             "Delivery Order",
                                             style: TextStyle(
-                                              fontSize: 12,
+                                              fontSize: 12.w,
                                               fontFamily: "Poppins",
                                               fontWeight: FontWeight.w800,
                                               color:
@@ -247,12 +195,12 @@ class _WarehouseSelectViewState extends State<WarehouseSelectView> {
                                             ),
                                           ),
                                           Container(
-                                            padding: EdgeInsets.all(6.0),
+                                            padding: EdgeInsets.all(6.w),
                                             child: Text(
                                               widget.batchID,
                                               style: TextStyle(
-                                                letterSpacing: 6,
-                                                fontSize: 18,
+                                                letterSpacing: 6.w,
+                                                fontSize: 18.w,
                                                 fontFamily: "Poppins",
                                                 fontWeight: FontWeight.w800,
                                                 color:
@@ -264,9 +212,7 @@ class _WarehouseSelectViewState extends State<WarehouseSelectView> {
                                       ),
                                     ),
                                     Padding(
-                                      padding: const EdgeInsets.only(
-                                        right: 16.0,
-                                      ),
+                                      padding: EdgeInsets.only(right: 16.w),
                                       child: GestureDetector(
                                         onTap: () {},
                                         child: Icon(
@@ -279,11 +225,11 @@ class _WarehouseSelectViewState extends State<WarehouseSelectView> {
                                 ),
                               ),
                             ),
-                            SizedBox(height: 8.0),
+                            SizedBox(height: 8.w),
                             Text(
                               "Silahkan Pilih Gudang",
                               style: TextStyle(
-                                fontSize: 16,
+                                fontSize: 16.w,
                                 fontFamily: "Poppins",
                                 fontWeight: FontWeight.w700,
                               ),
@@ -295,7 +241,7 @@ class _WarehouseSelectViewState extends State<WarehouseSelectView> {
                   ),
 
                   SliverPadding(
-                    padding: EdgeInsets.symmetric(horizontal: 8.0),
+                    padding: EdgeInsets.symmetric(horizontal: 8.w),
                     sliver: SliverToBoxAdapter(
                       child: ListView.builder(
                         shrinkWrap: true,
@@ -307,7 +253,7 @@ class _WarehouseSelectViewState extends State<WarehouseSelectView> {
                               leading: Text(
                                 (index + 1).toString(),
                                 style: TextStyle(
-                                  fontSize: 12,
+                                  fontSize: 12.w,
                                   color: Colors.black,
                                 ),
                               ),
@@ -315,7 +261,7 @@ class _WarehouseSelectViewState extends State<WarehouseSelectView> {
                               title: Text(
                                 state.batch.warehouses[index].whID,
                                 style: TextStyle(
-                                  fontSize: 14,
+                                  fontSize: 14.w,
                                   color: Colors.black,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -323,7 +269,7 @@ class _WarehouseSelectViewState extends State<WarehouseSelectView> {
                               subtitle: Text(
                                 state.batch.warehouses[index].descr,
                                 style: TextStyle(
-                                  fontSize: 12,
+                                  fontSize: 12.w,
                                   color: Colors.black,
                                 ),
                               ),
@@ -350,8 +296,8 @@ class _WarehouseSelectViewState extends State<WarehouseSelectView> {
                                 },
                                 style: ElevatedButton.styleFrom(
                                   padding: EdgeInsets.symmetric(
-                                    horizontal: 24,
-                                    vertical: 8,
+                                    horizontal: 24.w,
+                                    vertical: 8.w,
                                   ),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(8),
@@ -362,7 +308,7 @@ class _WarehouseSelectViewState extends State<WarehouseSelectView> {
                                 child: Text(
                                   'Pilih',
                                   style: TextStyle(
-                                    fontSize: 12,
+                                    fontSize: 12.w,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white,
                                   ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../bloc/auth/authentication/authentication_bloc.dart';
 import '../../bloc/auth/logout/logout_bloc.dart';
@@ -69,12 +70,12 @@ class MyGridLayout extends StatelessWidget {
             fontFamily: "Poppins",
             color: Colors.white,
             fontWeight: FontWeight.w600,
-            fontSize: 18.0,
+            fontSize: 18.w,
           ),
         ),
         actions: [
           Padding(
-            padding: const EdgeInsets.only(right: 16.0),
+            padding: EdgeInsets.only(right: 16.w),
             // child: Icon(Icons.logout, color: Colors.white),
             child: BlocConsumer<LogoutBloc, LogoutState>(
               listener: (context, state) {
@@ -122,7 +123,7 @@ class MyGridLayout extends StatelessWidget {
           crossAxisCount: 4, // Number of columns
           children: List.generate(buttons.length, (index) {
             return Container(
-              padding: EdgeInsets.all(4.0),
+              padding: EdgeInsets.all(4.w),
               // margin: EdgeInsets.fromLTRB(0.0, 8.0, 0.0, 0.0),
               child: AspectRatio(
                 aspectRatio: 1.0,
@@ -130,14 +131,14 @@ class MyGridLayout extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     Container(
-                      padding: EdgeInsets.all(2.0),
+                      padding: EdgeInsets.all(2.w),
                       decoration: BoxDecoration(
                         color: Color(0xff1E4694),
-                        borderRadius: BorderRadius.circular(10.0),
+                        borderRadius: BorderRadius.circular(10.w),
                       ),
                       child: IconButton(
                         icon: Icon(buttons[index]['icon']),
-                        iconSize: 24.0,
+                        iconSize: 24.w,
                         color: Colors.white,
                         onPressed: () {
                           // Add your onPressed logic here
@@ -149,11 +150,11 @@ class MyGridLayout extends StatelessWidget {
                         },
                       ),
                     ),
-                    SizedBox(height: 2.0),
+                    SizedBox(height: 2.w),
                     Text(
                       buttons[index]['text'],
                       style: TextStyle(
-                        fontSize: 12.0,
+                        fontSize: 12.w,
                         color: Color(0xff1E4694),
                         fontFamily: "Poppins",
                         fontWeight: FontWeight.bold,

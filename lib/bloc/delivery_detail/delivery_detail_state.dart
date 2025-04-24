@@ -13,17 +13,24 @@ class DeliveryDetailLoading extends DeliveryDetailState {}
 
 class DeliveryDetailSuccess extends DeliveryDetailState {
   final List<DeliveryDetail> deliveryDetail;
-
+  late final Map<String, List<DeliveryDetail>> groupedItems;
   late final bool isConfirmed;
 
   DeliveryDetailSuccess(this.deliveryDetail) {
     bool confirm = true;
+    Map<String, List<DeliveryDetail>> group = {};
+
     for (int i = 0; i < deliveryDetail.length; i++) {
       if (deliveryDetail[i].endLoad == "1900-01-01 00:00:00.000") {
         confirm = false;
-        break;
       }
+      final e = deliveryDetail[i];
+
+      group.putIfAbsent(e.orderID, () => []);
+      group[e.orderID]!.add(e);
     }
+
+    groupedItems = group;
     isConfirmed = confirm;
   }
 

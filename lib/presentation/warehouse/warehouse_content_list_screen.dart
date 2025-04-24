@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 
 import '../../bloc/auth/authentication/authentication_bloc.dart';
@@ -16,7 +17,6 @@ import '../../models/errors/custom_exception.dart';
 import '../../models/user.dart';
 import '../../models/vehicle.dart';
 import '../qr_code/qr_code_screen.dart';
-import '../widgets/base_pop_up.dart';
 
 class WareHouseContentListScreen extends StatelessWidget {
   const WareHouseContentListScreen({
@@ -114,48 +114,7 @@ class _WareHouseContentListState extends State<WareHouseContentListView> {
         iconTheme: IconThemeData(
           color: Colors.white, // Ganti warna tombol back menjadi hijau
         ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16.0),
-            child: BlocConsumer<LogoutBloc, LogoutState>(
-              listener: (context, state) {
-                if (state is LogoutFailure) {
-                  ScaffoldMessenger.of(
-                    context,
-                  ).showSnackBar(SnackBar(content: Text("Logout Not Success")));
-                } else if (state is LogoutSuccess) {
-                  BlocProvider.of<AuthenticationBloc>(
-                    context,
-                  ).add(SetAuthenticationStatus(isAuthenticated: false));
-                }
-              },
-              builder: (context, state) {
-                return GestureDetector(
-                  onTap: () {
-                    showDialog<bool>(
-                      context: context,
-                      builder: (BuildContext childContext) {
-                        return BasePopUpDialog(
-                          noText: "Tidak",
-                          yesText: "Ya",
-                          onNoPressed: () {},
-                          onYesPressed: () {
-                            if (state is! LogoutLoading) {
-                              context.read<LogoutBloc>().add(LogoutPressed());
-                            }
-                          },
-                          question:
-                              "Apakah Anda yakin ingin keluar dari aplikasi?",
-                        );
-                      },
-                    );
-                  },
-                  child: Icon(Icons.logout, color: Colors.white),
-                );
-              },
-            ),
-          ),
-        ],
+
         backgroundColor: Theme.of(context).primaryColor,
       ),
       backgroundColor: Theme.of(context).hintColor,
@@ -187,7 +146,10 @@ class _WareHouseContentListState extends State<WareHouseContentListView> {
                   SliverList(
                     delegate: SliverChildListDelegate([
                       Padding(
-                        padding: EdgeInsets.all(8.0),
+                        padding: EdgeInsets.symmetric(
+                          vertical: 8.w,
+                          horizontal: 8.w,
+                        ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -197,7 +159,7 @@ class _WareHouseContentListState extends State<WareHouseContentListView> {
                                   'Company ID : ${widget.companyID}',
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
-                                    fontSize: 18,
+                                    fontSize: 18.w,
                                     color: Color(0xff575353),
                                   ),
                                 ),
@@ -221,7 +183,7 @@ class _WareHouseContentListState extends State<WareHouseContentListView> {
                                   child: Icon(
                                     Icons.copy,
                                     color: Theme.of(context).disabledColor,
-                                    size: 15,
+                                    size: 15.w,
                                   ),
                                 ),
                               ],
@@ -232,11 +194,11 @@ class _WareHouseContentListState extends State<WareHouseContentListView> {
                                   'Mill ID : ${widget.millID}',
                                   style: TextStyle(
                                     fontWeight: FontWeight.w500,
-                                    fontSize: 18,
+                                    fontSize: 18.w,
                                     color: Color(0xff575353),
                                   ),
                                 ),
-                                const SizedBox(width: 8),
+                                SizedBox(width: 8.w),
                                 GestureDetector(
                                   onTap: () async {
                                     await Clipboard.setData(
@@ -256,7 +218,7 @@ class _WareHouseContentListState extends State<WareHouseContentListView> {
                                   child: Icon(
                                     Icons.copy,
                                     color: Theme.of(context).disabledColor,
-                                    size: 15,
+                                    size: 15.w,
                                   ),
                                 ),
                               ],
@@ -267,11 +229,11 @@ class _WareHouseContentListState extends State<WareHouseContentListView> {
                                   'Warehouse ID : ${widget.whID}',
                                   style: TextStyle(
                                     fontWeight: FontWeight.w500,
-                                    fontSize: 18,
+                                    fontSize: 18.w,
                                     color: Color(0xff575353),
                                   ),
                                 ),
-                                const SizedBox(width: 8),
+                                SizedBox(width: 8.w),
                                 GestureDetector(
                                   onTap: () async {
                                     await Clipboard.setData(
@@ -291,22 +253,25 @@ class _WareHouseContentListState extends State<WareHouseContentListView> {
                                   child: Icon(
                                     Icons.copy,
                                     color: Theme.of(context).disabledColor,
-                                    size: 15,
+                                    size: 15.w,
                                   ),
                                 ),
                               ],
                             ),
-                            SizedBox(height: 8.0),
+                            SizedBox(height: 8.w),
                             Center(
                               child: Container(
-                                padding: EdgeInsets.symmetric(vertical: 8.0),
+                                padding: EdgeInsets.symmetric(vertical: 8.w),
+                                margin: EdgeInsets.symmetric(horizontal: 2.w),
                                 decoration: BoxDecoration(
                                   color: Color(0xff8AC8FA),
                                   borderRadius: BorderRadius.circular(8),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors.grey.withValues(alpha: 0.3),
-                                      blurRadius: 5,
+                                      color: Colors.grey.withValues(
+                                        alpha: 0.3.w,
+                                      ),
+                                      blurRadius: 5.w,
                                       offset: Offset(0, 2),
                                     ),
                                   ],
@@ -321,7 +286,7 @@ class _WareHouseContentListState extends State<WareHouseContentListView> {
                                           Text(
                                             "Batch ID",
                                             style: TextStyle(
-                                              fontSize: 12,
+                                              fontSize: 12.w,
                                               fontFamily: "Poppins",
                                               fontWeight: FontWeight.w800,
                                               color:
@@ -329,12 +294,12 @@ class _WareHouseContentListState extends State<WareHouseContentListView> {
                                             ),
                                           ),
                                           Container(
-                                            padding: EdgeInsets.all(6.0),
+                                            padding: EdgeInsets.all(6.w),
                                             child: Text(
                                               widget.batchID,
                                               style: TextStyle(
-                                                letterSpacing: 6,
-                                                fontSize: 18,
+                                                letterSpacing: 6.w,
+                                                fontSize: 18.w,
                                                 fontFamily: "Poppins",
                                                 fontWeight: FontWeight.w800,
                                                 color:
@@ -375,8 +340,390 @@ class _WareHouseContentListState extends State<WareHouseContentListView> {
                                 ),
                               ),
                             ),
-                            SizedBox(height: 8.0),
+                          ],
+                        ),
+                      ),
+                    ]),
+                  ),
 
+                  SliverPadding(
+                    padding: EdgeInsets.symmetric(horizontal: 8.0),
+                    sliver: SliverToBoxAdapter(
+                      child: Column(
+                        children:
+                            state.groupedItems.keys.map((key) {
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const SizedBox(height: 5),
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 8.0),
+                                    child: Text(
+                                      "Order ID:  ",
+                                      style: TextStyle(
+                                        fontSize: 8.w,
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 8.0),
+                                    child: Row(
+                                      children: [
+                                        Text(
+                                          key,
+                                          style: TextStyle(
+                                            fontSize: 16.w,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 5),
+                                        GestureDetector(
+                                          onTap: () async {
+                                            await Clipboard.setData(
+                                              ClipboardData(text: key),
+                                            ).then((_) {
+                                              ScaffoldMessenger.of(
+                                                context,
+                                              ).showSnackBar(
+                                                SnackBar(
+                                                  content: Text(
+                                                    "Order ID copied to clipboard",
+                                                  ),
+                                                ),
+                                              );
+                                            });
+                                          },
+                                          child: Icon(
+                                            Icons.copy,
+                                            color: Colors.black,
+                                            size: 12,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  for (var item
+                                      in state.groupedItems[key]!) ...[
+                                    Card(
+                                      elevation: 5,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(
+                                          15.w,
+                                        ),
+                                      ),
+                                      child: Container(
+                                        padding: EdgeInsets.all(16.w),
+                                        child: Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            // Left Column for Order Description and ID
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      Column(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .start,
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Text(
+                                                            "Delivery ID",
+                                                            style: TextStyle(
+                                                              fontSize: 8.w,
+                                                            ),
+                                                          ),
+                                                          Row(
+                                                            children: [
+                                                              Text(
+                                                                item.delivID,
+                                                                style: TextStyle(
+                                                                  fontSize:
+                                                                      12.w,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w400,
+                                                                ),
+                                                              ),
+                                                              SizedBox(
+                                                                width: 5.w,
+                                                              ),
+                                                              GestureDetector(
+                                                                onTap: () async {
+                                                                  await Clipboard.setData(
+                                                                    ClipboardData(
+                                                                      text:
+                                                                          item.delivID,
+                                                                    ),
+                                                                  ).then((_) {
+                                                                    ScaffoldMessenger.of(
+                                                                      context,
+                                                                    ).showSnackBar(
+                                                                      SnackBar(
+                                                                        content:
+                                                                            Text(
+                                                                              "Delivery ID copied to clipboard",
+                                                                            ),
+                                                                      ),
+                                                                    );
+                                                                  });
+                                                                },
+                                                                child: Icon(
+                                                                  Icons.copy,
+                                                                  color:
+                                                                      const Color.fromARGB(
+                                                                        255,
+                                                                        66,
+                                                                        66,
+                                                                        66,
+                                                                      ),
+                                                                  size: 12.w,
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      Icon(
+                                                        Icons.security,
+                                                        size: 18.w,
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  SizedBox(height: 4),
+                                                  Text(
+                                                    item.descr,
+                                                    style: TextStyle(
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                    ),
+                                                  ),
+                                                  SizedBox(height: 2.w),
+                                                  Text(
+                                                    "Quantity : ${item.qtyShip} pcs",
+                                                    style: TextStyle(
+                                                      fontSize: 12.w,
+                                                    ),
+                                                  ),
+                                                  SizedBox(height: 2.w),
+                                                  Text(
+                                                    "Length: ${double.parse(item.lengthShip).toStringAsFixed(2)} m",
+                                                    style: TextStyle(
+                                                      fontSize: 12.w,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(height: 2),
+                                  ],
+                                ],
+                              );
+                            }).toList(),
+                      ),
+
+                      // ListView.builder(
+                      //   shrinkWrap: true,
+                      //   physics: NeverScrollableScrollPhysics(),
+                      //   // itemCount: state.deliveryDetail.length,
+                      //   itemCount: state.deliveryDetail.length,
+                      //   itemBuilder: (context, index) {
+                      //     return Card(
+                      //       elevation: 5,
+                      //       shape: RoundedRectangleBorder(
+                      //         borderRadius: BorderRadius.circular(15.w),
+                      //       ),
+                      //       child: Container(
+                      //         padding: EdgeInsets.all(16.w),
+                      //         child: Row(
+                      //           crossAxisAlignment: CrossAxisAlignment.start,
+                      //           children: [
+                      //             // Left Column for Order Description and ID
+                      //             Expanded(
+                      //               child: Column(
+                      //                 crossAxisAlignment:
+                      //                     CrossAxisAlignment.start,
+                      //                 children: [
+                      //                   Row(
+                      //                     mainAxisAlignment:
+                      //                         MainAxisAlignment.spaceBetween,
+                      //                     children: [
+                      //                       Column(
+                      //                         mainAxisAlignment:
+                      //                             MainAxisAlignment.start,
+                      //                         crossAxisAlignment:
+                      //                             CrossAxisAlignment.start,
+                      //                         children: [
+                      //                           Text(
+                      //                             "Order ID:",
+                      //                             style: TextStyle(
+                      //                               fontSize: 8.w,
+                      //                               fontWeight: FontWeight.bold,
+                      //                             ),
+                      //                           ),
+                      //                           Row(
+                      //                             children: [
+                      //                               Text(
+                      //                                 state
+                      //                                     .deliveryDetail[index]
+                      //                                     .orderID,
+                      //                                 style: TextStyle(
+                      //                                   fontSize: 14.w,
+                      //                                   fontWeight:
+                      //                                       FontWeight.w400,
+                      //                                 ),
+                      //                               ),
+                      //                               const SizedBox(width: 5),
+                      //                               GestureDetector(
+                      //                                 onTap: () async {
+                      //                                   await Clipboard.setData(
+                      //                                     ClipboardData(
+                      //                                       text:
+                      //                                           state
+                      //                                               .deliveryDetail[index]
+                      //                                               .orderID,
+                      //                                     ),
+                      //                                   ).then((_) {
+                      //                                     ScaffoldMessenger.of(
+                      //                                       context,
+                      //                                     ).showSnackBar(
+                      //                                       SnackBar(
+                      //                                         content: Text(
+                      //                                           "Order ID copied to clipboard",
+                      //                                         ),
+                      //                                       ),
+                      //                                     );
+                      //                                   });
+                      //                                 },
+                      //                                 child: Icon(
+                      //                                   Icons.copy,
+                      //                                   color: Colors.black,
+                      //                                   size: 12,
+                      //                                 ),
+                      //                               ),
+                      //                             ],
+                      //                           ),
+                      //                         ],
+                      //                       ),
+                      //                       Column(
+                      //                         mainAxisAlignment:
+                      //                             MainAxisAlignment.start,
+                      //                         crossAxisAlignment:
+                      //                             CrossAxisAlignment.start,
+                      //                         children: [
+                      //                           Text(
+                      //                             "Delivery ID",
+                      //                             style: TextStyle(
+                      //                               fontSize: 8.w,
+                      //                             ),
+                      //                           ),
+                      //                           Row(
+                      //                             children: [
+                      //                               Text(
+                      //                                 state
+                      //                                     .deliveryDetail[index]
+                      //                                     .delivID,
+                      //                                 style: TextStyle(
+                      //                                   fontSize: 12.w,
+                      //                                   fontWeight:
+                      //                                       FontWeight.w400,
+                      //                                 ),
+                      //                               ),
+                      //                               SizedBox(width: 5.w),
+                      //                               GestureDetector(
+                      //                                 onTap: () async {
+                      //                                   await Clipboard.setData(
+                      //                                     ClipboardData(
+                      //                                       text:
+                      //                                           state
+                      //                                               .deliveryDetail[index]
+                      //                                               .delivID,
+                      //                                     ),
+                      //                                   ).then((_) {
+                      //                                     ScaffoldMessenger.of(
+                      //                                       context,
+                      //                                     ).showSnackBar(
+                      //                                       SnackBar(
+                      //                                         content: Text(
+                      //                                           "Delivery ID copied to clipboard",
+                      //                                         ),
+                      //                                       ),
+                      //                                     );
+                      //                                   });
+                      //                                 },
+                      //                                 child: Icon(
+                      //                                   Icons.copy,
+                      //                                   color:
+                      //                                       const Color.fromARGB(
+                      //                                         255,
+                      //                                         66,
+                      //                                         66,
+                      //                                         66,
+                      //                                       ),
+                      //                                   size: 12.w,
+                      //                                 ),
+                      //                               ),
+                      //                             ],
+                      //                           ),
+                      //                         ],
+                      //                       ),
+                      //                       Icon(Icons.security, size: 18.w),
+                      //                     ],
+                      //                   ),
+                      //                   SizedBox(height: 2),
+
+                      //                   SizedBox(height: 2),
+                      //                   Text(
+                      //                     state.deliveryDetail[index].descr,
+                      //                     style: TextStyle(
+                      //                       fontSize: 14,
+                      //                       fontWeight: FontWeight.w500,
+                      //                     ),
+                      //                   ),
+                      //                   SizedBox(height: 2.w),
+                      //                   Text(
+                      //                     "Quantity : ${state.deliveryDetail[index].qtyShip} pcs",
+                      //                     style: TextStyle(fontSize: 12.w),
+                      //                   ),
+                      //                   SizedBox(height: 2.w),
+                      //                   Text(
+                      //                     "Length: ${double.parse(state.deliveryDetail[index].lengthShip).toStringAsFixed(2)} m",
+                      //                     style: TextStyle(fontSize: 12.w),
+                      //                   ),
+                      //                 ],
+                      //               ),
+                      //             ),
+                      //           ],
+                      //         ),
+                      //       ),
+                      //     );
+                      //   },
+                      // ),
+                    ),
+                  ),
+
+                  SliverList(
+                    delegate: SliverChildListDelegate([
+                      Padding(
+                        padding: EdgeInsets.all(8.w),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
                             if (state.isConfirmed) ...[
                               BlocConsumer<CancelLoadBloc, CancelLoadState>(
                                 listener: (context, state) {
@@ -404,16 +751,19 @@ class _WareHouseContentListState extends State<WareHouseContentListView> {
                                         content: Text("Cancel Load Success"),
                                       ),
                                     );
-                                    Navigator.of(context).popUntil(
-                                      ModalRoute.withName(
-                                        QrCodeScreen.routeName,
+                                    context.read<DeliveryDetailBloc>().add(
+                                      LoadDeliveryDetail(
+                                        batchID: widget.batchID,
+                                        companyID: widget.companyID,
+                                        millID: widget.millID,
+                                        whID: widget.whID,
                                       ),
                                     );
                                   }
                                 },
                                 builder: (context, state) {
                                   return Container(
-                                    height: 35,
+                                    height: 35.w,
                                     width: double.infinity,
                                     decoration: BoxDecoration(
                                       color: Colors.red,
@@ -443,7 +793,7 @@ class _WareHouseContentListState extends State<WareHouseContentListView> {
                             ] else if (!state.isConfirmed) ...[
                               Container(
                                 width: double.infinity,
-                                height: 35,
+                                height: 35.w,
                                 decoration: BoxDecoration(
                                   color: Colors.green,
                                   borderRadius: BorderRadius.circular(8),
@@ -512,177 +862,11 @@ class _WareHouseContentListState extends State<WareHouseContentListView> {
                               ),
                             ],
 
-                            // Row(
-                            //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            //   children: [
-                            //     Text(
-                            //       "List Barang",
-                            //       style: TextStyle(
-                            //         fontSize: 16,
-                            //         fontFamily: "Poppins",
-                            //         fontWeight: FontWeight.w700,
-                            //       ),
-                            //     ),
-                            //     SizedBox(width: 8.0),
-                            //     Expanded(
-                            //       child: Container(
-                            //         decoration: BoxDecoration(
-                            //           color: Colors.white,
-                            //           borderRadius: BorderRadius.circular(10),
-                            //           boxShadow: [
-                            //             BoxShadow(
-                            //               color: Colors.grey.withValues(
-                            //                 alpha: 0.2,
-                            //               ),
-                            //               blurRadius: 5,
-                            //               offset: Offset(0, 2),
-                            //             ),
-                            //           ],
-                            //         ),
-                            //         height: 40,
-                            //         child: TextField(
-                            //           style:
-                            //               Theme.of(
-                            //                 context,
-                            //               ).textTheme.labelSmall,
-                            //           decoration: InputDecoration(
-                            //             labelText: 'Search',
-                            //             labelStyle:
-                            //                 Theme.of(
-                            //                   context,
-                            //                 ).textTheme.labelSmall,
-                            //             hintStyle:
-                            //                 Theme.of(
-                            //                   context,
-                            //                 ).textTheme.labelSmall,
-                            //             prefixStyle:
-                            //                 Theme.of(
-                            //                   context,
-                            //                 ).textTheme.labelSmall,
-                            //             suffixStyle:
-                            //                 Theme.of(
-                            //                   context,
-                            //                 ).textTheme.labelSmall,
-                            //             prefixIcon: Icon(Icons.search),
-                            //             border: InputBorder.none,
-                            //             contentPadding: EdgeInsets.symmetric(),
-                            //           ),
-                            //         ),
-                            //       ),
-                            //     ),
-                            //     SizedBox(width: 8),
-                            //   ],
-                            // ),
-                            // SizedBox(height: 8.0),
+                            SizedBox(height: 8.w),
                           ],
                         ),
                       ),
                     ]),
-                  ),
-
-                  SliverPadding(
-                    padding: EdgeInsets.symmetric(horizontal: 8.0),
-                    sliver: SliverToBoxAdapter(
-                      child: ListView.builder(
-                        shrinkWrap: true,
-                        physics: NeverScrollableScrollPhysics(),
-                        itemCount:
-                            state
-                                .deliveryDetail
-                                .length, // Jumlah item dalam list
-                        itemBuilder: (context, index) {
-                          return Card(
-                            elevation: 5,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15),
-                            ),
-                            child: Container(
-                              padding: EdgeInsets.all(16),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  // Left Column for Order Description and ID
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          "Order ID: ${state.deliveryDetail[index].orderID}",
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                        Text(
-                                          "Delivery ID: ${state.deliveryDetail[index].delivID}",
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
-                                        Text(
-                                          "Tr Type: ${state.deliveryDetail[index].trType}",
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
-                                        SizedBox(height: 2),
-                                        Text(
-                                          "Order ID: ${state.deliveryDetail[index].orderID}",
-                                          style: TextStyle(fontSize: 12),
-                                        ),
-                                        SizedBox(height: 2),
-                                        Text(
-                                          "Qty Ship: ${state.deliveryDetail[index].qtyShip}",
-                                          style: TextStyle(fontSize: 12),
-                                        ),
-                                        Text(
-                                          "Deskripsi: ${state.deliveryDetail[index].descr}",
-                                          style: TextStyle(fontSize: 12),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  // Right Column for Action Buttons
-                                  // Column(
-                                  //   children: [
-                                  //     IconButton(
-                                  //       icon: Icon(
-                                  //         Icons.edit,
-                                  //         color: Colors.blue,
-                                  //       ),
-                                  //       onPressed: () {},
-                                  //     ),
-                                  //     IconButton(
-                                  //       icon: Icon(
-                                  //         Icons.delete,
-                                  //         color: Colors.red,
-                                  //       ),
-                                  //       onPressed: () {},
-                                  //     ),
-                                  //   ],
-                                  // ),
-                                ],
-                              ),
-                            ),
-                          );
-
-                          // ListTile(
-                          //   title: Text(
-                          //     state.deliveryDetail[index].descr,
-                          //   ), // Menampilkan item
-                          //   onTap: () {
-                          //     // Tindakan yang akan dilakukan ketika item dipilih
-                          //     ScaffoldMessenger.of(context).showSnackBar(
-                          //       SnackBar(content: Text('You tapped on1')),
-                          //     );
-                          //   },
-                          // );
-                        },
-                      ),
-                    ),
                   ),
                 ],
               );
@@ -695,31 +879,6 @@ class _WareHouseContentListState extends State<WareHouseContentListView> {
   }
 }
 
-// 'BlocBuilder<ListVehicleBloc, ListVehicleState>(
-//                   builder: (context, state) {
-//                     if (state is ListVehicleLoading) {
-//                       return Center(child: CircularProgressIndicator());
-//                     } else if (state is ListVehicleLoadSuccess ||
-//                         state is ListVehicleLoadFailure) {
-//                       return GridView.builder(
-//                         padding: EdgeInsets.zero,
-//                         shrinkWrap: true,
-//                         physics: NeverScrollableScrollPhysics(),
-//                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-//                           crossAxisCount: 2,
-//                           crossAxisSpacing: 10.0,
-//                           mainAxisSpacing: 10.0,
-//                           childAspectRatio: 0.80,
-//                         ),
-//                         itemCount: state.vehicles.length,
-//                         itemBuilder: (context, index) {
-//                           return BuildGridItem(vehicle: state.vehicles[index]);
-//                         },
-//                       );
-//                     }
-//                     return Container();
-//                   },
-//                 ),'
 String getImagePath(Vehicle vehicle) {
   if (!vehicle.isBanned) {
     if (vehicle.isDelivery) {
@@ -792,10 +951,10 @@ class BuildSection extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
         Container(
-          padding: EdgeInsets.all(10),
+          padding: EdgeInsets.all(10.w),
           decoration: BoxDecoration(
             color: color,
-            borderRadius: BorderRadius.circular(5),
+            borderRadius: BorderRadius.circular(5.w),
           ),
         ),
         SizedBox(width: 5),
@@ -807,11 +966,11 @@ class BuildSection extends StatelessWidget {
               title,
               style: TextStyle(
                 fontFamily: "Poppins",
-                fontSize: 10,
+                fontSize: 10.w,
                 color: Colors.grey,
               ),
             ),
-            SizedBox(height: 2),
+            SizedBox(height: 2.w),
             Text(
               value.toString(),
               style: Theme.of(context).textTheme.displaySmall,
@@ -872,10 +1031,10 @@ class BuildGridItem extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(10.w),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withValues(alpha: 0.3),
+              color: Colors.grey.withValues(alpha: 0.3.w),
               blurRadius: 5,
               offset: Offset(0, 2),
             ),
@@ -884,20 +1043,20 @@ class BuildGridItem extends StatelessWidget {
         child: Stack(
           children: [
             Positioned(
-              top: 10,
-              right: 10,
+              top: 10.w,
+              right: 10.w,
               child: Row(
                 children: [
                   Text(
                     getStatusVehicle(vehicle),
                     style: Theme.of(context).textTheme.displaySmall,
                   ),
-                  SizedBox(width: 5),
+                  SizedBox(width: 5.w),
                   Container(
-                    padding: EdgeInsets.all(10),
+                    padding: EdgeInsets.all(10.w),
                     decoration: BoxDecoration(
                       color: getStatusColor(vehicle),
-                      borderRadius: BorderRadius.circular(5),
+                      borderRadius: BorderRadius.circular(5.w),
                     ),
                   ),
                 ],
@@ -906,21 +1065,21 @@ class BuildGridItem extends StatelessWidget {
             Center(
               child: SvgPicture.asset(
                 getImagePath(vehicle),
-                width: 80,
-                height: 70,
+                width: 80.w,
+                height: 70.w,
               ),
             ),
             Positioned(
-              bottom: 15,
-              left: 10,
-              right: 10,
+              bottom: 15.w,
+              left: 10.w,
+              right: 10.w,
               child: Column(
                 children: [
                   Text(
                     vehicle.vehicleID,
-                    style: TextStyle(color: Colors.black, fontSize: 14),
+                    style: TextStyle(color: Colors.black, fontSize: 14.w),
                   ),
-                  SizedBox(height: 5),
+                  SizedBox(height: 5.w),
                   Text(
                     // vehicle.driverName.isEmpty ? "" : vehicle.driverName,
                     vehicle.expDescr,
@@ -935,11 +1094,11 @@ class BuildGridItem extends StatelessWidget {
               ),
             ),
             Positioned(
-              bottom: 10,
-              right: 10,
+              bottom: 10.w,
+              right: 10.w,
               child: Row(
                 children: [
-                  Icon(Icons.more_horiz, color: Colors.white, size: 24),
+                  Icon(Icons.more_horiz, color: Colors.white, size: 24.w),
                 ],
               ),
             ),
