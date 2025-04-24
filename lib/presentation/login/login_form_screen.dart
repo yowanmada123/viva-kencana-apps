@@ -50,7 +50,7 @@ class LoginFormView extends StatelessWidget {
                   controller: usernameController,
                   decoration: InputDecoration(
                     hintText: 'Username',
-                    hintStyle: TextStyle(fontSize: 14),
+                    hintStyle: TextStyle(fontSize: 14.w),
                     isCollapsed: true,
                   ),
                 ),
@@ -59,7 +59,7 @@ class LoginFormView extends StatelessWidget {
                   controller: passwordController,
                   decoration: InputDecoration(
                     hintText: 'Password',
-                    hintStyle: TextStyle(fontSize: 14),
+                    hintStyle: TextStyle(fontSize: 14.w),
                     isCollapsed: true,
                   ),
                   obscureText: true,

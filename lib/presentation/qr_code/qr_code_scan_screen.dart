@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:qr_code_scanner_plus/qr_code_scanner_plus.dart';
 
 class QrCodeScanScreen extends StatelessWidget {
@@ -46,7 +47,7 @@ class _QrCodeScanViewState extends State<QrCodeScanView> {
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(16.w),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -70,7 +71,7 @@ class _QrCodeScanViewState extends State<QrCodeScanView> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: <Widget>[
                         Container(
-                          margin: const EdgeInsets.all(8),
+                          margin: EdgeInsets.all(8.w),
                           child: ElevatedButton(
                             onPressed: () async {
                               await controller?.toggleFlash();
@@ -85,7 +86,7 @@ class _QrCodeScanViewState extends State<QrCodeScanView> {
                           ),
                         ),
                         Container(
-                          margin: const EdgeInsets.all(8),
+                          margin: EdgeInsets.all(8.w),
                           child: ElevatedButton(
                             onPressed: () async {
                               await controller?.flipCamera();
@@ -107,36 +108,6 @@ class _QrCodeScanViewState extends State<QrCodeScanView> {
                         ),
                       ],
                     ),
-                    // Row(
-                    //   mainAxisAlignment: MainAxisAlignment.center,
-                    //   crossAxisAlignment: CrossAxisAlignment.center,
-                    //   children: <Widget>[
-                    //     Container(
-                    //       margin: const EdgeInsets.all(8),
-                    //       child: ElevatedButton(
-                    //         onPressed: () async {
-                    //           await controller?.pauseCamera();
-                    //         },
-                    //         child: const Text(
-                    //           'pause',
-                    //           style: TextStyle(fontSize: 20),
-                    //         ),
-                    //       ),
-                    //     ),
-                    //     Container(
-                    //       margin: const EdgeInsets.all(8),
-                    //       child: ElevatedButton(
-                    //         onPressed: () async {
-                    //           await controller?.resumeCamera();
-                    //         },
-                    //         child: const Text(
-                    //           'resume',
-                    //           style: TextStyle(fontSize: 20),
-                    //         ),
-                    //       ),
-                    //     ),
-                    //   ],
-                    // ),
                   ],
                 ),
               ),

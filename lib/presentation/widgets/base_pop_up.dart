@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class BasePopUpDialog extends StatelessWidget {
   final String question;
@@ -27,7 +28,7 @@ class BasePopUpDialog extends StatelessWidget {
             noText,
             style: TextStyle(
               fontFamily: "Poppins",
-              fontSize: 12,
+              fontSize: 12.w,
               color: Theme.of(context).primaryColor,
             ),
           ),
@@ -41,7 +42,7 @@ class BasePopUpDialog extends StatelessWidget {
             yesText,
             style: TextStyle(
               fontFamily: "Poppins",
-              fontSize: 12,
+              fontSize: 12.w,
               color: Theme.of(context).primaryColor,
             ),
           ),
