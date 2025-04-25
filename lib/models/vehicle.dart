@@ -98,18 +98,18 @@ class Vehicle {
 
   factory Vehicle.fromMap(Map<String, dynamic> map) {
     return Vehicle(
-      expID: map['exp_id'] as String,
-      vehicleID: map['vehicle_id'] as String,
-      vehicleType: map['vehicle_type'] as String,
-      activeFlag: map['active_flag'] as String,
-      remark: map['remark'] as String,
-      expDescr: map['exp_descr'] as String,
-      kota: map['kota'] as String,
-      driverID: map['driver_id'] as String,
-      driverName: map['driver_name'] as String,
-      availability: map['availability'] as String,
-      cityCode: map['city_code'] as String,
-      provinceCode: map['province_code'] as String,
+      expID: map['exp_id'] ?? "",
+      vehicleID: map['vehicle_id'] ?? "",
+      vehicleType: map['vehicle_type'] ?? "",
+      activeFlag: map['active_flag'] ?? "",
+      remark: map['remark'] ?? "",
+      expDescr: map['exp_descr'] ?? "",
+      kota: map['kota'] ?? "",
+      driverID: map['driver_id'] ?? "",
+      driverName: map['driver_name'] ?? "",
+      availability: map['availability'] ?? "",
+      cityCode: map['city_code'] ?? "",
+      provinceCode: map['province_code'] ?? "",
     );
   }
 
