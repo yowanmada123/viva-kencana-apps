@@ -403,135 +403,268 @@ class _WareHouseContentListState extends State<WareHouseContentListView> {
                                       ],
                                     ),
                                   ),
-                                  for (var item
-                                      in state.groupedItems[key]!) ...[
-                                    Card(
-                                      elevation: 5,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(
-                                          15.w,
-                                        ),
+                                  // for (var item
+                                  //     in state.groupedItems[key]!) ...[
+                                  //   Card(
+                                  //     elevation: 5,
+                                  //     shape: RoundedRectangleBorder(
+                                  //       borderRadius: BorderRadius.circular(
+                                  //         15.w,
+                                  //       ),
+                                  //     ),
+                                  //     child: Container(
+                                  //       padding: EdgeInsets.all(16.w),
+                                  //       child: Row(
+                                  //         crossAxisAlignment:
+                                  //             CrossAxisAlignment.start,
+                                  //         children: [
+                                  //           // Left Column for Order Description and ID
+                                  //           Expanded(
+                                  //             child: Column(
+                                  //               crossAxisAlignment:
+                                  //                   CrossAxisAlignment.start,
+                                  //               children: [
+                                  //                 Row(
+                                  //                   mainAxisAlignment:
+                                  //                       MainAxisAlignment
+                                  //                           .spaceBetween,
+                                  //                   children: [
+                                  //                     Column(
+                                  //                       mainAxisAlignment:
+                                  //                           MainAxisAlignment
+                                  //                               .start,
+                                  //                       crossAxisAlignment:
+                                  //                           CrossAxisAlignment
+                                  //                               .start,
+                                  //                       children: [
+                                  //                         Text(
+                                  //                           "Delivery ID",
+                                  //                           style: TextStyle(
+                                  //                             fontSize: 8.w,
+                                  //                           ),
+                                  //                         ),
+                                  //                         Row(
+                                  //                           children: [
+                                  //                             Text(
+                                  //                               item.delivID,
+                                  //                               style: TextStyle(
+                                  //                                 fontSize:
+                                  //                                     12.w,
+                                  //                                 fontWeight:
+                                  //                                     FontWeight
+                                  //                                         .w400,
+                                  //                               ),
+                                  //                             ),
+                                  //                             SizedBox(
+                                  //                               width: 5.w,
+                                  //                             ),
+                                  //                             GestureDetector(
+                                  //                               onTap: () async {
+                                  //                                 await Clipboard.setData(
+                                  //                                   ClipboardData(
+                                  //                                     text:
+                                  //                                         item.delivID,
+                                  //                                   ),
+                                  //                                 ).then((_) {
+                                  //                                   ScaffoldMessenger.of(
+                                  //                                     context,
+                                  //                                   ).showSnackBar(
+                                  //                                     SnackBar(
+                                  //                                       content:
+                                  //                                           Text(
+                                  //                                             "Delivery ID copied to clipboard",
+                                  //                                           ),
+                                  //                                     ),
+                                  //                                   );
+                                  //                                 });
+                                  //                               },
+                                  //                               child: Icon(
+                                  //                                 Icons.copy,
+                                  //                                 color:
+                                  //                                     const Color.fromARGB(
+                                  //                                       255,
+                                  //                                       66,
+                                  //                                       66,
+                                  //                                       66,
+                                  //                                     ),
+                                  //                                 size: 12.w,
+                                  //                               ),
+                                  //                             ),
+                                  //                           ],
+                                  //                         ),
+                                  //                       ],
+                                  //                     ),
+                                  //                     Icon(
+                                  //                       Icons.security,
+                                  //                       size: 18.w,
+                                  //                     ),
+                                  //                   ],
+                                  //                 ),
+                                  //                 SizedBox(height: 4),
+                                  //                 Text(
+                                  //                   item.descr,
+                                  //                   style: TextStyle(
+                                  //                     fontSize: 14,
+                                  //                     fontWeight:
+                                  //                         FontWeight.w500,
+                                  //                   ),
+                                  //                 ),
+                                  //                 SizedBox(height: 2.w),
+                                  //                 Text(
+                                  //                   "Quantity : ${item.qtyShip} pcs",
+                                  //                   style: TextStyle(
+                                  //                     fontSize: 12.w,
+                                  //                   ),
+                                  //                 ),
+                                  //                 SizedBox(height: 2.w),
+                                  //                 Text(
+                                  //                   "Length: ${double.parse(item.lengthShip).toStringAsFixed(2)} m",
+                                  //                   style: TextStyle(
+                                  //                     fontSize: 12.w,
+                                  //                   ),
+                                  //                 ),
+                                  //               ],
+                                  //             ),
+                                  //           ),
+                                  //         ],
+                                  //       ),
+                                  //     ),
+                                  //   ),
+                                  //   SizedBox(height: 2),
+                                  // ],
+                                  SingleChildScrollView(
+                                    scrollDirection:
+                                        Axis.horizontal, // Membuat scroll horizontal
+                                    child: Table(
+                                      border: TableBorder.all(
+                                        width: 1.0,
+                                        color: Colors.grey,
                                       ),
-                                      child: Container(
-                                        padding: EdgeInsets.all(16.w),
-                                        child: Row(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                                      columnWidths: {
+                                        0: FixedColumnWidth(
+                                          150,
+                                        ), // Set ukuran kolom pertama
+                                        1: FixedColumnWidth(
+                                          200,
+                                        ), // Set ukuran kolom kedua
+                                        2: FixedColumnWidth(
+                                          120,
+                                        ), // Set ukuran kolom ketiga
+                                        3: FixedColumnWidth(
+                                          130,
+                                        ), // Set ukuran kolom keempat
+                                      },
+                                      children: [
+                                        // Header Baris
+                                        TableRow(
+                                          decoration: BoxDecoration(
+                                            color: Colors.grey.shade200,
+                                          ),
                                           children: [
-                                            // Left Column for Order Description and ID
-                                            Expanded(
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceBetween,
-                                                    children: [
-                                                      Column(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .start,
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          Text(
-                                                            "Delivery ID",
-                                                            style: TextStyle(
-                                                              fontSize: 8.w,
-                                                            ),
-                                                          ),
-                                                          Row(
-                                                            children: [
-                                                              Text(
-                                                                item.delivID,
-                                                                style: TextStyle(
-                                                                  fontSize:
-                                                                      12.w,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w400,
-                                                                ),
-                                                              ),
-                                                              SizedBox(
-                                                                width: 5.w,
-                                                              ),
-                                                              GestureDetector(
-                                                                onTap: () async {
-                                                                  await Clipboard.setData(
-                                                                    ClipboardData(
-                                                                      text:
-                                                                          item.delivID,
-                                                                    ),
-                                                                  ).then((_) {
-                                                                    ScaffoldMessenger.of(
-                                                                      context,
-                                                                    ).showSnackBar(
-                                                                      SnackBar(
-                                                                        content:
-                                                                            Text(
-                                                                              "Delivery ID copied to clipboard",
-                                                                            ),
-                                                                      ),
-                                                                    );
-                                                                  });
-                                                                },
-                                                                child: Icon(
-                                                                  Icons.copy,
-                                                                  color:
-                                                                      const Color.fromARGB(
-                                                                        255,
-                                                                        66,
-                                                                        66,
-                                                                        66,
-                                                                      ),
-                                                                  size: 12.w,
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        ],
-                                                      ),
-                                                      Icon(
-                                                        Icons.security,
-                                                        size: 18.w,
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  SizedBox(height: 4),
-                                                  Text(
-                                                    item.descr,
-                                                    style: TextStyle(
-                                                      fontSize: 14,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                    ),
-                                                  ),
-                                                  SizedBox(height: 2.w),
-                                                  Text(
-                                                    "Quantity : ${item.qtyShip} pcs",
-                                                    style: TextStyle(
-                                                      fontSize: 12.w,
-                                                    ),
-                                                  ),
-                                                  SizedBox(height: 2.w),
-                                                  Text(
-                                                    "Length: ${double.parse(item.lengthShip).toStringAsFixed(2)} m",
-                                                    style: TextStyle(
-                                                      fontSize: 12.w,
-                                                    ),
-                                                  ),
-                                                ],
+                                            Padding(
+                                              padding: EdgeInsets.all(8.0),
+                                              child: Text(
+                                                'Delivery ID',
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ),
+                                            Padding(
+                                              padding: EdgeInsets.all(8.0),
+                                              child: Text(
+                                                'Description',
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ),
+                                            Padding(
+                                              padding: EdgeInsets.all(8.0),
+                                              child: Text(
+                                                'Quantity',
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ),
+                                            Padding(
+                                              padding: EdgeInsets.all(8.0),
+                                              child: Text(
+                                                'Length (m)',
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                ),
                                               ),
                                             ),
                                           ],
                                         ),
-                                      ),
+                                        // Data Baris
+                                        ...state.groupedItems[key]!.map(
+                                          (item) => TableRow(
+                                            children: [
+                                              Padding(
+                                                padding: EdgeInsets.all(8.0),
+                                                child: Row(
+                                                  children: [
+                                                    Text(item.delivID),
+                                                    SizedBox(width: 5.w),
+                                                    GestureDetector(
+                                                      onTap: () async {
+                                                        await Clipboard.setData(
+                                                          ClipboardData(
+                                                            text: item.delivID,
+                                                          ),
+                                                        );
+                                                        ScaffoldMessenger.of(
+                                                          context,
+                                                        ).showSnackBar(
+                                                          SnackBar(
+                                                            content: Text(
+                                                              "Delivery ID copied to clipboard",
+                                                            ),
+                                                          ),
+                                                        );
+                                                      },
+                                                      child: Icon(
+                                                        Icons.copy,
+                                                        color: Color.fromARGB(
+                                                          255,
+                                                          66,
+                                                          66,
+                                                          66,
+                                                        ),
+                                                        size: 12.w,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding: EdgeInsets.all(8.0),
+                                                child: Text(item.descr),
+                                              ),
+                                              Padding(
+                                                padding: EdgeInsets.all(8.0),
+                                                child: Text(
+                                                  "${item.qtyShip} pcs",
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding: EdgeInsets.all(8.0),
+                                                child: Text(
+                                                  double.parse(
+                                                        item.lengthShip,
+                                                      ).toStringAsFixed(2) +
+                                                      ' m',
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                    SizedBox(height: 2),
-                                  ],
+                                  ),
                                 ],
                               );
                             }).toList(),
