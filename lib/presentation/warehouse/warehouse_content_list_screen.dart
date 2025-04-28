@@ -536,184 +536,6 @@ class _WareHouseContentListState extends State<WareHouseContentListView> {
                               );
                             }).toList(),
                       ),
-
-                      // ListView.builder(
-                      //   shrinkWrap: true,
-                      //   physics: NeverScrollableScrollPhysics(),
-                      //   // itemCount: state.deliveryDetail.length,
-                      //   itemCount: state.deliveryDetail.length,
-                      //   itemBuilder: (context, index) {
-                      //     return Card(
-                      //       elevation: 5,
-                      //       shape: RoundedRectangleBorder(
-                      //         borderRadius: BorderRadius.circular(15.w),
-                      //       ),
-                      //       child: Container(
-                      //         padding: EdgeInsets.all(16.w),
-                      //         child: Row(
-                      //           crossAxisAlignment: CrossAxisAlignment.start,
-                      //           children: [
-                      //             // Left Column for Order Description and ID
-                      //             Expanded(
-                      //               child: Column(
-                      //                 crossAxisAlignment:
-                      //                     CrossAxisAlignment.start,
-                      //                 children: [
-                      //                   Row(
-                      //                     mainAxisAlignment:
-                      //                         MainAxisAlignment.spaceBetween,
-                      //                     children: [
-                      //                       Column(
-                      //                         mainAxisAlignment:
-                      //                             MainAxisAlignment.start,
-                      //                         crossAxisAlignment:
-                      //                             CrossAxisAlignment.start,
-                      //                         children: [
-                      //                           Text(
-                      //                             "Order ID:",
-                      //                             style: TextStyle(
-                      //                               fontSize: 8.w,
-                      //                               fontWeight: FontWeight.bold,
-                      //                             ),
-                      //                           ),
-                      //                           Row(
-                      //                             children: [
-                      //                               Text(
-                      //                                 state
-                      //                                     .deliveryDetail[index]
-                      //                                     .orderID,
-                      //                                 style: TextStyle(
-                      //                                   fontSize: 14.w,
-                      //                                   fontWeight:
-                      //                                       FontWeight.w400,
-                      //                                 ),
-                      //                               ),
-                      //                               const SizedBox(width: 5),
-                      //                               GestureDetector(
-                      //                                 onTap: () async {
-                      //                                   await Clipboard.setData(
-                      //                                     ClipboardData(
-                      //                                       text:
-                      //                                           state
-                      //                                               .deliveryDetail[index]
-                      //                                               .orderID,
-                      //                                     ),
-                      //                                   ).then((_) {
-                      //                                     ScaffoldMessenger.of(
-                      //                                       context,
-                      //                                     ).showSnackBar(
-                      //                                       SnackBar(
-                      //                                         content: Text(
-                      //                                           "Order ID copied to clipboard",
-                      //                                         ),
-                      //                                       ),
-                      //                                     );
-                      //                                   });
-                      //                                 },
-                      //                                 child: Icon(
-                      //                                   Icons.copy,
-                      //                                   color: Colors.black,
-                      //                                   size: 12,
-                      //                                 ),
-                      //                               ),
-                      //                             ],
-                      //                           ),
-                      //                         ],
-                      //                       ),
-                      //                       Column(
-                      //                         mainAxisAlignment:
-                      //                             MainAxisAlignment.start,
-                      //                         crossAxisAlignment:
-                      //                             CrossAxisAlignment.start,
-                      //                         children: [
-                      //                           Text(
-                      //                             "Delivery ID",
-                      //                             style: TextStyle(
-                      //                               fontSize: 8.w,
-                      //                             ),
-                      //                           ),
-                      //                           Row(
-                      //                             children: [
-                      //                               Text(
-                      //                                 state
-                      //                                     .deliveryDetail[index]
-                      //                                     .delivID,
-                      //                                 style: TextStyle(
-                      //                                   fontSize: 12.w,
-                      //                                   fontWeight:
-                      //                                       FontWeight.w400,
-                      //                                 ),
-                      //                               ),
-                      //                               SizedBox(width: 5.w),
-                      //                               GestureDetector(
-                      //                                 onTap: () async {
-                      //                                   await Clipboard.setData(
-                      //                                     ClipboardData(
-                      //                                       text:
-                      //                                           state
-                      //                                               .deliveryDetail[index]
-                      //                                               .delivID,
-                      //                                     ),
-                      //                                   ).then((_) {
-                      //                                     ScaffoldMessenger.of(
-                      //                                       context,
-                      //                                     ).showSnackBar(
-                      //                                       SnackBar(
-                      //                                         content: Text(
-                      //                                           "Delivery ID copied to clipboard",
-                      //                                         ),
-                      //                                       ),
-                      //                                     );
-                      //                                   });
-                      //                                 },
-                      //                                 child: Icon(
-                      //                                   Icons.copy,
-                      //                                   color:
-                      //                                       const Color.fromARGB(
-                      //                                         255,
-                      //                                         66,
-                      //                                         66,
-                      //                                         66,
-                      //                                       ),
-                      //                                   size: 12.w,
-                      //                                 ),
-                      //                               ),
-                      //                             ],
-                      //                           ),
-                      //                         ],
-                      //                       ),
-                      //                       Icon(Icons.security, size: 18.w),
-                      //                     ],
-                      //                   ),
-                      //                   SizedBox(height: 2),
-
-                      //                   SizedBox(height: 2),
-                      //                   Text(
-                      //                     state.deliveryDetail[index].descr,
-                      //                     style: TextStyle(
-                      //                       fontSize: 14,
-                      //                       fontWeight: FontWeight.w500,
-                      //                     ),
-                      //                   ),
-                      //                   SizedBox(height: 2.w),
-                      //                   Text(
-                      //                     "Quantity : ${state.deliveryDetail[index].qtyShip} pcs",
-                      //                     style: TextStyle(fontSize: 12.w),
-                      //                   ),
-                      //                   SizedBox(height: 2.w),
-                      //                   Text(
-                      //                     "Length: ${double.parse(state.deliveryDetail[index].lengthShip).toStringAsFixed(2)} m",
-                      //                     style: TextStyle(fontSize: 12.w),
-                      //                   ),
-                      //                 ],
-                      //               ),
-                      //             ),
-                      //           ],
-                      //         ),
-                      //       ),
-                      //     );
-                      //   },
-                      // ),
                     ),
                   ),
 
@@ -770,7 +592,16 @@ class _WareHouseContentListState extends State<WareHouseContentListView> {
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: TextButton(
-                                      onPressed: () {
+                                      onPressed: () async {
+                                        final result = await showDialog<bool>(
+                                          context: context,
+                                          builder: (BuildContext context) {
+                                            return ConfirmDialog(
+                                              message:
+                                                  'Apakah Anda ingin Cancel status ?',
+                                            );
+                                          },
+                                        );
                                         if (state is! CancelLoadLoading) {
                                           context.read<CancelLoadBloc>().add(
                                             CancelLoadSubmitted(
@@ -840,16 +671,27 @@ class _WareHouseContentListState extends State<WareHouseContentListView> {
                                   },
                                   builder: (context, state) {
                                     return TextButton(
-                                      onPressed: () {
-                                        if (state is! ConfirmLoadLoading) {
-                                          context.read<ConfirmLoadBloc>().add(
-                                            ConfirmLoadSubmitted(
-                                              batchID: widget.batchID,
-                                              companyID: widget.companyID,
-                                              millID: widget.millID,
-                                              whID: widget.whID,
-                                            ),
-                                          );
+                                      onPressed: () async {
+                                        final result = await showDialog<bool>(
+                                          context: context,
+                                          builder: (BuildContext context) {
+                                            return ConfirmDialog(
+                                              message:
+                                                  'Apakah Anda ingin mengubah status menjadi Confirmed ? ',
+                                            );
+                                          },
+                                        );
+                                        if (result == true) {
+                                          if (state is! ConfirmLoadLoading) {
+                                            context.read<ConfirmLoadBloc>().add(
+                                              ConfirmLoadSubmitted(
+                                                batchID: widget.batchID,
+                                                companyID: widget.companyID,
+                                                millID: widget.millID,
+                                                whID: widget.whID,
+                                              ),
+                                            );
+                                          }
                                         }
                                       },
                                       child: Text(
@@ -926,10 +768,65 @@ Color getStatusColor(Vehicle vehicle) {
     } else if (vehicle.isReady) {
       return Color(0xff66ED12);
     } else {
-      return Color.fromARGB(255, 88, 88, 88);
+      return Color.fromARGB(255, 230, 20, 20);
     }
   } else {
     return Color(0xffFF0000);
+  }
+}
+
+class ConfirmDialog extends StatelessWidget {
+  const ConfirmDialog({super.key, required this.message});
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text('Informasi', style: TextStyle(fontWeight: FontWeight.bold)),
+      content: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            message,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              fontFamily: 'Poppins',
+            ),
+          ),
+        ],
+      ),
+      actions: <Widget>[
+        TextButton(
+          child: Text(
+            "Tidak",
+            style: TextStyle(
+              fontFamily: "Poppins",
+              fontSize: 12,
+              color: Theme.of(context).primaryColor,
+            ),
+          ),
+          onPressed: () {
+            Navigator.of(context).pop(false);
+          },
+        ),
+
+        TextButton(
+          child: Text(
+            "Ya",
+            style: TextStyle(
+              fontFamily: "Poppins",
+              fontSize: 12,
+              color: Theme.of(context).primaryColor,
+            ),
+          ),
+          onPressed: () {
+            Navigator.of(context).pop(true);
+          },
+        ),
+      ],
+    );
   }
 }
 
