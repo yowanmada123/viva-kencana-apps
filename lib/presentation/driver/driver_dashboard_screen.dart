@@ -80,9 +80,9 @@ class MyGridLayout extends StatelessWidget {
             child: BlocConsumer<LogoutBloc, LogoutState>(
               listener: (context, state) {
                 if (state is LogoutFailure) {
-                  ScaffoldMessenger.of(
+                  BlocProvider.of<AuthenticationBloc>(
                     context,
-                  ).showSnackBar(SnackBar(content: Text("Logout Not Success")));
+                  ).add(SetAuthenticationStatus(isAuthenticated: false));
                 } else if (state is LogoutSuccess) {
                   BlocProvider.of<AuthenticationBloc>(
                     context,
