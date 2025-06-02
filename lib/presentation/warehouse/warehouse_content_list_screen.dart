@@ -661,13 +661,13 @@ class _WareHouseContentListState extends State<WareHouseContentListView> {
                                               Padding(
                                                 padding: EdgeInsets.all(8.0),
                                                 child: Text(
-                                                  "${item.qtyShip} pcs",
+                                                  '${double.parse(item.lengthShip).toStringAsFixed(2)} m',
                                                 ),
                                               ),
                                               Padding(
                                                 padding: EdgeInsets.all(8.0),
                                                 child: Text(
-                                                  '${double.parse(item.lengthShip).toStringAsFixed(2)} m',
+                                                  "${item.qtyShip} pcs",
                                                 ),
                                               ),
                                             ],
