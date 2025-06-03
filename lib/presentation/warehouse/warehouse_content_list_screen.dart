@@ -544,14 +544,15 @@ class _WareHouseContentListState extends State<WareHouseContentListView> {
                                         0: FixedColumnWidth(
                                           150,
                                         ), // Set ukuran kolom pertama
-                                        1: FixedColumnWidth(
+                                        1: FixedColumnWidth(105),
+                                        2: FixedColumnWidth(
                                           200,
                                         ), // Set ukuran kolom kedua
-                                        2: FixedColumnWidth(
-                                          120,
-                                        ), // Set ukuran kolom ketiga
                                         3: FixedColumnWidth(
-                                          130,
+                                          100,
+                                        ), // Set ukuran kolom ketiga
+                                        4: FixedColumnWidth(
+                                          100,
                                         ), // Set ukuran kolom keempat
                                       },
                                       children: [
@@ -573,6 +574,15 @@ class _WareHouseContentListState extends State<WareHouseContentListView> {
                                             Padding(
                                               padding: EdgeInsets.all(8.0),
                                               child: Text(
+                                                'Item Number',
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ),
+                                            Padding(
+                                              padding: EdgeInsets.all(8.0),
+                                              child: Text(
                                                 'Description',
                                                 style: TextStyle(
                                                   fontWeight: FontWeight.bold,
@@ -582,7 +592,7 @@ class _WareHouseContentListState extends State<WareHouseContentListView> {
                                             Padding(
                                               padding: EdgeInsets.all(8.0),
                                               child: Text(
-                                                'Quantity',
+                                                'Length (m)',
                                                 style: TextStyle(
                                                   fontWeight: FontWeight.bold,
                                                 ),
@@ -591,7 +601,7 @@ class _WareHouseContentListState extends State<WareHouseContentListView> {
                                             Padding(
                                               padding: EdgeInsets.all(8.0),
                                               child: Text(
-                                                'Length (m)',
+                                                'Quantity',
                                                 style: TextStyle(
                                                   fontWeight: FontWeight.bold,
                                                 ),
@@ -642,21 +652,22 @@ class _WareHouseContentListState extends State<WareHouseContentListView> {
                                               ),
                                               Padding(
                                                 padding: EdgeInsets.all(8.0),
+                                                child: Text(item.itemNumber),
+                                              ),
+                                              Padding(
+                                                padding: EdgeInsets.all(8.0),
                                                 child: Text(item.descr),
                                               ),
                                               Padding(
                                                 padding: EdgeInsets.all(8.0),
                                                 child: Text(
-                                                  "${item.qtyShip} pcs",
+                                                  '${double.parse(item.lengthShip).toStringAsFixed(2)} m',
                                                 ),
                                               ),
                                               Padding(
                                                 padding: EdgeInsets.all(8.0),
                                                 child: Text(
-                                                  double.parse(
-                                                        item.lengthShip,
-                                                      ).toStringAsFixed(2) +
-                                                      ' m',
+                                                  "${item.qtyShip} pcs",
                                                 ),
                                               ),
                                             ],
