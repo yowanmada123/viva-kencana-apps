@@ -77,12 +77,17 @@ class LoginFormView extends StatelessWidget {
                 BlocConsumer<LoginFormBloc, LoginFormState>(
                   listener: (context, state) {
                     if (state is LoginFormError) {
-                      usernameController.clear();
-                      passwordController.clear();
-                      // shifController.clear();
-                      ScaffoldMessenger.of(
-                        context,
-                      ).showSnackBar(SnackBar(content: Text(state.message)));
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(state.message),
+                          duration: Duration(seconds: 2),
+                          behavior: SnackBarBehavior.floating,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          backgroundColor: Color(0xffEB5757),
+                        ),
+                      );
                     } else if (state is LoginFormSuccess) {
                       // print("masuk Sini login success");
                       BlocProvider.of<AuthenticationBloc>(context).add(
@@ -100,6 +105,20 @@ class LoginFormView extends StatelessWidget {
                           final username = usernameController.text;
                           final password = passwordController.text;
                           // final shif = shifController.text;
+                          if (username.isEmpty || password.isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Username atau password kosong'),
+                                duration: Duration(seconds: 2),
+                                behavior: SnackBarBehavior.floating,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                backgroundColor: Color(0xffEB5757),
+                              ),
+                            );
+                            return;
+                          }
                           context.read<LoginFormBloc>().add(
                             LoginFormSubmitted(
                               username: username,

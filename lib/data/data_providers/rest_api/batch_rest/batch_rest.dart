@@ -46,6 +46,8 @@ class BatchRest {
       } else {
         return Left(NetUtils.parseErrorResponse(response: response.data));
       }
+    } on DioException catch (e) {
+      return Left(NetUtils.parseDioException(e));
     } on Exception catch (e) {
       if (e is DioException) {
         return Left(NetUtils.parseDioException(e));
@@ -82,6 +84,8 @@ class BatchRest {
       } else {
         return Left(NetUtils.parseErrorResponse(response: response.data));
       }
+    } on DioException catch (e) {
+      return Left(NetUtils.parseDioException(e));
     } on Exception catch (e) {
       if (e is DioException) {
         return Left(NetUtils.parseDioException(e));
