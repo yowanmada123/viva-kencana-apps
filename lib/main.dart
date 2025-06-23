@@ -5,17 +5,18 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:path_provider/path_provider.dart';
+import 'data/data_providers/rest_api/entity_rest/entity_rest.dart';
+import 'data/repository/entity_repository.dart';
+import 'presentation/entity/entity_screen.dart';
 
 import 'bloc/auth/authentication/authentication_bloc.dart';
 import 'data/data_providers/rest_api/auth_rest.dart';
-
 import 'data/data_providers/rest_api/batch_rest/batch_rest.dart';
 import 'data/data_providers/shared-preferences/shared_preferences_key.dart';
 import 'data/data_providers/shared-preferences/shared_preferences_manager.dart';
 import 'data/repository/auth_repository.dart';
 import 'data/repository/batch_repository.dart';
 import 'environment.dart';
-
 import 'presentation/driver/driver_dashboard_screen.dart';
 import 'presentation/login/login_form_screen.dart';
 import 'utils/interceptors/dio_request_token_interceptor.dart';
@@ -39,18 +40,21 @@ void main() async {
 
   final authRest = AuthRest(dioClient);
   final batchRest = BatchRest(dioClient);
+  final entityRest = EntityRest(dioClient);
 
   final authRepository = AuthRepository(
     authRest: authRest,
     authSharedPref: authSharedPref,
   );
   final batchRepository = BatchRepository(batchRest: batchRest);
+  final entityRepository = EntityRepository(entityRest: entityRest);
 
   runApp(
     MultiRepositoryProvider(
       providers: [
         RepositoryProvider.value(value: authRepository),
         RepositoryProvider.value(value: batchRepository),
+        RepositoryProvider.value(value: entityRepository),
       ],
       child: MultiBlocProvider(
         providers: [
@@ -109,7 +113,7 @@ class MyApp extends StatelessWidget {
                   // final user = state.user;
                   if (true) {
                     print("masuk sini authenticated");
-                    return DriverDashboardScreen();
+                    return EntityScreen();
                   }
                 }
                 return LoginFormScreen();
