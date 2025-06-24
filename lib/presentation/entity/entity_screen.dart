@@ -8,7 +8,7 @@ import '../../bloc/entity/entity_bloc.dart';
 import '../../data/repository/auth_repository.dart';
 import '../../data/repository/entity_repository.dart';
 import '../driver/driver_dashboard_screen.dart';
-import '../widgets/base_pop_up.dart';
+import '../../models/errors/custom_exception.dart';
 
 class EntityScreen extends StatelessWidget {
   const EntityScreen({super.key});
@@ -34,29 +34,6 @@ class EntityScreen extends StatelessWidget {
 }
 
 class MyGridLayout extends StatelessWidget {
-  final List<Map<String, dynamic>> buttons = [
-    {'text': 'Loading', 'color': Color(0xff1E4694)},
-    {'text': 'Packing', 'color': Color(0xffF79D2A)},
-    {'text': 'Selesai', 'color': Color(0xff28A745)},
-    {'text': 'Cancel', 'color': Color(0xffDC3545)},
-  ];
-
-  void _navigateToScreen(BuildContext context, int index, String? name) {
-    switch (index) {
-      case 0:
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            settings: RouteSettings(name: name),
-            builder: (context) => DriverDashboardScreen(),
-          ),
-        );
-        break;
-      default:
-        break;
-    }
-  }
-
   Color hexToColor(String hex) {
     hex = hex.replaceAll('#', '');
     if (hex.length == 6) {
@@ -82,53 +59,21 @@ class MyGridLayout extends StatelessWidget {
             fontSize: 18.w,
           ),
         ),
-        actions: [
-          Padding(
-            padding: EdgeInsets.only(right: 16.w),
-            child: BlocConsumer<LogoutBloc, LogoutState>(
-              listener: (context, state) {
-                if (state is LogoutFailure) {
-                  BlocProvider.of<AuthenticationBloc>(
-                    context,
-                  ).add(SetAuthenticationStatus(isAuthenticated: false));
-                } else if (state is LogoutSuccess) {
-                  BlocProvider.of<AuthenticationBloc>(
-                    context,
-                  ).add(SetAuthenticationStatus(isAuthenticated: false));
-
-                }
-              },
-              builder: (context, state) {
-                return GestureDetector(
-                  onTap: () {
-                    showDialog<bool>(
-                      context: context,
-                      builder: (BuildContext childContext) {
-                        return BasePopUpDialog(
-                          noText: "Tidak",
-                          yesText: "Ya",
-                          onNoPressed: () {},
-                          onYesPressed: () {
-                            if (state is! LogoutLoading) {
-                              context.read<LogoutBloc>().add(LogoutPressed());
-                            }
-                          },
-                          question:
-                              "Apakah Anda yakin ingin keluar dari aplikasi?",
-                        );
-                      },
-                    );
-                  },
-                  child: Icon(Icons.logout, color: Colors.white),
-                );
-              },
-            ),
-          ),
-        ],
+        
       ),
       body: Container(
         margin: EdgeInsets.fromLTRB(8.0, 8.0, 0.0, 0.0),
-        child: BlocBuilder<EntityBloc, EntityState>(
+        child: BlocConsumer<EntityBloc, EntityState>(
+          listener: (context, state) {
+            if (state is EntityFailure) {
+              if (state.exception is UnauthorizedException) {
+                context.read<AuthenticationBloc>().add(
+                  SetAuthenticationStatus(isAuthenticated: false),
+                );
+                Navigator.of(context).popUntil((route) => route.isFirst);
+              }
+            }
+          },
           builder: (context, state) {
             if (state is EntityLoaded) {
               final entities = state.entities;
@@ -138,33 +83,38 @@ class MyGridLayout extends StatelessWidget {
                   final entity = entities[index];
                   return Container(
                     padding: EdgeInsets.all(4.w),
-                    child: AspectRatio(
-                      aspectRatio: 1.0,
-                      child: GestureDetector(
-                        onTap: () {
-                          Navigator.pushAndRemoveUntil(
-                            context,
-                            MaterialPageRoute(
-                              settings: RouteSettings(name: '/dashboard'),
-                              builder: (context) => DriverDashboardScreen(),
+                    child: Center(
+                      child: SizedBox(
+                        width: 50.w,
+                        height: 50.w,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: hexToColor(entity.color),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8.w), 
                             ),
-                            (route) => route.isCurrent,
-                          );
-                        },
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: hexToColor(entity.color),
-                            borderRadius: BorderRadius.circular(10.w),
+                            padding: EdgeInsets.zero, 
+                            elevation: 2,
                           ),
-                          alignment: Alignment.center,
-                          child: Text(
-                            entity.entityId,
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 12.w,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                              fontFamily: "Poppins",
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => DriverDashboardScreen(entityId: entity.entityId),
+                              ),
+                            );
+                          },
+                          child: Center(
+                            child: Text(
+                              entity.entityId,
+                              textAlign: TextAlign.center,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 12.sp,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
                             ),
                           ),
                         ),
