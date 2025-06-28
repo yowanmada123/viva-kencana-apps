@@ -7,8 +7,9 @@ import '../../bloc/auth/logout/logout_bloc.dart';
 import '../../bloc/entity/entity_bloc.dart';
 import '../../data/repository/auth_repository.dart';
 import '../../data/repository/entity_repository.dart';
-import '../driver/driver_dashboard_screen.dart';
 import '../../models/errors/custom_exception.dart';
+import '../driver/driver_dashboard_screen.dart';
+import '../widgets/base_pop_up.dart';
 
 class EntityScreen extends StatelessWidget {
   const EntityScreen({super.key});
@@ -59,7 +60,42 @@ class MyGridLayout extends StatelessWidget {
             fontSize: 18.w,
           ),
         ),
-        
+        actions: [
+          Padding(
+            padding: EdgeInsets.only(right: 16.w),
+            child: BlocConsumer<LogoutBloc, LogoutState>(
+              listener: (context, state) {
+                if (state is LogoutSuccess || state is LogoutFailure) {
+                  context.read<AuthenticationBloc>().add(
+                      SetAuthenticationStatus(isAuthenticated: false));
+                }
+              },
+              builder: (context, state) {
+                return GestureDetector(
+                  onTap: () {
+                    showDialog<bool>(
+                      context: context,
+                      builder: (BuildContext childContext) {
+                        return BasePopUpDialog(
+                          noText: "Tidak",
+                          yesText: "Ya",
+                          onNoPressed: () {},
+                          onYesPressed: () {
+                            if (state is! LogoutLoading) {
+                              context.read<LogoutBloc>().add(LogoutPressed());
+                            }
+                          },
+                          question: "Apakah Anda yakin ingin keluar dari aplikasi?",
+                        );
+                      },
+                    );
+                  },
+                  child: Icon(Icons.logout, color: Colors.white),
+                );
+              },
+            ),
+          )
+        ]
       ),
       body: Container(
         margin: EdgeInsets.fromLTRB(8.0, 8.0, 0.0, 0.0),
@@ -77,6 +113,14 @@ class MyGridLayout extends StatelessWidget {
           builder: (context, state) {
             if (state is EntityLoaded) {
               final entities = state.entities;
+              if (entities.isEmpty) {
+                return const Center(
+                  child: Text(
+                    "Entitas tidak ditemukan",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                );
+              }
               return GridView.count(
                 crossAxisCount: 4,
                 children: List.generate(entities.length, (index) {
