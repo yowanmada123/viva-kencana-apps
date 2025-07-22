@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:vivakencanaapp/presentation/sales_activity/sales_activity_form_screen.dart';
 
 import '../../bloc/auth/authentication/authentication_bloc.dart';
 import '../../bloc/auth/logout/logout_bloc.dart';
@@ -48,6 +49,9 @@ class MyGridLayout extends StatelessWidget {
       case 'confirmLoading':
         routeBuilder = () => QrCodeScreen(); 
         break;
+      case 'mnuSalesActivity':
+        routeBuilder = () => SalesActivityFormScreen(); 
+        break;
       default:
         routeBuilder = null;
     }
@@ -63,8 +67,8 @@ class MyGridLayout extends StatelessWidget {
     switch (menuId) {
       case 'confirmLoading':
         return Icons.local_shipping;
-      case 'packing':
-        return Icons.inventory;
+      case 'mnuSalesActivity':
+        return Icons.location_searching;
       default:
         return Icons.menu;
     }
