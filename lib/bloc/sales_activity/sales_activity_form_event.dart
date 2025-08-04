@@ -51,3 +51,6 @@ class SetUserOption extends SalesActivityFormEvent {
   @override
   List<Object?> get props => [option];
 }
+
+
+class SetLocationEvent extends SalesActivityFormEvent {}

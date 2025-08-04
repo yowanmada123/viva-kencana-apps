@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:vivakencanaapp/presentation/sales_activity/sales_activity_form_checkin_screen.dart';
 import '../../bloc/auth/authentication/authentication_bloc.dart';
 import '../../bloc/auth/logout/logout_bloc.dart';
@@ -805,6 +807,62 @@ class _SalesActivityFormSecondStepState
                         },
                       ),
                     ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.w),
+                child: ElevatedButton.icon(
+                  onPressed: () => context.read<SalesActivityFormBloc>().add(SetLocationEvent()),
+                  icon: const Icon(Icons.location_on),
+                  label: const Text("Get Location"),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.w),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 16),
+                    SizedBox(
+                      height: 200,
+                      child: FlutterMap(
+                        options: MapOptions(
+                          initialCenter: LatLng(
+                            -7.245953,
+                            112.7371463,
+                          ),
+                          initialZoom: 17.0,
+                        ),
+                        children: [
+                          TileLayer(
+                            urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                            subdomains: const ['a', 'b', 'c'],
+                            userAgentPackageName: 'com.example.vivakencanaapp',
+                          ),
+                          if (state.position != null)
+                            MarkerLayer(
+                              markers: [
+                                Marker(
+                                  point: LatLng(
+                                    state.position!.latitude,
+                                    state.position!.longitude,
+                                  ),
+                                  width: 40,
+                                  height: 40,
+                                  child: const Icon(
+                                    Icons.location_pin,
+                                    color: Colors.red,
+                                    size: 40,
+                                  ),
+                                ),
+                              ],
+                            ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(state.address),
                   ],
                 ),
               ),
