@@ -25,6 +25,15 @@ class SetImageEvent extends SalesActivityFormEvent {
   List<Object?> get props => [image];
 }
 
+class AddImageEvent extends SalesActivityFormEvent {
+  final File image;
+
+  const AddImageEvent(this.image);
+
+  @override
+  List<Object?> get props => [image];
+}
+
 class SetOfficeOption extends SalesActivityFormEvent {
   final String option;
 

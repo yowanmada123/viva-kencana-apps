@@ -2,33 +2,33 @@ part of 'sales_activity_form_bloc.dart';
 
 class SalesActivityFormState extends Equatable {
   final Set<String> selectedActivities;
-  final File? image;
+  final List<File> images;
   final String officeOption;
   final String userOption;
 
   const SalesActivityFormState({
     this.selectedActivities = const {},
-    this.image,
+    this.images = const [],
     this.officeOption = '',
     this.userOption = '',
   });
 
   SalesActivityFormState copyWith({
     Set<String>? selectedActivities,
-    File? image,
+    List<File>? images,
     String? officeOption,
     String? userOption,
   }) {
     return SalesActivityFormState(
       selectedActivities: selectedActivities ?? this.selectedActivities,
-      image: image ?? this.image,
+      images: images ?? this.images,
       officeOption: officeOption ?? this.officeOption,
       userOption: userOption ?? this.userOption,
     );
   }
 
   @override
-  List<Object?> get props => [selectedActivities, image, officeOption, userOption];
+  List<Object?> get props => [selectedActivities, images, officeOption, userOption];
 }
 
 class SalesActivityFormInitial extends SalesActivityFormState {}

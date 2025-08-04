@@ -6,8 +6,7 @@ part 'sales_activity_form_event.dart';
 part 'sales_activity_form_state.dart';
 
 class SalesActivityFormBloc extends Bloc<SalesActivityFormEvent, SalesActivityFormState> {
-  SalesActivityFormBloc()
-      : super(const SalesActivityFormState()) {
+  SalesActivityFormBloc() : super(const SalesActivityFormState()) {
     on<ToggleActivityEvent>((event, emit) {
       final updated = Set<String>.from(state.selectedActivities);
       if (updated.contains(event.activity)) {
@@ -18,8 +17,9 @@ class SalesActivityFormBloc extends Bloc<SalesActivityFormEvent, SalesActivityFo
       emit(state.copyWith(selectedActivities: updated));
     });
 
-    on<SetImageEvent>((event, emit) {
-      emit(state.copyWith(image: event.image));
+    on<AddImageEvent>((event, emit) {
+      final updatedImages = List<File>.from(state.images)..add(event.image);
+      emit(state.copyWith(images: updatedImages));
     });
 
     on<SetOfficeOption>((event, emit) {

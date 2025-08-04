@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:vivakencanaapp/presentation/sales_activity/sales_activity_form_screen.dart';
 
 import '../../bloc/auth/authentication/authentication_bloc.dart';
 import '../../bloc/auth/logout/logout_bloc.dart';
 import '../../bloc/authorization/access_menu/access_menu_bloc.dart';
+import '../../bloc/sales_activity/checkin/sales_activity_form_checkin_bloc.dart';
 import '../../data/repository/auth_repository.dart';
 import '../../data/repository/authorization_repository.dart';
 import '../../models/errors/custom_exception.dart';
 import '../../models/menu.dart';
 import '../qr_code/qr_code_screen.dart';
+import '../sales_activity/sales_activity_form_checkin_screen.dart';
+import '../sales_activity/sales_activity_form_screen.dart';
 import '../widgets/base_pop_up.dart';
 
 class DriverDashboardScreen extends StatelessWidget {
@@ -39,7 +41,7 @@ class DriverDashboardScreen extends StatelessWidget {
 }
 
 class MyGridLayout extends StatelessWidget {
-  Map<String, dynamic>? getButton(SubMenu submenu) {
+  Map<String, dynamic>? getButton(SubMenu submenu, BuildContext context) {
     final menuId = submenu.menuId;
     final caption = submenu.menuCaption;
 
@@ -50,7 +52,14 @@ class MyGridLayout extends StatelessWidget {
         routeBuilder = () => QrCodeScreen(); 
         break;
       case 'mnuSalesActivity':
-        routeBuilder = () => SalesActivityFormScreen(); 
+        final state = context.read<SalesActivityFormCheckInBloc>().state;
+        print(state.isCheckedIn);
+
+        if (state.isCheckedIn) {
+          routeBuilder = () => SalesActivityFormScreen();
+        } else {
+          routeBuilder = () => SalesActivityFormCheckInScreen();
+        }
         break;
       default:
         routeBuilder = null;
@@ -193,7 +202,7 @@ class MyGridLayout extends StatelessWidget {
     for (var menu in menus) {
       if (menu.submenus != null) {
         for (var submenu in menu.submenus) {
-          final button = getButton(submenu);
+          final button = getButton(submenu, context);
           if (button != null) submenus.add(button);
         }
       }

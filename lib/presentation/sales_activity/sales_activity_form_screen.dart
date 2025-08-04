@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:vivakencanaapp/presentation/sales_activity/sales_activity_form_checkin_screen.dart';
 import '../../bloc/auth/authentication/authentication_bloc.dart';
 import '../../bloc/auth/logout/logout_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -121,6 +122,32 @@ class _SalesActivityFormScreenState extends State<SalesActivityFormScreen> {
     districtController.dispose();
     villageController.dispose();
     super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => BasePopUpDialog(
+          noText: "Kembali",
+          yesText: "Lanjutkan",
+          autoPopOnPressed: false,
+          onNoPressed: () {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                builder: (_) => const SalesActivityFormCheckInScreen(),
+              ),
+            );
+          },
+          onYesPressed: () {},
+          question: "Ingin Sudahi Trip?",
+        ),
+      );
+    });
   }
 
   @override
@@ -646,7 +673,7 @@ class _SalesActivityFormSecondStepState
       final pickedFile = await _picker.pickImage(source: ImageSource.camera);
       if (pickedFile != null) {
         final imageFile = File(pickedFile.path);
-        context.read<SalesActivityFormBloc>().add(SetImageEvent(imageFile));
+        context.read<SalesActivityFormBloc>().add(AddImageEvent(imageFile));
       }
     } else if (status.isPermanentlyDenied) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -740,133 +767,140 @@ class _SalesActivityFormSecondStepState
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text("Image"),
+                    const Text("Images"),
                     SizedBox(height: 8.w),
-                    GestureDetector(
-                      onTap: _getImageFromCamera,
-                      child: Container(
-                        height: 150,
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey),
-                          borderRadius: BorderRadius.circular(8),
-                          color: Colors.grey[100],
-                          image:
-                              state.image != null
-                                  ? DecorationImage(
-                                    image: FileImage(state.image!),
-                                    fit: BoxFit.cover,
-                                  )
-                                  : null,
-                        ),
-                        child:
-                            state.image == null
-                                ? const Center(
-                                  child: Icon(
-                                    Icons.camera_alt,
-                                    color: Colors.grey,
-                                    size: 40,
-                                  ),
-                                )
-                                : null,
+                    SizedBox(
+                      height: 150,
+                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: state.images.length + 1,
+                        separatorBuilder: (_, __) => SizedBox(width: 8),
+                        itemBuilder: (context, index) {
+                          if (index == state.images.length) {
+                            return GestureDetector(
+                              onTap: _getImageFromCamera,
+                              child: Container(
+                                width: 150,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[200],
+                                  border: Border.all(color: Colors.grey),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: const Center(
+                                  child: Icon(Icons.add_a_photo, size: 40, color: Colors.grey),
+                                ),
+                              ),
+                            );
+                          } else {
+                            return ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: Image.file(
+                                state.images[index],
+                                width: 150,
+                                height: 150,
+                                fit: BoxFit.cover,
+                              ),
+                            );
+                          }
+                        },
                       ),
                     ),
                   ],
                 ),
               ),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.w),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: const [
-                        Text(
-                          "Office",
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(width: 4),
-                        Text(
-                          "(Office location as default point)",
-                          style: TextStyle(
-                            color: Colors.red,
-                            fontSize: 12,
-                            fontStyle: FontStyle.italic,
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 8.w),
-                    RadioListTile<String>(
-                      value: 'start',
-                      groupValue: state.officeOption,
-                      title: const Text('Start Point From Office'),
-                      onChanged: (value) {
-                        context.read<SalesActivityFormBloc>().add(
-                          SetOfficeOption(value!),
-                        );
-                      },
-                    ),
-                    RadioListTile<String>(
-                      value: 'end',
-                      groupValue: state.officeOption,
-                      title: const Text('End Point in Office'),
-                      onChanged: (value) {
-                        context.read<SalesActivityFormBloc>().add(
-                          SetOfficeOption(value!),
-                        );
-                      },
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.w),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: const [
-                        Text(
-                          "User",
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(width: 4),
-                        Text(
-                          "(Custom location by user)",
-                          style: TextStyle(
-                            color: Colors.red,
-                            fontSize: 12,
-                            fontStyle: FontStyle.italic,
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 8.w),
+              // Padding(
+              //   padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.w),
+              //   child: Column(
+              //     crossAxisAlignment: CrossAxisAlignment.start,
+              //     children: [
+              //       Row(
+              //         children: const [
+              //           Text(
+              //             "Office",
+              //             style: TextStyle(fontWeight: FontWeight.bold),
+              //           ),
+              //           SizedBox(width: 4),
+              //           Text(
+              //             "(Office location as default point)",
+              //             style: TextStyle(
+              //               color: Colors.red,
+              //               fontSize: 12,
+              //               fontStyle: FontStyle.italic,
+              //             ),
+              //           ),
+              //         ],
+              //       ),
+              //       SizedBox(height: 8.w),
+              //       RadioListTile<String>(
+              //         value: 'start',
+              //         groupValue: state.officeOption,
+              //         title: const Text('Start Point From Office'),
+              //         onChanged: (value) {
+              //           context.read<SalesActivityFormBloc>().add(
+              //             SetOfficeOption(value!),
+              //           );
+              //         },
+              //       ),
+              //       RadioListTile<String>(
+              //         value: 'end',
+              //         groupValue: state.officeOption,
+              //         title: const Text('End Point in Office'),
+              //         onChanged: (value) {
+              //           context.read<SalesActivityFormBloc>().add(
+              //             SetOfficeOption(value!),
+              //           );
+              //         },
+              //       ),
+              //     ],
+              //   ),
+              // ),
+              // Padding(
+              //   padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.w),
+              //   child: Column(
+              //     crossAxisAlignment: CrossAxisAlignment.start,
+              //     children: [
+              //       Row(
+              //         children: const [
+              //           Text(
+              //             "User",
+              //             style: TextStyle(fontWeight: FontWeight.bold),
+              //           ),
+              //           SizedBox(width: 4),
+              //           Text(
+              //             "(Custom location by user)",
+              //             style: TextStyle(
+              //               color: Colors.red,
+              //               fontSize: 12,
+              //               fontStyle: FontStyle.italic,
+              //             ),
+              //           ),
+              //         ],
+              //       ),
+              //       SizedBox(height: 8.w),
 
-                    RadioListTile<String>(
-                      value: 'custom_start',
-                      groupValue: state.userOption,
-                      title: const Text('Start Point Custom'),
-                      onChanged: (value) {
-                        context.read<SalesActivityFormBloc>().add(
-                          SetUserOption(value!),
-                        );
-                      },
-                    ),
-                    RadioListTile<String>(
-                      value: 'custom_end',
-                      groupValue: state.userOption,
-                      title: const Text('End Point Custom'),
-                      onChanged: (value) {
-                        context.read<SalesActivityFormBloc>().add(
-                          SetUserOption(value!),
-                        );
-                      },
-                    ),
-                  ],
-                ),
-              ),
+              //       RadioListTile<String>(
+              //         value: 'custom_start',
+              //         groupValue: state.userOption,
+              //         title: const Text('Start Point Custom'),
+              //         onChanged: (value) {
+              //           context.read<SalesActivityFormBloc>().add(
+              //             SetUserOption(value!),
+              //           );
+              //         },
+              //       ),
+              //       RadioListTile<String>(
+              //         value: 'custom_end',
+              //         groupValue: state.userOption,
+              //         title: const Text('End Point Custom'),
+              //         onChanged: (value) {
+              //           context.read<SalesActivityFormBloc>().add(
+              //             SetUserOption(value!),
+              //           );
+              //         },
+              //       ),
+              //     ],
+              //   ),
+              // ),
 
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.w),
@@ -901,7 +935,7 @@ class _SalesActivityFormSecondStepState
                           //   SalesActivityFormSubmit(amount: _kasbonController.text),
                           // );
                         },
-                        child: Text("Get GPS"),
+                        child: Text("Submit"),
                       ),
                     ),
                   ],

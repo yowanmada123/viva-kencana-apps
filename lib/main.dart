@@ -12,6 +12,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import 'bloc/auth/authentication/authentication_bloc.dart';
+import 'bloc/sales_activity/checkin/sales_activity_form_checkin_bloc.dart';
 import 'bloc/sales_activity/sales_activity_form_bloc.dart';
 import 'bloc/update/update_bloc.dart';
 import 'data/data_providers/rest_api/auth_rest.dart';
@@ -72,6 +73,7 @@ void main() async {
           BlocProvider(lazy: false, create: (context) => AuthenticationBloc()),
           BlocProvider(lazy: false, create: (context) => UpdateBloc()..add(CheckForUpdate())),
           BlocProvider(lazy: false, create: (context) => SalesActivityFormBloc()),
+          BlocProvider(lazy: false, create: (context) => SalesActivityFormCheckInBloc()),
         ],
         child: const MyApp(),
       ),

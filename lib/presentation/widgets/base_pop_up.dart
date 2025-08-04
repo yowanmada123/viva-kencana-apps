@@ -7,6 +7,7 @@ class BasePopUpDialog extends StatelessWidget {
   final String noText;
   final VoidCallback onYesPressed;
   final VoidCallback onNoPressed;
+  final bool autoPopOnPressed;
 
   const BasePopUpDialog({
     super.key,
@@ -15,6 +16,7 @@ class BasePopUpDialog extends StatelessWidget {
     required this.noText,
     required this.onYesPressed,
     required this.onNoPressed,
+    this.autoPopOnPressed = true,
   });
 
   @override
@@ -34,7 +36,9 @@ class BasePopUpDialog extends StatelessWidget {
           ),
           onPressed: () {
             onNoPressed();
-            Navigator.of(context).pop();
+            if (autoPopOnPressed) {
+              Navigator.of(context).pop();
+            }
           },
         ),
         TextButton(
