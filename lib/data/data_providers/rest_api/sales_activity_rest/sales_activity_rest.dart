@@ -4,6 +4,7 @@ import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 
 import '../../../../models/errors/custom_exception.dart';
+import '../../../../models/sales_activity/customer_detail.dart';
 import '../../../../models/sales_activity/customer_info.dart';
 import '../../../../models/sales_activity/sales_info.dart';
 import '../../../../models/sales_activity/submit_data.dart';
@@ -58,7 +59,7 @@ class SalesActivityRest {
         final body = response.data;
 
         List<String> provinceList =
-            (body['data'] as List)
+            (body['province'] as List)
                 .map((item) => item['province'] as String)
                 .toList();
 
@@ -248,6 +249,39 @@ class SalesActivityRest {
         final body = response.data;
 
         return Right(body['message']);
+      } else {
+        return Left(NetUtils.parseErrorResponse(response: response.data));
+      }
+    } on DioException catch (e) {
+      return Left(NetUtils.parseDioException(e));
+    } on Exception catch (e) {
+      if (e is DioException) {
+        return Left(NetUtils.parseDioException(e));
+      }
+      return Future.value(Left(CustomException(message: e.toString())));
+    } catch (e) {
+      return Left(CustomException(message: e.toString()));
+    }
+  }
+
+  Future<Either<CustomException, CustomerDetail>> getCustomerDetail({
+    required String customerId,
+  }) async {
+    try {
+      http.options.headers['requiresToken'] = true;
+      log(
+        'Request to https://v2.kencana.org/api/kmb/sales/CustomerVisit/getCustomer (POST)',
+      );
+      final response = await http.post(
+        "api/kmb/sales/CustomerVisit/getCustomer",
+        data: {"customer_id": customerId},
+      );
+      if (response.statusCode == 200) {
+        log('Response body: ${response.data}');
+
+        final body = response.data;
+
+        return Right(CustomerDetail.fromMap(body['customer']));
       } else {
         return Left(NetUtils.parseErrorResponse(response: response.data));
       }

@@ -1,6 +1,7 @@
 import 'package:dartz/dartz.dart';
 
 import '../../models/errors/custom_exception.dart';
+import '../../models/sales_activity/customer_detail.dart';
 import '../../models/sales_activity/customer_info.dart';
 import '../../models/sales_activity/sales_info.dart';
 import '../../models/sales_activity/submit_data.dart';
@@ -49,5 +50,11 @@ class SalesActivityRepository {
     required SalesActivityFormData formData,
   }) async {
     return salesActivityRest.submitSalesActivity(formData: formData);
+  }
+
+  Future<Either<CustomException, CustomerDetail>> getCustomerDetail({
+    required String customerId,
+  }) async {
+    return salesActivityRest.getCustomerDetail(customerId: customerId);
   }
 }
