@@ -232,6 +232,39 @@ class SalesActivityRest {
     }
   }
 
+  Future<Either<CustomException, String>> submitSalesCheckIn({
+    required SalesActivityFormData formData,
+  }) async {
+    try {
+      http.options.headers['requiresToken'] = true;
+      log(
+        'Request to https://v2.kencana.org/api/kmb/sales/CustomerVisit/getActivityData (POST)',
+      );
+      final response = await http.post(
+        "api/kmb/sales/CustomerVisit/storeActivityData",
+        data: formData.toMap(),
+      );
+      if (response.statusCode == 200) {
+        log('Response body: ${response.data}');
+
+        final body = response.data;
+
+        return Right(body['message']);
+      } else {
+        return Left(NetUtils.parseErrorResponse(response: response.data));
+      }
+    } on DioException catch (e) {
+      return Left(NetUtils.parseDioException(e));
+    } on Exception catch (e) {
+      if (e is DioException) {
+        return Left(NetUtils.parseDioException(e));
+      }
+      return Future.value(Left(CustomException(message: e.toString())));
+    } catch (e) {
+      return Left(CustomException(message: e.toString()));
+    }
+  }
+
   Future<Either<CustomException, String>> submitSalesActivity({
     required SalesActivityFormData formData,
   }) async {

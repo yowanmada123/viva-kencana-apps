@@ -3,11 +3,13 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:google_ml_kit/google_ml_kit.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../../bloc/sales_activity/checkin/sales_activity_form_checkin_bloc.dart';
+import '../../models/sales_activity/submit_data.dart';
 import '../../utils/strict_location.dart';
 import '../widgets/base_danger_button.dart';
 import '../widgets/base_primary_button.dart';
@@ -23,6 +25,14 @@ class SalesActivityFormCheckInScreen extends StatefulWidget {
 class _SalesActivityFormCheckInScreenState extends State<SalesActivityFormCheckInScreen> {
   final _picker = ImagePicker();
   final _odometerController = TextEditingController();
+  bool salesmanVehicle = false;
+  String imagePath = '';
+
+  String? _extractOdometerFromText(String text) {
+    final regex = RegExp(r'\b\d{4,7}\b');
+    final match = regex.firstMatch(text);
+    return match?.group(0);
+  }
 
   Future<void> _getImageFromCamera() async {
     final status = await Permission.camera.status;
@@ -30,19 +40,48 @@ class _SalesActivityFormCheckInScreenState extends State<SalesActivityFormCheckI
     if (status.isGranted || await Permission.camera.request().isGranted) {
       final pickedFile = await _picker.pickImage(source: ImageSource.camera);
       if (pickedFile != null) {
+        imagePath = pickedFile.path.toString();
         final imageFile = File(pickedFile.path.toString());
-        context.read<SalesActivityFormCheckInBloc>().add(SetImageEvent(imageFile));
+        final inputImage = InputImage.fromFile(imageFile);
+        final textRecognizer = TextRecognizer(
+          script: TextRecognitionScript.latin,
+        );
+        final RecognizedText recognizedText = await textRecognizer.processImage(
+          inputImage,
+        );
+        final String? odometerValue = _extractOdometerFromText(
+          recognizedText.text,
+        );
+
+        textRecognizer.close();
+        context.read<SalesActivityFormCheckInBloc>().add(
+          SetImageEvent(imageFile),
+        );
+
+        if (odometerValue != null) {
+          context.read<SalesActivityFormCheckInBloc>().add(
+            SetOdometerEvent(odometerValue),
+          );
+        }
       }
     } else if (status.isPermanentlyDenied) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Akses kamera ditolak permanen. Buka pengaturan untuk mengaktifkan.'),
-          action: SnackBarAction(label: 'Buka', onPressed: () => openAppSettings()),
+          content: const Text(
+            'Akses kamera ditolak permanen. Buka pengaturan untuk mengaktifkan.',
+          ),
+          action: SnackBarAction(
+            label: 'Buka',
+            onPressed: () => openAppSettings(),
+          ),
         ),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Akses kamera diperlukan untuk mengambil foto.'), backgroundColor: Colors.red),
+        const SnackBar(
+          content: Text('Akses kamera diperlukan untuk mengambil foto.'),
+          backgroundColor: Colors.red,
+        ),
       );
     }
   }
@@ -50,21 +89,19 @@ class _SalesActivityFormCheckInScreenState extends State<SalesActivityFormCheckI
   @override
   void initState() {
     StrictLocation.checkLocationRequirements();
+    context.read<SalesActivityFormCheckInBloc>().add(LoadCheckinStatus());
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<SalesActivityFormCheckInBloc, SalesActivityFormCheckInState>(
+    return BlocBuilder<
+      SalesActivityFormCheckInBloc,
+      SalesActivityFormCheckInState
+    >(
       builder: (context, state) {
         return Scaffold(
-          appBar: AppBar(
-            title: Text(
-              state.isCheckedIn
-                  ? (state.isCheckedOut ? 'Trip Selesai' : 'Checkout Form')
-                  : 'Checkin Form',
-            ),
-          ),
+          appBar: AppBar(title: Text("Checkin Form")),
           body: Padding(
             padding: const EdgeInsets.all(16.0),
             child: SingleChildScrollView(
@@ -82,24 +119,38 @@ class _SalesActivityFormCheckInScreenState extends State<SalesActivityFormCheckI
                         border: Border.all(color: Colors.grey),
                         borderRadius: BorderRadius.circular(8),
                         color: Colors.grey[100],
-                        image: state.imageCheckIn != null
-                            ? DecorationImage(image: FileImage(state.imageCheckIn!), fit: BoxFit.cover)
-                            : null,
+                        image:
+                            state.imageCheckIn != null
+                                ? DecorationImage(
+                                  image: FileImage(state.imageCheckIn!),
+                                  fit: BoxFit.cover,
+                                )
+                                : null,
                       ),
-                      child: state.imageCheckIn == null
-                          ? const Center(child: Icon(Icons.camera_alt, color: Colors.grey, size: 40))
-                          : null,
+                      child:
+                          state.imageCheckIn == null
+                              ? const Center(
+                                child: Icon(
+                                  Icons.camera_alt,
+                                  color: Colors.grey,
+                                  size: 40,
+                                ),
+                              )
+                              : null,
                     ),
                   ),
                   const SizedBox(height: 16),
                   TextFormField(
-                    controller: _odometerController,
+                    controller: _odometerController..text = state.odometer,
                     decoration: const InputDecoration(labelText: 'Odometer'),
                     keyboardType: TextInputType.number,
                   ),
                   const SizedBox(height: 16),
                   BasePrimaryButton(
-                    onPressed: () => context.read<SalesActivityFormCheckInBloc>().add(SetLocationEvent()),
+                    onPressed:
+                        () => context.read<SalesActivityFormCheckInBloc>().add(
+                          SetLocationEvent(),
+                        ),
                     label: "Get Location",
                     icon: Icons.location_on,
                   ),
@@ -111,17 +162,16 @@ class _SalesActivityFormCheckInScreenState extends State<SalesActivityFormCheckI
                         height: 200,
                         child: FlutterMap(
                           options: MapOptions(
-                            initialCenter: LatLng(
-                              -7.245953,
-                              112.7371463,
-                            ),
+                            initialCenter: LatLng(-7.245953, 112.7371463),
                             initialZoom: 17.0,
                           ),
                           children: [
                             TileLayer(
-                              urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                              urlTemplate:
+                                  'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                               subdomains: const ['a', 'b', 'c'],
-                              userAgentPackageName: 'com.example.vivakencanaapp',
+                              userAgentPackageName:
+                                  'com.example.vivakencanaapp',
                             ),
                             if (state.position != null)
                               MarkerLayer(
@@ -148,53 +198,129 @@ class _SalesActivityFormCheckInScreenState extends State<SalesActivityFormCheckI
                       Text(state.address),
                     ],
                   ),
+                  CheckboxListTile(
+                    value: salesmanVehicle,
+                    contentPadding: EdgeInsets.zero,
+                    title: Text(
+                      'Salesman Car',
+                      style: const TextStyle(fontSize: 14),
+                    ),
+                    controlAffinity: ListTileControlAffinity.leading,
+                    onChanged: (bool? value) {
+                      setState(() {
+                        salesmanVehicle = value ?? false;
+                      });
+                    },
+                  ),
                   const SizedBox(height: 32),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      BaseDangerButton(onPressed: (){}, label: 'Back'),
-                      BlocListener<SalesActivityFormCheckInBloc, SalesActivityFormCheckInState>(
-                        listenWhen: (previous, current) {
-                          return previous.isCheckedIn != current.isCheckedIn ||
-                                previous.isCheckedOut != current.isCheckedOut;
-                        },
+                      BaseDangerButton(onPressed: () {}, label: 'Back'),
+
+                      BlocConsumer<
+                        SalesActivityFormCheckInBloc,
+                        SalesActivityFormCheckInState
+                      >(
+                        listenWhen:
+                            (previous, current) =>
+                                current is SalesActivityFormCheckInSuccess ||
+                                current is SalesActivityFormCheckInError,
                         listener: (context, state) {
-                          if (state.isCheckedIn && !state.isCheckedOut) {
+                          if (state is SalesActivityFormCheckInSuccess) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
-                                content: Text("Check In berhasil!"),
+                                content: Text("Check in Berhasil!"),
                                 backgroundColor: Colors.green,
                               ),
                             );
-                            Future.delayed(const Duration(milliseconds: 300), () {
-                              Navigator.of(context).pushReplacement(
-                                MaterialPageRoute(
-                                  builder: (_) => const SalesActivityFormScreen(),
+
+                            Future.delayed(
+                              const Duration(milliseconds: 300),
+                              () {
+                                Navigator.of(context).pushReplacement(
+                                  MaterialPageRoute(
+                                    builder:
+                                        (_) => const SalesActivityFormScreen(),
+                                  ),
+                                );
+                              },
+                            );
+                          } else if (state is SalesActivityFormCheckInError) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  "Checkout gagal: ${state.message}",
                                 ),
-                              );
-                            });
-                          } else if (state.isCheckedOut) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text("Checkout berhasil!"),
-                                backgroundColor: Colors.green,
+                                backgroundColor: Colors.red,
                               ),
                             );
-                            Navigator.of(context).pop();
                           }
                         },
-                        child: BasePrimaryButton(
-                          label: !state.isCheckedIn
-                                ? "Check In"
-                                : (state.isCheckedOut ? "Selesai" : "Check Out"),
-                          onPressed: () {
-                            if (!state.isCheckedIn) {
-                              context.read<SalesActivityFormCheckInBloc>().add(SetCheckInEvent());
-                            } else if (!state.isCheckedOut) {
-                              context.read<SalesActivityFormCheckInBloc>().add(SetCheckOutEvent());
-                            }
-                          },
-                        ),
+                        builder: (context, state) {
+                          if(state is CheckinLoading){
+                            return Center(child: CircularProgressIndicator());
+                          } else if (state is CheckinLoaded){
+                            final isLoading =
+                                state is SalesActivityFormCheckInLoading;
+                            final isCheckedIn = state.isCheckedIn;
+
+                            return BasePrimaryButton(
+                              isLoading: isLoading,
+                              label: isCheckedIn ? "Checkout" : "Checkin",
+                              onPressed:
+                                  isLoading
+                                      ? null
+                                      : () {
+                                        final blocState =
+                                            context
+                                                .read<
+                                                  SalesActivityFormCheckInBloc
+                                                >()
+                                                .state;
+
+                                        if (blocState.position == null ||
+                                            _odometerController.text.isEmpty) {
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            const SnackBar(
+                                              content: Text(
+                                                "Mohon isi odometer dan pastikan lokasi tersedia.",
+                                              ),
+                                              backgroundColor: Colors.orange,
+                                            ),
+                                          );
+                                          return;
+                                        }
+
+                                        final formData = SalesActivityFormData(
+                                          checkboxCar:
+                                              salesmanVehicle ? 'Y' : 'N',
+                                          latitude: blocState.position!.latitude,
+                                          longitude:
+                                              blocState.position!.longitude,
+                                          remark: "Tes Remark",
+                                          image: imagePath,
+                                          speedoKmModel: _odometerController.text,
+                                          checkpoint:
+                                              blocState.isCheckedIn ? "OE" : "OS",
+                                          salesid: "WIT001",
+                                          officeid: "10",
+                                        );
+
+                                        context
+                                            .read<SalesActivityFormCheckInBloc>()
+                                            .add(
+                                              SubmitSalesActivityCheckInForm(
+                                                formData,
+                                              ),
+                                            );
+                                      },
+                            );
+                          }
+                          return SizedBox();
+                        },
                       ),
                     ],
                   ),

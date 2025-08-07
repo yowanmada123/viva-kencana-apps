@@ -3,75 +3,77 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 
 class SalesActivityFormData {
-  final String customerId;
-  final String custName;
-  final String custKtpNpwp;
-  final String custPhone;
-  final String custEmail;
-  final String custAddress;
-  final String custProvince;
-  final String custCity;
-  final String custDistrict;
-  final String custVillage;
-  final String custBussiness;
-  final String custBussinessStatus;
-  final String custBussinessType;
-  final String custTaxType;
-  final String custOfficeType;
-  final String custOfficeOwnership;
-  final String custType;
-  final String checkboxCar;
-  final bool checkbox1;
-  final bool checkbox2;
-  final bool checkbox3;
-  final bool checkbox4;
-  final bool checkbox5;
-  final bool checkbox6;
-  final double latitude;
-  final double longitude;
-  final String currentLocation;
-  final String remark;
-  final String image;
-  final List<Image> images;
-  final String new_;
-  final String speedoKmModel;
-  final String checkpoint;
-  final String salesid;
+  final String? customerId;
+  final String? custName;
+  final String? custKtpNpwp;
+  final String? custPhone;
+  final String? custEmail;
+  final String? custAddress;
+  final String? custProvince;
+  final String? custCity;
+  final String? custDistrict;
+  final String? custVillage;
+  final String? custBussiness;
+  final String? custBussinessStatus;
+  final String? custBussinessType;
+  final String? custTaxType;
+  final String? custOfficeType;
+  final String? custOfficeOwnership;
+  final String? custType;
+  final String? checkboxCar;
+  final bool? checkbox1;
+  final bool? checkbox2;
+  final bool? checkbox3;
+  final bool? checkbox4;
+  final bool? checkbox5;
+  final bool? checkbox6;
+  final double? latitude;
+  final double? longitude;
+  final String? currentLocation;
+  final String? remark;
+  final String? image;
+  final List<Image>? images;
+  final String? new_;
+  final String? speedoKmModel;
+  final String? checkpoint;
+  final String? salesid;
+  final String? officeid;
   SalesActivityFormData({
-    required this.customerId,
-    required this.custName,
-    required this.custKtpNpwp,
-    required this.custPhone,
-    required this.custEmail,
-    required this.custAddress,
-    required this.custProvince,
-    required this.custCity,
-    required this.custDistrict,
-    required this.custVillage,
-    required this.custBussiness,
-    required this.custBussinessStatus,
-    required this.custBussinessType,
-    required this.custTaxType,
-    required this.custOfficeType,
-    required this.custOfficeOwnership,
-    required this.custType,
-    required this.checkboxCar,
-    required this.checkbox1,
-    required this.checkbox2,
-    required this.checkbox3,
-    required this.checkbox4,
-    required this.checkbox5,
-    required this.checkbox6,
-    required this.latitude,
-    required this.longitude,
-    required this.currentLocation,
-    required this.remark,
-    required this.image,
-    required this.images,
-    required this.new_,
-    required this.speedoKmModel,
-    required this.checkpoint,
-    required this.salesid,
+    this.customerId = '',
+    this.custName = '',
+    this.custKtpNpwp = '',
+    this.custPhone = '',
+    this.custEmail = '',
+    this.custAddress = '',
+    this.custProvince = '',
+    this.custCity = '',
+    this.custDistrict = '',
+    this.custVillage = '',
+    this.custBussiness = '',
+    this.custBussinessStatus = '',
+    this.custBussinessType = '',
+    this.custTaxType = '',
+    this.custOfficeType = '',
+    this.custOfficeOwnership = '',
+    this.custType = '',
+    this.checkboxCar = '',
+    this.checkbox1 = false,
+    this.checkbox2 = false,
+    this.checkbox3 = false,
+    this.checkbox4 = false,
+    this.checkbox5 = false,
+    this.checkbox6 = false,
+    this.latitude = 0.0,
+    this.longitude = 0.0,
+    this.currentLocation = '',
+    this.remark = '',
+    this.image = '',
+    this.images = const [],
+    this.new_ = '',
+    this.speedoKmModel = '',
+    this.checkpoint = '',
+    this.salesid = '',
+    this.officeid = '',
   });
 
   SalesActivityFormData copyWith({
@@ -109,6 +111,7 @@ class SalesActivityFormData {
     String? speedoKmModel,
     String? checkpoint,
     String? salesid,
+    String? officeid,
   }) {
     return SalesActivityFormData(
       customerId: customerId ?? this.customerId,
@@ -145,6 +148,7 @@ class SalesActivityFormData {
       speedoKmModel: speedoKmModel ?? this.speedoKmModel,
       checkpoint: checkpoint ?? this.checkpoint,
       salesid: salesid ?? this.salesid,
+      officeid: officeid ?? this.officeid,
     );
   }
 
@@ -179,11 +183,12 @@ class SalesActivityFormData {
       'currentLocation': currentLocation,
       'remark': remark,
       'image': image,
-      'images': images.map((x) => x.toMap()).toList(),
+      'images': images?.map((x) => x.toMap()).toList(),
       'new': new_,
       'speedoKmModel': speedoKmModel,
       'checkpoint': checkpoint,
       'salesid': salesid,
+      'officeid': officeid,
     };
   }
 
@@ -222,7 +227,7 @@ class SalesActivityFormData {
       new_: map['new'] ?? '',
       speedoKmModel: map['speedoKmModel'] ?? '',
       checkpoint: map['checkpoint'] ?? '',
-      salesid: map['salesid'] ?? '',
+      officeid: map['officeid'] ?? '',
     );
   }
 
@@ -233,7 +238,7 @@ class SalesActivityFormData {
 
   @override
   String toString() {
-    return 'SalesActivityFormData(customerId: $customerId, custName: $custName, custKtpNpwp: $custKtpNpwp, custPhone: $custPhone, custEmail: $custEmail, custAddress: $custAddress, custProvince: $custProvince, custCity: $custCity, custDistrict: $custDistrict, custVillage: $custVillage, custBussiness: $custBussiness, custBussinessStatus: $custBussinessStatus, custBussinessType: $custBussinessType, custTaxType: $custTaxType, custOfficeType: $custOfficeType, custOfficeOwnership: $custOfficeOwnership, custType: $custType, checkboxCar: $checkboxCar, checkbox1: $checkbox1, checkbox2: $checkbox2, checkbox3: $checkbox3, checkbox4: $checkbox4, checkbox5: $checkbox5, checkbox6: $checkbox6, latitude: $latitude, longitude: $longitude, currentLocation: $currentLocation, remark: $remark, image: $image, images: $images, new_: $new_, speedoKmModel: $speedoKmModel, checkpoint: $checkpoint, salesid: $salesid)';
+    return 'SalesActivityFormData(customerId: $customerId, custName: $custName, custKtpNpwp: $custKtpNpwp, custPhone: $custPhone, custEmail: $custEmail, custAddress: $custAddress, custProvince: $custProvince, custCity: $custCity, custDistrict: $custDistrict, custVillage: $custVillage, custBussiness: $custBussiness, custBussinessStatus: $custBussinessStatus, custBussinessType: $custBussinessType, custTaxType: $custTaxType, custOfficeType: $custOfficeType, custOfficeOwnership: $custOfficeOwnership, custType: $custType, checkboxCar: $checkboxCar, checkbox1: $checkbox1, checkbox2: $checkbox2, checkbox3: $checkbox3, checkbox4: $checkbox4, checkbox5: $checkbox5, checkbox6: $checkbox6, latitude: $latitude, longitude: $longitude, currentLocation: $currentLocation, remark: $remark, image: $image, images: $images, new_: $new_, speedoKmModel: $speedoKmModel, checkpoint: $checkpoint, salesid: $salesid, officeid: $officeid)';
   }
 
   @override
@@ -274,7 +279,8 @@ class SalesActivityFormData {
         other.new_ == new_ &&
         other.speedoKmModel == speedoKmModel &&
         other.checkpoint == checkpoint &&
-        other.salesid == salesid;
+        other.salesid == salesid &&
+        other.officeid == officeid;
   }
 
   @override
@@ -312,7 +318,8 @@ class SalesActivityFormData {
         new_.hashCode ^
         speedoKmModel.hashCode ^
         checkpoint.hashCode ^
-        salesid.hashCode;
+        salesid.hashCode ^
+        officeid.hashCode;
   }
 }
 

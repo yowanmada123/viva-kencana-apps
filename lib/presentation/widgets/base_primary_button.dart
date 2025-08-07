@@ -4,12 +4,14 @@ class BasePrimaryButton extends StatelessWidget {
   final VoidCallback? onPressed;
   final String label;
   final IconData? icon;
+  final bool isLoading;
 
   const BasePrimaryButton({
     Key? key,
     required this.onPressed,
     required this.label,
     this.icon,
+    this.isLoading = false,
   }) : super(key: key);
 
   @override
@@ -21,7 +23,7 @@ class BasePrimaryButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(4),
         ),
       ),
-      onPressed: onPressed,
+      onPressed: isLoading ? null : onPressed,
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -29,7 +31,13 @@ class BasePrimaryButton extends StatelessWidget {
             Icon(icon, size: 18),
             const SizedBox(width: 6),
           ],
-          Text(label),
+          isLoading
+            ? const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+              )
+            : Text(label),
         ],
       ),
     );

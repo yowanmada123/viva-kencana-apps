@@ -47,6 +47,12 @@ class SalesActivityRepository {
     return salesActivityRest.getCustomer(searchQuery: searchQuery);
   }
 
+  Future<Either<CustomException, String>> submitSalesCheckIn({
+    required SalesActivityFormData formData,
+  }) async {
+    return salesActivityRest.submitSalesCheckIn(formData: formData);
+  }
+
   Future<Either<CustomException, String>> submitSalesActivity({
     required SalesActivityFormData formData,
   }) async {

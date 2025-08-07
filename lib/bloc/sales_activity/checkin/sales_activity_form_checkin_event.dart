@@ -16,6 +16,13 @@ class SetImageEvent extends SalesActivityFormCheckInEvent {
   List<Object?> get props => [image];
 }
 
+class SetOdometerEvent extends SalesActivityFormCheckInEvent {
+  final String odometer;
+  const SetOdometerEvent(this.odometer);
+
+  @override
+  List<Object?> get props => [odometer];
+}
 
 class GetLocationEvent extends SalesActivityFormCheckInEvent {
   final Position position;
@@ -26,3 +33,14 @@ class GetLocationEvent extends SalesActivityFormCheckInEvent {
 class SetLocationEvent extends SalesActivityFormCheckInEvent {}
 class SetCheckInEvent extends SalesActivityFormCheckInEvent {}
 class SetCheckOutEvent extends SalesActivityFormCheckInEvent {} 
+
+class SubmitSalesActivityCheckInForm extends SalesActivityFormCheckInEvent {
+  final SalesActivityFormData formData;
+
+  const SubmitSalesActivityCheckInForm(this.formData);
+
+  @override
+  List<Object?> get props => [formData];
+}
+
+class LoadCheckinStatus extends SalesActivityFormCheckInEvent {}

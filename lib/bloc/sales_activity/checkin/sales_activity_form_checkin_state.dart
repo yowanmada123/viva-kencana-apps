@@ -51,10 +51,36 @@ class SalesActivityFormCheckInState extends Equatable {
       ];
 }
 
-class SalesActivityFormInitial extends SalesActivityFormCheckInState {}
+class SalesActivityFormCheckInInitial extends SalesActivityFormCheckInState {}
 
-class SalesActivityFormLoading extends SalesActivityFormCheckInState {}
+class SalesActivityFormCheckInLoading extends SalesActivityFormCheckInState {}
 
-class SalesActivityFormSuccess extends SalesActivityFormCheckInState {}
+class SalesActivityFormCheckInSuccess extends SalesActivityFormCheckInState {}
 
-class SalesActivityFormError extends SalesActivityFormCheckInState {}
+class SalesActivityFormCheckInError extends SalesActivityFormCheckInState {
+  final String message;
+
+  const SalesActivityFormCheckInError(this.message);
+
+  @override
+  List<Object?> get props => [message];
+}
+
+class CheckinInitial extends SalesActivityFormCheckInState {}
+
+class CheckinLoading extends SalesActivityFormCheckInState {}
+
+class   CheckinLoaded extends SalesActivityFormCheckInState {
+  final CheckinInfo checkinInfo;
+
+  const CheckinLoaded(this.checkinInfo);
+
+  @override
+  bool get isCheckedIn => checkinInfo.stat == 'Y';
+}
+
+class CheckinError extends SalesActivityFormCheckInState {
+  final String message;
+
+  const CheckinError(this.message);
+}

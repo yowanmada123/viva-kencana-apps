@@ -4,11 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:vivakencanaapp/utils/strict_location.dart';
 
 import '../../bloc/auth/authentication/authentication_bloc.dart';
 import '../../bloc/auth/logout/logout_bloc.dart';
@@ -17,9 +15,9 @@ import '../../data/repository/auth_repository.dart';
 import '../../models/errors/custom_exception.dart';
 import '../../models/sales_activity/customer_info.dart';
 import '../../models/sales_activity/submit_data.dart' as model;
+import '../../utils/image_to_base_64_converter.dart';
 import '../widgets/base_dropdown_search.dart';
 import '../widgets/base_pop_up.dart';
-import '../../utils/image_to_base_64_converter.dart';
 import '../widgets/base_primary_button.dart';
 import 'sales_activity_form_checkin_screen.dart';
 
@@ -822,19 +820,6 @@ class _SalesActivityFormSecondStepState
         return model.Image(src: url, remark: img.remark, price: img.price);
       }),
     );
-  }
-
-  Position? _currentPosition;
-
-  void _loadLocation() async {
-    try {
-      Position position = await StrictLocation.getCurrentPosition();
-      setState(() {
-        _currentPosition = position;
-      });
-    } catch (e) {
-      print("Error getting location: $e");
-    }
   }
 
   @override

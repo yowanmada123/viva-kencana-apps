@@ -2,10 +2,14 @@ import 'dart:convert';
 
 class SalesInfo {
   final List<SalesData> salesData;
-  final LastVisit lastVisit;
-  SalesInfo({required this.salesData, required this.lastVisit});
+  final LastVisit? lastVisit;
 
-  SalesInfo copyWith({List<SalesData>? salesData, LastVisit? lastVisit}) {
+  SalesInfo({required this.salesData, this.lastVisit});
+
+  SalesInfo copyWith({
+    List<SalesData>? salesData,
+    LastVisit? lastVisit,
+  }) {
     return SalesInfo(
       salesData: salesData ?? this.salesData,
       lastVisit: lastVisit ?? this.lastVisit,
@@ -15,7 +19,7 @@ class SalesInfo {
   Map<String, dynamic> toMap() {
     return {
       'salesData': salesData.map((x) => x.toMap()).toList(),
-      'lastVisit': lastVisit.toMap(),
+      'lastVisit': lastVisit?.toMap(),
     };
   }
 
@@ -24,7 +28,9 @@ class SalesInfo {
       salesData: List<SalesData>.from(
         map['salesData']?.map((x) => SalesData.fromMap(x)),
       ),
-      lastVisit: LastVisit.fromMap(map['lastVisit']),
+      lastVisit: map['lastVisit'] != null
+          ? LastVisit.fromMap(map['lastVisit'])
+          : null,
     );
   }
 
@@ -85,10 +91,10 @@ class SalesData {
   final String telepon;
   final String region;
   final String email;
-  final String office_id;
+  final String officeId;
   final String office;
-  final String office_lat;
-  final String office_lng;
+  final String officeLat;
+  final String officeLng;
   SalesData({
     required this.salesId,
     required this.namaSales,
@@ -97,10 +103,10 @@ class SalesData {
     required this.telepon,
     required this.region,
     required this.email,
-    required this.office_id,
+    required this.officeId,
     required this.office,
-    required this.office_lat,
-    required this.office_lng,
+    required this.officeLat,
+    required this.officeLng,
   });
 
   SalesData copyWith({
@@ -111,10 +117,10 @@ class SalesData {
     String? telepon,
     String? region,
     String? email,
-    String? office_id,
+    String? officeId,
     String? office,
-    String? office_lat,
-    String? office_lng,
+    String? officeLat,
+    String? officeLng,
   }) {
     return SalesData(
       salesId: salesId ?? this.salesId,
@@ -124,10 +130,10 @@ class SalesData {
       telepon: telepon ?? this.telepon,
       region: region ?? this.region,
       email: email ?? this.email,
-      office_id: office_id ?? this.office_id,
+      officeId: officeId ?? this.officeId,
       office: office ?? this.office,
-      office_lat: office_lat ?? this.office_lat,
-      office_lng: office_lng ?? this.office_lng,
+      officeLat: officeLat ?? this.officeLat,
+      officeLng: officeLng ?? this.officeLng,
     );
   }
 
@@ -140,10 +146,10 @@ class SalesData {
       'Telepon': telepon,
       'region': region,
       'e_mail': email,
-      'office_id': office_id,
+      'office_id': officeId,
       'office': office,
-      'office_lat': office_lat,
-      'office_lng': office_lng,
+      'office_lat': officeLat,
+      'office_lng': officeLng,
     };
   }
 
@@ -156,10 +162,10 @@ class SalesData {
       telepon: map['Telepon'] ?? '',
       region: map['region'] ?? '',
       email: map['e_mail'] ?? '',
-      office_id: map['office_id'] ?? '',
+      officeId: map['office_id'] ?? '',
       office: map['office'] ?? '',
-      office_lat: map['office_lat'] ?? '',
-      office_lng: map['office_lng'] ?? '',
+      officeLat: map['office_lat'] ?? '',
+      officeLng: map['office_lng'] ?? '',
     );
   }
 
@@ -170,7 +176,7 @@ class SalesData {
 
   @override
   String toString() {
-    return 'SalesData(salesId: $salesId, namaSales: $namaSales, alamat: $alamat, kota: $kota, telepon: $telepon, region: $region, email: $email, office_id: $office_id, office: $office, office_lat: $office_lat, office_lng: $office_lng)';
+    return 'SalesData(salesId: $salesId, namaSales: $namaSales, alamat: $alamat, kota: $kota, telepon: $telepon, region: $region, email: $email, officeId: $officeId, office: $office, officeLat: $officeLat, officeLng: $officeLng)';
   }
 
   @override
@@ -185,10 +191,10 @@ class SalesData {
         other.telepon == telepon &&
         other.region == region &&
         other.email == email &&
-        other.office_id == office_id &&
+        other.officeId == officeId &&
         other.office == office &&
-        other.office_lat == office_lat &&
-        other.office_lng == office_lng;
+        other.officeLat == officeLat &&
+        other.officeLng == officeLng;
   }
 
   @override
@@ -200,9 +206,9 @@ class SalesData {
         telepon.hashCode ^
         region.hashCode ^
         email.hashCode ^
-        office_id.hashCode ^
+        officeId.hashCode ^
         office.hashCode ^
-        office_lat.hashCode ^
-        office_lng.hashCode;
+        officeLat.hashCode ^
+        officeLng.hashCode;
   }
 }

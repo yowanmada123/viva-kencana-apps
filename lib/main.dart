@@ -77,7 +77,7 @@ void main() async {
           BlocProvider(lazy: false, create: (context) => AuthenticationBloc()),
           BlocProvider(lazy: false, create: (context) => UpdateBloc()..add(CheckForUpdate())),
           BlocProvider(lazy: false, create: (context) => SalesActivityFormBloc(salesActivityRepository: salesActivityRepository)),
-          BlocProvider(lazy: false, create: (context) => SalesActivityFormCheckInBloc()),
+          BlocProvider(lazy: false, create: (context) => SalesActivityFormCheckInBloc(salesActivityRepository: salesActivityRepository)),
         ],
         child: const MyApp(),
       ),
