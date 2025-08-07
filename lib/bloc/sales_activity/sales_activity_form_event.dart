@@ -52,8 +52,8 @@ class SetUserOption extends SalesActivityFormEvent {
   List<Object?> get props => [option];
 }
 
-
 class SetLocationEvent extends SalesActivityFormEvent {}
+
 class SearchCustomerData extends SalesActivityFormEvent {
   final String search;
 
@@ -75,6 +75,11 @@ class FetchDistricts extends SalesActivityFormEvent {
 class FetchVillages extends SalesActivityFormEvent {
   final String district;
   const FetchVillages(this.district);
+}
+
+class FetchCustomerDetail extends SalesActivityFormEvent {
+  final String customerId;
+  const FetchCustomerDetail(this.customerId);
 }
 
 class SubmitSalesActivityForm extends SalesActivityFormEvent {

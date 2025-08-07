@@ -1,6 +1,7 @@
 import 'package:dartz/dartz.dart';
 
 import '../../models/errors/custom_exception.dart';
+import '../../models/sales_activity/checkin_info.dart';
 import '../../models/sales_activity/customer_detail.dart';
 import '../../models/sales_activity/customer_info.dart';
 import '../../models/sales_activity/sales_info.dart';
@@ -56,5 +57,9 @@ class SalesActivityRepository {
     required String customerId,
   }) async {
     return salesActivityRest.getCustomerDetail(customerId: customerId);
+  }
+
+  Future<Either<CustomException, CheckinInfo>> getCheckinInfo() async {
+    return salesActivityRest.getCheckinInfo();
   }
 }

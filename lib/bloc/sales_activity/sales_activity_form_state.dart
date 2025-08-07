@@ -48,7 +48,17 @@ class SalesActivityFormState extends Equatable {
   }
 
   @override
-  List<Object?> get props => [selectedActivities, images, officeOption, userOption, odometer, position, address, isLoadingLocation, currentPosition];
+  List<Object?> get props => [
+    selectedActivities,
+    images,
+    officeOption,
+    userOption,
+    odometer,
+    position,
+    address,
+    isLoadingLocation,
+    currentPosition,
+  ];
 }
 
 class ImageWithFile {
@@ -64,11 +74,7 @@ class ImageWithFile {
     this.price = '',
   });
 
-  ImageWithFile copyWith({
-    String? uploadedUrl,
-    String? remark,
-    String? price,
-  }) {
+  ImageWithFile copyWith({String? uploadedUrl, String? remark, String? price}) {
     return ImageWithFile(
       file: file,
       uploadedUrl: uploadedUrl ?? this.uploadedUrl,
@@ -79,6 +85,7 @@ class ImageWithFile {
 }
 
 class SalesActivityInitial extends SalesActivityFormState {}
+
 class SalesActivityLoading extends SalesActivityFormState {}
 
 class SalesActivityError extends SalesActivityFormState {
@@ -96,6 +103,7 @@ class CustomerSearchSuccess extends SalesActivityFormState {
 }
 
 class CustomerSearchLoading extends SalesActivityFormState {}
+
 class CustomerSearchError extends SalesActivityFormState {
   final String message;
 
@@ -125,6 +133,12 @@ class VillageLoadSuccess extends SalesActivityFormState {
   const VillageLoadSuccess(this.villages);
 }
 
+class CustomerDetailLoadSuccess extends SalesActivityFormState {
+  final CustomerDetail customerDetail;
+
+  const CustomerDetailLoadSuccess(this.customerDetail);
+}
+
 class SalesActivityFormInitial extends SalesActivityFormState {}
 
 class SalesActivityFormLoading extends SalesActivityFormState {}
@@ -137,6 +151,7 @@ class SalesActivityFormFailure extends SalesActivityFormState {
 }
 
 class CurrentLocationLoading extends SalesActivityFormState {}
+
 class CurrentLocationSuccess extends SalesActivityFormState {
   final Position initialPosition;
   const CurrentLocationSuccess(this.initialPosition);

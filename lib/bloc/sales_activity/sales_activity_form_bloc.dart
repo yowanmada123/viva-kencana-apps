@@ -6,6 +6,7 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 
 import '../../data/repository/sales_repository.dart';
+import '../../models/sales_activity/customer_detail.dart';
 import '../../models/sales_activity/customer_info.dart';
 import '../../models/sales_activity/submit_data.dart';
 import '../../utils/strict_location.dart';
@@ -13,14 +14,17 @@ import '../../utils/strict_location.dart';
 part 'sales_activity_form_event.dart';
 part 'sales_activity_form_state.dart';
 
-class SalesActivityFormBloc extends Bloc<SalesActivityFormEvent, SalesActivityFormState> {
+class SalesActivityFormBloc
+    extends Bloc<SalesActivityFormEvent, SalesActivityFormState> {
   final SalesActivityRepository salesActivityRepository;
-  SalesActivityFormBloc({required this.salesActivityRepository}) : super(const SalesActivityFormState()) {
+  SalesActivityFormBloc({required this.salesActivityRepository})
+    : super(const SalesActivityFormState()) {
     on<SearchCustomerData>(_onSearchCustomer);
     on<FetchProvinces>(_onFetchProvinces);
     on<FetchCities>(_onFetchCities);
     on<FetchDistricts>(_onFetchDistricts);
     on<FetchVillages>(_onFetchVillages);
+    on<FetchCustomerDetail>(_onFetchCustomerDetail);
     on<ToggleActivityEvent>(_onToggleActivity);
     on<AddImageEvent>(_onAddImage);
     on<SetOfficeOption>(_onSetOfficeOption);
@@ -36,7 +40,9 @@ class SalesActivityFormBloc extends Bloc<SalesActivityFormEvent, SalesActivityFo
   ) async {
     emit(CustomerSearchLoading());
     try {
-      final res = await salesActivityRepository.getCustomers(searchQuery: event.search);
+      final res = await salesActivityRepository.getCustomers(
+        searchQuery: event.search,
+      );
       res.fold(
         (failure) => emit(CustomerSearchError(failure.message!)),
         (customers) => emit(CustomerSearchSuccess(customers)),
@@ -63,7 +69,9 @@ class SalesActivityFormBloc extends Bloc<SalesActivityFormEvent, SalesActivityFo
     Emitter<SalesActivityFormState> emit,
   ) async {
     emit(SalesActivityLoading());
-    final result = await salesActivityRepository.getCities(province: event.province);
+    final result = await salesActivityRepository.getCities(
+      province: event.province,
+    );
     result.fold(
       (failure) => emit(SalesActivityError(failure.message!)),
       (data) => emit(CityLoadSuccess(data)),
@@ -87,10 +95,26 @@ class SalesActivityFormBloc extends Bloc<SalesActivityFormEvent, SalesActivityFo
     Emitter<SalesActivityFormState> emit,
   ) async {
     emit(SalesActivityLoading());
-    final result = await salesActivityRepository.getVillages(district: event.district);
+    final result = await salesActivityRepository.getVillages(
+      district: event.district,
+    );
     result.fold(
       (failure) => emit(SalesActivityError(failure.message!)),
       (data) => emit(VillageLoadSuccess(data)),
+    );
+  }
+
+  Future<void> _onFetchCustomerDetail(
+    FetchCustomerDetail event,
+    Emitter<SalesActivityFormState> emit,
+  ) async {
+    final result = await salesActivityRepository.getCustomerDetail(
+      customerId: event.customerId,
+    );
+
+    result.fold(
+      (failure) => emit(SalesActivityError(failure.message!)),
+      (data) => emit(CustomerDetailLoadSuccess(data)),
     );
   }
 
@@ -107,11 +131,9 @@ class SalesActivityFormBloc extends Bloc<SalesActivityFormEvent, SalesActivityFo
     emit(state.copyWith(selectedActivities: updated));
   }
 
-  void _onAddImage(
-    AddImageEvent event,
-    Emitter<SalesActivityFormState> emit,
-  ) {
-    final updatedImages = List<ImageWithFile>.from(state.images)..add(ImageWithFile(file: event.image));
+  void _onAddImage(AddImageEvent event, Emitter<SalesActivityFormState> emit) {
+    final updatedImages = List<ImageWithFile>.from(state.images)
+      ..add(ImageWithFile(file: event.image));
     emit(state.copyWith(images: updatedImages));
   }
 
@@ -148,14 +170,12 @@ class SalesActivityFormBloc extends Bloc<SalesActivityFormEvent, SalesActivityFo
         position.longitude,
       );
 
-      final address = placemarks.isNotEmpty
-          ? "${placemarks.first.street}, ${placemarks.first.locality}, ${placemarks.first.administrativeArea}"
-          : "Address not found";
+      final address =
+          placemarks.isNotEmpty
+              ? "${placemarks.first.street}, ${placemarks.first.locality}, ${placemarks.first.administrativeArea}"
+              : "Address not found";
 
-      emit(state.copyWith(
-        position: position,
-        address: address,
-      ));
+      emit(state.copyWith(position: position, address: address));
     } catch (e) {
       print("Failed to get location: $e");
     }
@@ -166,7 +186,9 @@ class SalesActivityFormBloc extends Bloc<SalesActivityFormEvent, SalesActivityFo
     Emitter<SalesActivityFormState> emit,
   ) async {
     emit(SalesActivityFormLoading());
-    final result = await salesActivityRepository.submitSalesActivity(formData: event.formData);
+    final result = await salesActivityRepository.submitSalesActivity(
+      formData: event.formData,
+    );
     result.fold(
       (failure) => emit(SalesActivityError(failure.message!)),
       (data) => emit(SalesActivityFormSuccess()),
