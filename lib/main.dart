@@ -12,18 +12,21 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import 'bloc/auth/authentication/authentication_bloc.dart';
+import 'bloc/sales_activity/checkin/sales_activity_form_checkin_bloc.dart';
 import 'bloc/sales_activity/sales_activity_form_bloc.dart';
 import 'bloc/update/update_bloc.dart';
 import 'data/data_providers/rest_api/auth_rest.dart';
 import 'data/data_providers/rest_api/authorization_rest/authorization_rest.dart';
 import 'data/data_providers/rest_api/batch_rest/batch_rest.dart';
 import 'data/data_providers/rest_api/entity_rest/entity_rest.dart';
+import 'data/data_providers/rest_api/sales_activity_rest/sales_activity_rest.dart';
 import 'data/data_providers/shared-preferences/shared_preferences_key.dart';
 import 'data/data_providers/shared-preferences/shared_preferences_manager.dart';
 import 'data/repository/auth_repository.dart';
 import 'data/repository/authorization_repository.dart';
 import 'data/repository/batch_repository.dart';
 import 'data/repository/entity_repository.dart';
+import 'data/repository/sales_repository.dart';
 import 'environment.dart';
 import 'presentation/entity/entity_screen.dart';
 import 'presentation/login/login_form_screen.dart';
@@ -50,6 +53,7 @@ void main() async {
   final batchRest = BatchRest(dioClient);
   final entityRest = EntityRest(dioClient);
   final authorizationRest = AuthorizationRest(dioClient);
+  final salesActivityRest = SalesActivityRest(dioClient);
 
   final authRepository = AuthRepository(
     authRest: authRest,
@@ -58,6 +62,7 @@ void main() async {
   final batchRepository = BatchRepository(batchRest: batchRest);
   final entityRepository = EntityRepository(entityRest: entityRest);
   final authorizationRepository = AuthorizationRepository(authorizationRest: authorizationRest);
+  final salesActivityRepository = SalesActivityRepository(salesActivityRest: salesActivityRest);
 
   runApp(
     MultiRepositoryProvider(
@@ -71,7 +76,8 @@ void main() async {
         providers: [
           BlocProvider(lazy: false, create: (context) => AuthenticationBloc()),
           BlocProvider(lazy: false, create: (context) => UpdateBloc()..add(CheckForUpdate())),
-          BlocProvider(lazy: false, create: (context) => SalesActivityFormBloc()),
+          BlocProvider(lazy: false, create: (context) => SalesActivityFormBloc(salesActivityRepository: salesActivityRepository)),
+          BlocProvider(lazy: false, create: (context) => SalesActivityFormCheckInBloc(salesActivityRepository: salesActivityRepository)),
         ],
         child: const MyApp(),
       ),

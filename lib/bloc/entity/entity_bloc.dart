@@ -3,6 +3,7 @@ import 'package:equatable/equatable.dart';
 
 import '../../data/repository/entity_repository.dart';
 import '../../models/entity.dart';
+import '../../utils/strict_location.dart';
 
 part 'entity_event.dart';
 part 'entity_state.dart';
@@ -16,6 +17,7 @@ class EntityBloc extends Bloc<EntityEvent, EntityState> {
 
   void _loadEntity(LoadEntity event, Emitter<EntityState> emit) async {
     emit(EntityLoading());
+    StrictLocation.checkLocationRequirements();
 
     final res = await entityRepository.getEntities();
 

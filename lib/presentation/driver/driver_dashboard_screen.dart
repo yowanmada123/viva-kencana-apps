@@ -1,16 +1,20 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:vivakencanaapp/presentation/sales_activity/sales_activity_form_screen.dart';
 
 import '../../bloc/auth/authentication/authentication_bloc.dart';
 import '../../bloc/auth/logout/logout_bloc.dart';
 import '../../bloc/authorization/access_menu/access_menu_bloc.dart';
+import '../../bloc/sales_activity/checkin/sales_activity_form_checkin_bloc.dart';
 import '../../data/repository/auth_repository.dart';
 import '../../data/repository/authorization_repository.dart';
 import '../../models/errors/custom_exception.dart';
 import '../../models/menu.dart';
 import '../qr_code/qr_code_screen.dart';
+import '../sales_activity/sales_activity_form_checkin_screen.dart';
+import '../sales_activity/sales_activity_form_screen.dart';
 import '../widgets/base_pop_up.dart';
 
 class DriverDashboardScreen extends StatelessWidget {
@@ -39,27 +43,61 @@ class DriverDashboardScreen extends StatelessWidget {
 }
 
 class MyGridLayout extends StatelessWidget {
-  Map<String, dynamic>? getButton(SubMenu submenu) {
+  Map<String, dynamic>? getButton(SubMenu submenu, BuildContext context) {
     final menuId = submenu.menuId;
     final caption = submenu.menuCaption;
-
     final icon = _getIconForMenuId(menuId);
-    Widget Function()? routeBuilder;
+
+    Future<void> Function()? routeAction;
+
     switch (menuId) {
       case 'confirmLoading':
-        routeBuilder = () => QrCodeScreen(); 
+        routeAction = () async {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => QrCodeScreen()),
+          );
+        };
         break;
       case 'mnuSalesActivity':
-        routeBuilder = () => SalesActivityFormScreen(); 
+        routeAction = () async {
+          final bloc = context.read<SalesActivityFormCheckInBloc>();
+          bloc.add(LoadCheckinStatus());
+          await Future.delayed(Duration(milliseconds: 500));
+
+          final state = bloc.state;
+          if (state is CheckinLoaded) {
+            print(state.checkinInfo.stat);
+            if (state.checkinInfo.stat == 'Y') {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => SalesActivityFormScreen()),
+              );
+            } else {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => SalesActivityFormCheckInScreen()),
+              );
+            }
+          } else if (state is CheckinError) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text("Gagal memuat status check-in: ${state.message}")),
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("Sedang memuat status check-in...")),
+            );
+          }
+        };
         break;
       default:
-        routeBuilder = null;
+        routeAction = null;
     }
 
     return {
       'icon': icon,
       'text': caption,
-      'route': routeBuilder,
+      'action': routeAction,
     };
   }
 
@@ -74,19 +112,16 @@ class MyGridLayout extends StatelessWidget {
     }
   }
 
-  void _navigateToScreen(BuildContext context, Map<String, dynamic> button) {
-    final routeBuilder = button['route'] as Widget Function()?;
+  void _navigateToScreen(BuildContext context, Map<String, dynamic> button) async {
+    final action = button['action'] as Future<void> Function()?;
 
-    if (routeBuilder == null) {
+    if (action == null) {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text("Fitur belum tersedia")));
       return;
     }
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => routeBuilder()),
-    );
+    await action();
   }
 
   @override
@@ -193,7 +228,7 @@ class MyGridLayout extends StatelessWidget {
     for (var menu in menus) {
       if (menu.submenus != null) {
         for (var submenu in menu.submenus) {
-          final button = getButton(submenu);
+          final button = getButton(submenu, context);
           if (button != null) submenus.add(button);
         }
       }
