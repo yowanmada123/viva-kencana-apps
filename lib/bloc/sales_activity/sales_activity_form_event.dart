@@ -54,3 +54,33 @@ class SetUserOption extends SalesActivityFormEvent {
 
 
 class SetLocationEvent extends SalesActivityFormEvent {}
+class SearchCustomerData extends SalesActivityFormEvent {
+  final String search;
+
+  const SearchCustomerData(this.search);
+}
+
+class FetchProvinces extends SalesActivityFormEvent {}
+
+class FetchCities extends SalesActivityFormEvent {
+  final String province;
+  const FetchCities(this.province);
+}
+
+class FetchDistricts extends SalesActivityFormEvent {
+  final String city;
+  const FetchDistricts(this.city);
+}
+
+class FetchVillages extends SalesActivityFormEvent {
+  final String district;
+  const FetchVillages(this.district);
+}
+
+class SubmitSalesActivityForm extends SalesActivityFormEvent {
+  final SalesActivityFormData formData;
+
+  SubmitSalesActivityForm(this.formData);
+}
+
+class LoadCurrentLocation extends SalesActivityFormEvent {}

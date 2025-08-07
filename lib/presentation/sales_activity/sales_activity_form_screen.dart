@@ -3,26 +3,75 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:vivakencanaapp/presentation/sales_activity/sales_activity_form_checkin_screen.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:vivakencanaapp/utils/strict_location.dart';
+
 import '../../bloc/auth/authentication/authentication_bloc.dart';
 import '../../bloc/auth/logout/logout_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../bloc/sales_activity/sales_activity_form_bloc.dart';
 import '../../data/repository/auth_repository.dart';
-import 'package:permission_handler/permission_handler.dart';
 import '../../models/errors/custom_exception.dart';
-import 'package:image_picker/image_picker.dart';
+import '../../models/sales_activity/customer_info.dart';
+import '../../models/sales_activity/submit_data.dart' as model;
+import '../widgets/base_dropdown_search.dart';
 import '../widgets/base_pop_up.dart';
+import '../../utils/image_to_base_64_converter.dart';
+import '../widgets/base_primary_button.dart';
+import 'sales_activity_form_checkin_screen.dart';
 
 class SalesActivityFormScreen extends StatefulWidget {
   const SalesActivityFormScreen({super.key});
 
   @override
-  State<SalesActivityFormScreen> createState() => _SalesActivityFormScreenState();
+  State<SalesActivityFormScreen> createState() =>
+      _SalesActivityFormScreenState();
 }
 
 class _SalesActivityFormScreenState extends State<SalesActivityFormScreen> {
+  CustomerInfo? selectedCustomerInfo;
+
+  List<CustomerInfo> customerList = [];
+  List<String> provinceList = [];
+  List<String> cityList = [];
+  List<String> districtList = [];
+  List<String> villageList = [];
+  List<String> custBusiness = [
+    "APLIKATOR BAJA RINGAN",
+    "BENGKEL LAS (BAJA)",
+    "DEVELOPER (GUDANG/RUMAH)",
+    "END USER",
+    "GROSIR BAHAN BANGUNAN",
+    "GROSIR BAJA RINGAN",
+    "KIOS KENCANA",
+    "KONTRAKTOR UMUM/GENERAL KONTRAKTOR",
+    "LAIN-LAIN",
+    "PERUSAHAAN DAGANG",
+    "PERUSAHAAN INDUSTRI (PABRIK/OWNER)",
+    "PERUSAHAAN JASA/TRADING",
+    "TOKO BANGUNAN UMUM",
+    "TOKO BESI",
+    "TOKO GALVALUM",
+    "TOKO KACA & ALUMINIUM",
+  ];
+  List<String> custBusinessType = [
+    "PERORANGAN",
+    "CV",
+    "FIRMA",
+    "PT",
+    "KOPERASI",
+    "YAYASAN",
+  ];
+
+  List<String> custBusinessStatus = ["SWASTA NASIONAL", "BUMN", "PMA"];
+  List<String> custTaxType = ["PKP", "NON PKP"];
+  List<String> custOfficeType = ["GEDUNG", "RUKO", "RUMAH", "PABRIK/GUDANG"];
+  List<String> custOfficeOwnership = ["SENDIRI", "SEWA", "KONTRAK", "LAINNYA"];
+  List<String> custType = ["RETAIL", "PROJECT", "OTHER"];
+
   String customerType = 'Existing Customer';
   String? selectedCustomer;
   String? selectedVehicle;
@@ -30,8 +79,19 @@ class _SalesActivityFormScreenState extends State<SalesActivityFormScreen> {
   String? selectedCity;
   String? selectedDistrict;
   String? selectedVillage;
+  String? selectedKindOfBusiness;
+  String? selectedBusinessStatus;
+  String? selectedBusinessType;
+  String? selectedTaxType;
+  String? selectedOfficeType;
+  String? selectedOwnership;
+  String? selectedCustomerType;
+
   int currentStep = 0;
   double progress = 1;
+
+  bool salesmanVehicle = false;
+
   final nameController = TextEditingController();
   final ktpController = TextEditingController();
   final phoneController = TextEditingController();
@@ -44,73 +104,21 @@ class _SalesActivityFormScreenState extends State<SalesActivityFormScreen> {
 
   final pageController = PageController(initialPage: 0);
 
-  final dummyCustomers = [
-    {
-      'id': '1',
-      'name': 'Budi Santoso',
-      'ktp': '1234567890123456',
-      'phone': '081234567890',
-      'email': 'budi@email.com',
-      'address': 'Jl. Merdeka No.1',
-      'province': 'Jawa Timur',
-      'city': 'Surabaya',
-      'district': 'Bubutan',
-      'village': 'Bubutan',
-    },
-    {
-      'id': '2',
-      'name': 'Sari Dewi',
-      'ktp': '9876543210987654',
-      'phone': '081987654321',
-      'email': 'sari@email.com',
-      'address': 'Jl. Asia Afrika No.2',
-      'province': 'Jawa Tengah',
-      'city': 'Semarang',
-      'district': 'Tembalang',
-      'village': 'Bulusan',
-    },
-  ];
-
-  Map<String, String> customerData = {};
-
-  void _onCustomerSelected(String? id) {
-    final customer = dummyCustomers.firstWhere(
-      (e) => e['id'] == id,
-      orElse: () => {},
-    );
-    setState(() {
-      selectedCustomer = id;
-      customerData = Map<String, String>.from(customer);
-
-      nameController.text = customer['name'] ?? '';
-      ktpController.text = customer['ktp'] ?? '';
-      phoneController.text = customer['phone'] ?? '';
-      emailController.text = customer['email'] ?? '';
-      addressController.text = customer['address'] ?? '';
-      // provinceController.text = customer['province'] ?? '';
-      // cityController.text = customer['city'] ?? '';
-      // districtController.text = customer['district'] ?? '';
-      // villageController.text = customer['village'] ?? '';
-      selectedProvince = customer['province'];
-      selectedCity = customer['city'];
-      selectedDistrict = customer['district'];
-      selectedVillage = customer['village'];
-
-    });
-  }
-
   void resetCustomerForm() {
     nameController.clear();
     ktpController.clear();
     phoneController.clear();
     emailController.clear();
     addressController.clear();
+    provinceController.clear();
+    cityController.clear();
+    districtController.clear();
+    villageController.clear();
     selectedProvince = null;
     selectedCity = null;
     selectedDistrict = null;
     selectedVillage = null;
   }
-
 
   @override
   void dispose() {
@@ -134,22 +142,25 @@ class _SalesActivityFormScreenState extends State<SalesActivityFormScreen> {
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (_) => BasePopUpDialog(
-          noText: "Kembali",
-          yesText: "Lanjutkan",
-          autoPopOnPressed: false,
-          onNoPressed: () {
-            Navigator.of(context).pushReplacement(
-              MaterialPageRoute(
-                builder: (_) => const SalesActivityFormCheckInScreen(),
-              ),
-            );
-          },
-          onYesPressed: () {},
-          question: "Ingin Sudahi Trip?",
-        ),
+        builder:
+            (_) => BasePopUpDialog(
+              noText: "Kembali",
+              yesText: "Lanjutkan",
+              autoPopOnPressed: false,
+              onNoPressed: () {
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(
+                    builder: (_) => const SalesActivityFormCheckInScreen(),
+                  ),
+                );
+              },
+              onYesPressed: () {},
+              question: "Ingin Sudahi Trip?",
+            ),
       );
     });
+
+    context.read<SalesActivityFormBloc>().add(FetchProvinces());
   }
 
   @override
@@ -270,7 +281,7 @@ class _SalesActivityFormScreenState extends State<SalesActivityFormScreen> {
             ),
             body: BlocConsumer<SalesActivityFormBloc, SalesActivityFormState>(
               listener: (context, state) {
-                if (state is SalesActivityFormError) {
+                if (state is CustomerSearchError) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(
@@ -306,6 +317,7 @@ class _SalesActivityFormScreenState extends State<SalesActivityFormScreen> {
                               // Customer Type
                               DropdownButtonFormField<String>(
                                 value: customerType,
+                                padding: EdgeInsets.fromLTRB(0, 0, 16, 0),
                                 decoration: const InputDecoration(
                                   labelText: 'Customer Type',
                                 ),
@@ -321,7 +333,6 @@ class _SalesActivityFormScreenState extends State<SalesActivityFormScreen> {
                                 onChanged: (value) {
                                   setState(() {
                                     customerType = value!;
-                                    customerData.clear();
                                     selectedCustomer = null;
 
                                     if (customerType == 'New Customer') {
@@ -333,21 +344,36 @@ class _SalesActivityFormScreenState extends State<SalesActivityFormScreen> {
                               const SizedBox(height: 6),
 
                               if (isExisting) ...[
-                                DropdownButtonFormField<String>(
-                                  value: selectedCustomer,
-                                  decoration: const InputDecoration(
-                                    labelText: 'Find Customer',
+                                BlocListener<
+                                  SalesActivityFormBloc,
+                                  SalesActivityFormState
+                                >(
+                                  listener: (context, state) {
+                                    if (state is CustomerSearchSuccess) {
+                                      setState(() {
+                                        customerList = state.customers;
+                                      });
+                                    }
+                                  },
+                                  child: BaseDropdownSearch<CustomerInfo>(
+                                    label: "Customer",
+                                    items: customerList,
+                                    getLabel:
+                                        (customer) => customer.namaCustomer,
+                                    selectedValue: selectedCustomerInfo,
+                                    onChanged: (val) {
+                                      setState(() {
+                                        selectedCustomerInfo = val;
+                                      });
+                                    },
+                                    onSearchChanged: (query) {
+                                      if (query.isNotEmpty) {
+                                        context
+                                            .read<SalesActivityFormBloc>()
+                                            .add(SearchCustomerData(query));
+                                      }
+                                    },
                                   ),
-                                  items:
-                                      dummyCustomers
-                                          .map(
-                                            (customer) => DropdownMenuItem(
-                                              value: customer['id'],
-                                              child: Text(customer['name']!),
-                                            ),
-                                          )
-                                          .toList(),
-                                  onChanged: _onCustomerSelected,
                                 ),
                               ],
 
@@ -376,201 +402,233 @@ class _SalesActivityFormScreenState extends State<SalesActivityFormScreen> {
                                 controller: addressController,
                                 isReadOnly: isExisting,
                               ),
-                              buildDropdownField(
-                                label: "Province",
-                                items: ['Jawa Tengah', 'Jawa Timur'],
-                                value: selectedProvince,
-                                isDisabled: isExisting,
-                                onChanged: (val) => setState(() => selectedProvince = val),
-                              ),
-                              buildDropdownField(
-                                label: "City",
-                                items: ['Semarang', 'Surabaya'],
-                                value: selectedCity,
-                                isDisabled: isExisting,
-                                onChanged: (val) {
-                                  setState(() {
-                                    selectedCity = val;
-                                  });
+                              BlocBuilder<
+                                SalesActivityFormBloc,
+                                SalesActivityFormState
+                              >(
+                                builder: (context, state) {
+                                  if (state is ProvinceLoadSuccess) {
+                                    provinceList = state.provinces;
+                                  } else if (state is SalesActivityError) {
+                                    return Text(state.message);
+                                  }
+                                  return BaseDropdownSearch<String>(
+                                    label: "Province",
+                                    isDisabled: isExisting,
+                                    items: provinceList,
+                                    getLabel: (province) => province,
+                                    selectedValue: selectedProvince,
+                                    controller: provinceController,
+                                    onChanged: (val) {
+                                      if (val != null) {
+                                        setState(() {
+                                          selectedProvince = val;
+                                          cityController.clear();
+                                          districtController.clear();
+                                          villageController.clear();
+                                          context
+                                              .read<SalesActivityFormBloc>()
+                                              .add(FetchCities(val));
+                                        });
+                                      }
+                                    },
+                                  );
                                 },
                               ),
-                              buildDropdownField(
-                                label: "District",
-                                items: ['Tembalang', 'Bubutan'],
-                                value: selectedDistrict,
-                                isDisabled: isExisting,
-                                onChanged: (val) {
-                                  setState(() {
-                                    selectedDistrict = val;
-                                  });
-                                },
-                              ),
-                              buildDropdownField(
-                                label: "Village",
-                                items: ['Bulusan', 'Bubutan'],
-                                value: selectedVillage,
-                                isDisabled: isExisting,
-                                onChanged: (val) {
-                                  setState(() {
-                                    selectedVillage = val;
-                                  });
-                                },
-                              ),
+                              BlocBuilder<
+                                SalesActivityFormBloc,
+                                SalesActivityFormState
+                              >(
+                                builder: (context, state) {
+                                  if (state is CityLoadSuccess) {
+                                    cityList = state.cities;
 
+                                    districtController.clear();
+                                  } else if (state is SalesActivityError) {
+                                    return Text(state.message);
+                                  }
+                                  return BaseDropdownSearch<String>(
+                                    label: "City",
+                                    isDisabled: isExisting,
+                                    items: cityList,
+                                    getLabel: (city) => city,
+                                    selectedValue: selectedCity,
+                                    controller: cityController,
+                                    onChanged: (val) {
+                                      if (val != null) {
+                                        setState(() {
+                                          selectedCity = val;
+                                          districtController.clear();
+                                          villageController.clear();
+
+                                          context
+                                              .read<SalesActivityFormBloc>()
+                                              .add(FetchDistricts(val));
+                                        });
+                                      }
+                                    },
+                                  );
+                                },
+                              ),
+                              BlocBuilder<
+                                SalesActivityFormBloc,
+                                SalesActivityFormState
+                              >(
+                                builder: (context, state) {
+                                  if (state is DistrictLoadSuccess) {
+                                    districtList = state.districts;
+                                  } else if (state is SalesActivityError) {
+                                    return Text(state.message);
+                                  }
+                                  return BaseDropdownSearch<String>(
+                                    label: "District",
+                                    isDisabled: isExisting,
+                                    items: districtList,
+                                    getLabel: (district) => district,
+                                    selectedValue: selectedDistrict,
+                                    controller: districtController,
+                                    onChanged: (val) {
+                                      if (val != null) {
+                                        setState(() {
+                                          selectedDistrict = val;
+                                          villageController.clear();
+                                          context
+                                              .read<SalesActivityFormBloc>()
+                                              .add(FetchVillages(val));
+                                        });
+                                      }
+                                    },
+                                  );
+                                },
+                              ),
+                              BlocBuilder<
+                                SalesActivityFormBloc,
+                                SalesActivityFormState
+                              >(
+                                builder: (context, state) {
+                                  if (state is VillageLoadSuccess) {
+                                    villageList = state.villages;
+                                  } else if (state is SalesActivityError) {
+                                    return Text(state.message);
+                                  }
+                                  return BaseDropdownSearch<String>(
+                                    label: "Village",
+                                    isDisabled: isExisting,
+                                    items: villageList,
+                                    getLabel: (village) => village,
+                                    selectedValue: selectedVillage,
+                                    controller: villageController,
+                                    onChanged: (val) {
+                                      if (val != null) {
+                                        setState(() {
+                                          selectedVillage = val;
+                                        });
+                                      }
+                                    },
+                                  );
+                                },
+                              ),
                               if (!isExisting) ...[
-                                DropdownButtonFormField<String>(
-                                  decoration: const InputDecoration(
-                                    labelText: "Kind of Business",
-                                  ),
-                                  items:
-                                      ['Retail', 'Distributor', 'Wholesale']
-                                          .map(
-                                            (item) => DropdownMenuItem(
-                                              value: item,
-                                              child: Text(item),
-                                            ),
-                                          )
-                                          .toList(),
-                                  onChanged: (_) {},
+                                buildDropdownField(
+                                  label: "Kind of Business",
+                                  items: custBusiness,
+                                  value: selectedKindOfBusiness,
+                                  onChanged: (val) {
+                                    setState(() {
+                                      selectedKindOfBusiness = val;
+                                    });
+                                  },
                                 ),
 
-                                DropdownButtonFormField<String>(
-                                  decoration: const InputDecoration(
-                                    labelText: "Business Status",
-                                  ),
-                                  items:
-                                      ['Active', 'Inactive']
-                                          .map(
-                                            (item) => DropdownMenuItem(
-                                              value: item,
-                                              child: Text(item),
-                                            ),
-                                          )
-                                          .toList(),
-                                  onChanged: (_) {},
+                                buildDropdownField(
+                                  label: "Business Status",
+                                  items: custBusinessStatus,
+                                  value: selectedBusinessStatus,
+                                  onChanged: (val) {
+                                    setState(() {
+                                      selectedBusinessStatus = val;
+                                    });
+                                  },
                                 ),
 
-                                // Business Type
-                                DropdownButtonFormField<String>(
-                                  decoration: const InputDecoration(
-                                    labelText: "Business Type",
-                                  ),
-                                  items:
-                                      ['Toko', 'Pabrik', 'Kantor']
-                                          .map(
-                                            (item) => DropdownMenuItem(
-                                              value: item,
-                                              child: Text(item),
-                                            ),
-                                          )
-                                          .toList(),
-                                  onChanged: (_) {},
+                                buildDropdownField(
+                                  label: "Business Type",
+                                  items: custBusinessType,
+                                  value: selectedBusinessType,
+                                  onChanged: (val) {
+                                    setState(() {
+                                      selectedBusinessType = val;
+                                    });
+                                  },
                                 ),
 
-                                // Tax Type
-                                DropdownButtonFormField<String>(
-                                  decoration: const InputDecoration(
-                                    labelText: "Tax Type",
-                                  ),
-                                  items:
-                                      ['PKP', 'Non-PKP']
-                                          .map(
-                                            (item) => DropdownMenuItem(
-                                              value: item,
-                                              child: Text(item),
-                                            ),
-                                          )
-                                          .toList(),
-                                  onChanged: (_) {},
+                                buildDropdownField(
+                                  label: "Tax Type",
+                                  items: custTaxType,
+                                  value: selectedTaxType,
+                                  onChanged: (val) {
+                                    setState(() {
+                                      selectedTaxType = val;
+                                    });
+                                  },
                                 ),
 
-                                // Office Type
-                                DropdownButtonFormField<String>(
-                                  decoration: const InputDecoration(
-                                    labelText: "Office Type",
-                                  ),
-                                  items:
-                                      ['Cabang', 'Pusat']
-                                          .map(
-                                            (item) => DropdownMenuItem(
-                                              value: item,
-                                              child: Text(item),
-                                            ),
-                                          )
-                                          .toList(),
-                                  onChanged: (_) {},
+                                buildDropdownField(
+                                  label: "Office Type",
+                                  items: custOfficeType,
+                                  value: selectedOfficeType,
+                                  onChanged: (val) {
+                                    setState(() {
+                                      selectedOfficeType = val;
+                                    });
+                                  },
                                 ),
 
-                                // Ownership
-                                DropdownButtonFormField<String>(
-                                  decoration: const InputDecoration(
-                                    labelText: "Ownership",
-                                  ),
-                                  items:
-                                      ['Milik Sendiri', 'Sewa']
-                                          .map(
-                                            (item) => DropdownMenuItem(
-                                              value: item,
-                                              child: Text(item),
-                                            ),
-                                          )
-                                          .toList(),
-                                  onChanged: (_) {},
+                                buildDropdownField(
+                                  label: "Ownership",
+                                  items: custOfficeOwnership,
+                                  value: selectedOwnership,
+                                  onChanged: (val) {
+                                    setState(() {
+                                      selectedOwnership = val;
+                                    });
+                                  },
                                 ),
 
-                                // Customer Type
-                                DropdownButtonFormField<String>(
-                                  decoration: const InputDecoration(
-                                    labelText: "Customer Type",
-                                  ),
-                                  items:
-                                      ['Grosir', 'Eceran']
-                                          .map(
-                                            (item) => DropdownMenuItem(
-                                              value: item,
-                                              child: Text(item),
-                                            ),
-                                          )
-                                          .toList(),
-                                  onChanged: (_) {},
+                                buildDropdownField(
+                                  label: "Customer Type",
+                                  items: custType,
+                                  value: selectedCustomerType,
+                                  onChanged: (val) {
+                                    setState(() {
+                                      selectedCustomerType = val;
+                                    });
+                                  },
                                 ),
                               ],
 
-                              // Salesman Vehicle (Tetap ditampilkan)
-                              DropdownButtonFormField<String>(
-                                value: selectedVehicle,
-                                decoration: const InputDecoration(
-                                  labelText: 'Salesman Vehicle',
+                              CheckboxListTile(
+                                value: salesmanVehicle,
+                                contentPadding: EdgeInsets.zero,
+                                title: Text(
+                                  'Salesman Vehicle',
+                                  style: const TextStyle(fontSize: 14),
                                 ),
-                                items:
-                                    ['Private car', 'Office car']
-                                        .map(
-                                          (type) => DropdownMenuItem(
-                                            value: type,
-                                            child: Text(type),
-                                          ),
-                                        )
-                                        .toList(),
-                                onChanged: (value) {
+                                controlAffinity:
+                                    ListTileControlAffinity.leading,
+                                onChanged: (bool? value) {
                                   setState(() {
-                                    selectedVehicle = value;
+                                    salesmanVehicle = value ?? false;
                                   });
                                 },
                               ),
 
                               SizedBox(height: 12),
 
-                              // Next Button
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
-                                  FilledButton(
-                                    style: FilledButton.styleFrom(
-                                      backgroundColor: const Color(0xff1C3FAA),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(4),
-                                      ),
-                                    ),
+                                  BasePrimaryButton(
                                     onPressed: () {
                                       if (!isExisting &&
                                           nameController.text.isEmpty) {
@@ -594,7 +652,7 @@ class _SalesActivityFormScreenState extends State<SalesActivityFormScreen> {
                                         curve: Curves.linear,
                                       );
                                     },
-                                    child: const Text("Next"),
+                                    label: "Next",
                                   ),
                                 ],
                               ),
@@ -610,6 +668,23 @@ class _SalesActivityFormScreenState extends State<SalesActivityFormScreen> {
                           curve: Curves.linear,
                         );
                       },
+                      custName: nameController.text,
+                      ktpNpwp: ktpController.text,
+                      phone: phoneController.text,
+                      email: emailController.text,
+                      address: addressController.text,
+                      province: selectedProvince ?? provinceController.text,
+                      city: selectedCity ?? cityController.text,
+                      district: selectedDistrict ?? districtController.text,
+                      village: selectedVillage ?? villageController.text,
+                      custBusiness: selectedKindOfBusiness,
+                      custBusinessStatus: selectedBusinessStatus,
+                      custBusinessType: selectedBusinessType,
+                      custTaxType: selectedTaxType,
+                      custOfficeType: selectedOfficeType,
+                      custOwnership: selectedOwnership,
+                      custType: selectedCustomerType,
+                      salesVehicle: salesmanVehicle,
                     ),
                   ],
                 );
@@ -641,7 +716,10 @@ class _SalesActivityFormScreenState extends State<SalesActivityFormScreen> {
     bool isDisabled = false,
   }) {
     return DropdownButtonFormField<String>(
+      menuMaxHeight: 300.w,
       value: value,
+      isExpanded: true,
+      padding: EdgeInsets.fromLTRB(0, 0, 16, 0),
       decoration: InputDecoration(labelText: label),
       items:
           items
@@ -654,7 +732,44 @@ class _SalesActivityFormScreenState extends State<SalesActivityFormScreen> {
 
 class _SalesActivityFormSecondStep extends StatefulWidget {
   final Function onBackFunction;
-  const _SalesActivityFormSecondStep({required this.onBackFunction});
+  final String custName;
+  final String ktpNpwp;
+  final String phone;
+  final String email;
+  final String address;
+  final String province;
+  final String city;
+  final String district;
+  final String village;
+  final String? custBusiness;
+  final String? custBusinessStatus;
+  final String? custBusinessType;
+  final String? custTaxType;
+  final String? custOfficeType;
+  final String? custOwnership;
+  final String? custType;
+  final bool salesVehicle;
+
+  const _SalesActivityFormSecondStep({
+    required this.onBackFunction,
+    required this.custName,
+    required this.ktpNpwp,
+    required this.phone,
+    required this.email,
+    required this.address,
+    required this.province,
+    required this.city,
+    required this.district,
+    required this.village,
+    this.custBusiness,
+    this.custBusinessStatus,
+    this.custBusinessType,
+    this.custTaxType,
+    this.custOfficeType,
+    this.custOwnership,
+    this.custType,
+    required this.salesVehicle,
+  });
 
   @override
   State<_SalesActivityFormSecondStep> createState() =>
@@ -663,7 +778,6 @@ class _SalesActivityFormSecondStep extends StatefulWidget {
 
 class _SalesActivityFormSecondStepState
     extends State<_SalesActivityFormSecondStep> {
-  final _kasbonController = TextEditingController();
   String? selectedOfficePoint;
   String? selectedUserPoint;
 
@@ -699,9 +813,38 @@ class _SalesActivityFormSecondStepState
     }
   }
 
+  Future<List<model.Image>> prepareImagesForSubmission(
+    List<ImageWithFile> images,
+  ) async {
+    return await Future.wait(
+      images.map((img) async {
+        final url = await imageToDataUri(img.file);
+        return model.Image(src: url, remark: img.remark, price: img.price);
+      }),
+    );
+  }
+
+  Position? _currentPosition;
+
+  void _loadLocation() async {
+    try {
+      Position position = await StrictLocation.getCurrentPosition();
+      setState(() {
+        _currentPosition = position;
+      });
+    } catch (e) {
+      print("Error getting location: $e");
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    context.read<SalesActivityFormBloc>().add(LoadCurrentLocation());
+  }
+
   @override
   void dispose() {
-    _kasbonController.dispose();
     super.dispose();
   }
 
@@ -789,7 +932,11 @@ class _SalesActivityFormSecondStepState
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: const Center(
-                                  child: Icon(Icons.add_a_photo, size: 40, color: Colors.grey),
+                                  child: Icon(
+                                    Icons.add_a_photo,
+                                    size: 40,
+                                    color: Colors.grey,
+                                  ),
                                 ),
                               ),
                             );
@@ -797,7 +944,7 @@ class _SalesActivityFormSecondStepState
                             return ClipRRect(
                               borderRadius: BorderRadius.circular(8),
                               child: Image.file(
-                                state.images[index],
+                                state.images[index].file,
                                 width: 150,
                                 height: 150,
                                 fit: BoxFit.cover,
@@ -812,10 +959,13 @@ class _SalesActivityFormSecondStepState
               ),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.w),
-                child: ElevatedButton.icon(
-                  onPressed: () => context.read<SalesActivityFormBloc>().add(SetLocationEvent()),
-                  icon: const Icon(Icons.location_on),
-                  label: const Text("Get Location"),
+                child: BasePrimaryButton(
+                  onPressed:
+                      () => context.read<SalesActivityFormBloc>().add(
+                        SetLocationEvent(),
+                      ),
+                  label: 'Get Location',
+                  icon: Icons.location_on,
                 ),
               ),
               Padding(
@@ -826,39 +976,53 @@ class _SalesActivityFormSecondStepState
                     const SizedBox(height: 16),
                     SizedBox(
                       height: 200,
-                      child: FlutterMap(
-                        options: MapOptions(
-                          initialCenter: LatLng(
-                            -7.245953,
-                            112.7371463,
-                          ),
-                          initialZoom: 17.0,
-                        ),
-                        children: [
-                          TileLayer(
-                            urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                            subdomains: const ['a', 'b', 'c'],
-                            userAgentPackageName: 'com.example.vivakencanaapp',
-                          ),
-                          if (state.position != null)
-                            MarkerLayer(
-                              markers: [
-                                Marker(
-                                  point: LatLng(
-                                    state.position!.latitude,
-                                    state.position!.longitude,
-                                  ),
-                                  width: 40,
-                                  height: 40,
-                                  child: const Icon(
-                                    Icons.location_pin,
-                                    color: Colors.red,
-                                    size: 40,
-                                  ),
+                      child: BlocBuilder<
+                        SalesActivityFormBloc,
+                        SalesActivityFormState
+                      >(
+                        builder: (context, state) {
+                          if (state is CurrentLocationLoading) {
+                            return Center(child: CircularProgressIndicator());
+                          } else if (state is CurrentLocationSuccess) {
+                            return FlutterMap(
+                              options: MapOptions(
+                                initialCenter: LatLng(
+                                  state.initialPosition.latitude,
+                                  state.initialPosition.longitude,
                                 ),
+                                initialZoom: 17.0,
+                              ),
+                              children: [
+                                TileLayer(
+                                  urlTemplate:
+                                      'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                                  subdomains: const ['a', 'b', 'c'],
+                                  userAgentPackageName:
+                                      'com.example.vivakencanaapp',
+                                ),
+                                if (state.position != null)
+                                  MarkerLayer(
+                                    markers: [
+                                      Marker(
+                                        point: LatLng(
+                                          state.position!.latitude,
+                                          state.position!.longitude,
+                                        ),
+                                        width: 40,
+                                        height: 40,
+                                        child: const Icon(
+                                          Icons.location_pin,
+                                          color: Colors.red,
+                                          size: 40,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                               ],
-                            ),
-                        ],
+                            );
+                          }
+                          return SizedBox();
+                        },
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -959,7 +1123,6 @@ class _SalesActivityFormSecondStepState
               //     ],
               //   ),
               // ),
-
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.w),
                 child: Row(
@@ -988,10 +1151,59 @@ class _SalesActivityFormSecondStepState
                             borderRadius: BorderRadius.circular(4),
                           ), // Adjust radius here
                         ),
-                        onPressed: () {
-                          // context.read<SalesActivityFormBloc>().add(
-                          //   SalesActivityFormSubmit(amount: _kasbonController.text),
-                          // );
+                        onPressed: () async {
+                          final activities = [
+                            'Registrasi Customer Baru',
+                            'Penawaran Produk',
+                            'Taking Order',
+                            'Info Program/Hadiah',
+                            'Penagihan',
+                            'Customer Visit/Assistensi',
+                          ];
+                          final selected = state.selectedActivities;
+                          final List<model.Image> modelImages =
+                              await prepareImagesForSubmission(state.images);
+                          final formData = model.SalesActivityFormData(
+                            customerId: '',
+                            custName: widget.custName,
+                            custKtpNpwp: widget.ktpNpwp,
+                            custPhone: widget.phone,
+                            custEmail: widget.email,
+                            custAddress: widget.address,
+                            custProvince: widget.province,
+                            custCity: widget.city,
+                            custDistrict: widget.district,
+                            custVillage: widget.village,
+                            custBussiness: widget.custBusiness ?? '',
+                            custBussinessStatus:
+                                widget.custBusinessStatus ?? '',
+                            custBussinessType: widget.custBusinessType ?? '',
+                            custTaxType: widget.custTaxType ?? '',
+                            custOfficeType: widget.custOfficeType ?? '',
+                            custOfficeOwnership: widget.custOwnership ?? '',
+                            custType: widget.custType ?? '',
+                            checkboxCar: widget.salesVehicle ? 'Y' : 'N',
+                            checkbox1: selected.contains(activities[0]),
+                            checkbox2: selected.contains(activities[1]),
+                            checkbox3: selected.contains(activities[2]),
+                            checkbox4: selected.contains(activities[3]),
+                            checkbox5: selected.contains(activities[4]),
+                            checkbox6: selected.contains(activities[5]),
+                            currentLocation: state.address,
+                            latitude: state.position!.latitude,
+                            longitude: state.position!.longitude,
+                            remark: "",
+                            image: "",
+                            images: modelImages,
+                            new_: "",
+                            checkpoint: "",
+                            salesid: "",
+                            speedoKmModel: "",
+                          );
+
+                          context.read<SalesActivityFormBloc>().add(
+                            SubmitSalesActivityForm(formData),
+                          );
                         },
                         child: Text("Submit"),
                       ),

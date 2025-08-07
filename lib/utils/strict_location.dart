@@ -33,4 +33,18 @@ class StrictLocation {
       throw Exception('Layanan lokasi tidak aktif');
     }
   }
+
+  static Future<Position> getCurrentPosition() async {
+    await checkLocationRequirements();
+    final LocationSettings locationSettings = LocationSettings(
+      accuracy: LocationAccuracy.high,
+      distanceFilter: 100,
+    );
+
+    final position = await Geolocator.getCurrentPosition(
+      locationSettings: locationSettings
+    );
+
+    return position;
+  }
 }

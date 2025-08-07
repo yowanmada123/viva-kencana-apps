@@ -13,7 +13,7 @@ class SalesActivityRepository {
   SalesActivityRepository({required this.salesActivityRest});
 
   Future<Either<CustomException, SalesInfo>> getSalesInfo({
-    required String deliveryID,
+    String deliveryID = '',
   }) async {
     return salesActivityRest.getSalesInfo();
   }

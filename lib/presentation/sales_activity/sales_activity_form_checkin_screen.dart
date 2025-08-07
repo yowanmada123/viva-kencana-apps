@@ -6,9 +6,12 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:vivakencanaapp/presentation/sales_activity/sales_activity_form_screen.dart';
 
 import '../../bloc/sales_activity/checkin/sales_activity_form_checkin_bloc.dart';
+import '../../utils/strict_location.dart';
+import '../widgets/base_danger_button.dart';
+import '../widgets/base_primary_button.dart';
+import 'sales_activity_form_screen.dart';
 
 class SalesActivityFormCheckInScreen extends StatefulWidget {
   const SalesActivityFormCheckInScreen({Key? key}) : super(key: key);
@@ -42,6 +45,12 @@ class _SalesActivityFormCheckInScreenState extends State<SalesActivityFormCheckI
         const SnackBar(content: Text('Akses kamera diperlukan untuk mengambil foto.'), backgroundColor: Colors.red),
       );
     }
+  }
+
+  @override
+  void initState() {
+    StrictLocation.checkLocationRequirements();
+    super.initState();
   }
 
   @override
@@ -89,10 +98,10 @@ class _SalesActivityFormCheckInScreenState extends State<SalesActivityFormCheckI
                     keyboardType: TextInputType.number,
                   ),
                   const SizedBox(height: 16),
-                  ElevatedButton.icon(
+                  BasePrimaryButton(
                     onPressed: () => context.read<SalesActivityFormCheckInBloc>().add(SetLocationEvent()),
-                    icon: const Icon(Icons.location_on),
-                    label: const Text("Get Location"),
+                    label: "Get Location",
+                    icon: Icons.location_on,
                   ),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -143,10 +152,7 @@ class _SalesActivityFormCheckInScreenState extends State<SalesActivityFormCheckI
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      ElevatedButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: const Text("Back"),
-                      ),
+                      BaseDangerButton(onPressed: (){}, label: 'Back'),
                       BlocListener<SalesActivityFormCheckInBloc, SalesActivityFormCheckInState>(
                         listenWhen: (previous, current) {
                           return previous.isCheckedIn != current.isCheckedIn ||
@@ -177,7 +183,10 @@ class _SalesActivityFormCheckInScreenState extends State<SalesActivityFormCheckI
                             Navigator.of(context).pop();
                           }
                         },
-                        child: ElevatedButton(
+                        child: BasePrimaryButton(
+                          label: !state.isCheckedIn
+                                ? "Check In"
+                                : (state.isCheckedOut ? "Selesai" : "Check Out"),
                           onPressed: () {
                             if (!state.isCheckedIn) {
                               context.read<SalesActivityFormCheckInBloc>().add(SetCheckInEvent());
@@ -185,11 +194,6 @@ class _SalesActivityFormCheckInScreenState extends State<SalesActivityFormCheckI
                               context.read<SalesActivityFormCheckInBloc>().add(SetCheckOutEvent());
                             }
                           },
-                          child: Text(
-                            !state.isCheckedIn
-                                ? "Check In"
-                                : (state.isCheckedOut ? "Selesai" : "Check Out"),
-                          ),
                         ),
                       ),
                     ],

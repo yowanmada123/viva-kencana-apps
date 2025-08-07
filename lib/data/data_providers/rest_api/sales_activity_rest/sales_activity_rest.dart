@@ -27,7 +27,7 @@ class SalesActivityRest {
       if (response.statusCode == 200) {
         log('Response body: ${response.data}');
         final body = response.data;
-        final salesInfo = SalesInfo.fromMap(body['data']);
+        final salesInfo = SalesInfo.fromMap(body);
         return Right(salesInfo);
       } else {
         return Left(NetUtils.parseErrorResponse(response: response.data));
@@ -174,7 +174,7 @@ class SalesActivityRest {
 
         List<String> villageList =
             (body['village'] as List)
-                .map((item) => item['village'] as String)
+                .map((item) => item['vilage'] as String)
                 .toList();
 
         return Right(villageList);
@@ -211,7 +211,7 @@ class SalesActivityRest {
         final body = response.data;
 
         final List<CustomerInfo> customers =
-            (body['data'] as List)
+            (body['result'] as List)
                 .map((item) => CustomerInfo.fromMap(item))
                 .toList();
 
