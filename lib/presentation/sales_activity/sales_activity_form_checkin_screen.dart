@@ -12,6 +12,7 @@ import '../../bloc/sales_activity/checkin/sales_activity_form_checkin_bloc.dart'
 import '../../models/sales_activity/submit_data.dart';
 import '../../utils/strict_location.dart';
 import '../widgets/base_danger_button.dart';
+import '../widgets/base_dropdown_button.dart';
 import '../widgets/base_primary_button.dart';
 import 'sales_activity_form_screen.dart';
 
@@ -27,7 +28,7 @@ class _SalesActivityFormCheckInScreenState
     extends State<SalesActivityFormCheckInScreen> {
   final _picker = ImagePicker();
   final _odometerController = TextEditingController();
-  bool salesmanVehicle = false;
+  String? selectedSalesmanVehicle;
   String imagePath = '';
   final MapController _mapController = MapController();
 
@@ -105,7 +106,7 @@ class _SalesActivityFormCheckInScreenState
     >(
       builder: (context, state) {
         return Scaffold(
-          appBar: AppBar(title: Text("Checkin Form")),
+          appBar: AppBar(title: Text("Sales Form")),
           body: Padding(
             padding: const EdgeInsets.all(16.0),
             child: SingleChildScrollView(
@@ -164,14 +165,20 @@ class _SalesActivityFormCheckInScreenState
                       const SizedBox(height: 16),
                       SizedBox(
                         height: 200,
-                        child: BlocBuilder<SalesActivityFormCheckInBloc, SalesActivityFormCheckInState>(
+                        child: BlocBuilder<
+                          SalesActivityFormCheckInBloc,
+                          SalesActivityFormCheckInState
+                        >(
                           builder: (context, state) {
-                            if(state is CurrentLocationLoading){
+                            if (state is CurrentLocationLoading) {
                               return Center(child: CircularProgressIndicator());
                             } else {
                               if (state.position != null) {
                                 _mapController.move(
-                                  LatLng(state.position!.latitude, state.position!.longitude),
+                                  LatLng(
+                                    state.position!.latitude,
+                                    state.position!.longitude,
+                                  ),
                                   17.0,
                                 );
                               }
@@ -183,7 +190,8 @@ class _SalesActivityFormCheckInScreenState
                                 ),
                                 children: [
                                   TileLayer(
-                                    urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                                    urlTemplate:
+                                        'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                                     subdomains: const ['a', 'b', 'c'],
                                     userAgentPackageName:
                                         'com.example.vivakencanaapp',
@@ -213,20 +221,21 @@ class _SalesActivityFormCheckInScreenState
                         ),
                       ),
                       const SizedBox(height: 8),
-                      Text(state.address),
+                      Text(state.address!),
                     ],
                   ),
-                  CheckboxListTile(
-                    value: salesmanVehicle,
-                    contentPadding: EdgeInsets.zero,
-                    title: Text(
-                      'Salesman Car',
-                      style: const TextStyle(fontSize: 14),
-                    ),
-                    controlAffinity: ListTileControlAffinity.leading,
-                    onChanged: (bool? value) {
+                  BaseDropdownButton(
+                    label: "Salesman Vehicle",
+                    items: {
+                      "Y": "Company Car",
+                      "N": "Private Car",
+                      "M": "Private Motorcycle",
+                      "L": "Online Transport",
+                    },
+                    value: selectedSalesmanVehicle,
+                    onChanged: (val) {
                       setState(() {
-                        salesmanVehicle = value ?? false;
+                        selectedSalesmanVehicle = val;
                       });
                     },
                   ),
@@ -248,7 +257,7 @@ class _SalesActivityFormCheckInScreenState
                           if (state is SalesActivityFormCheckInSuccess) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
-                                content: Text("Check in Berhasil!"),
+                                content: Text("Berhasil!"),
                                 backgroundColor: Colors.green,
                               ),
                             );
@@ -296,14 +305,14 @@ class _SalesActivityFormCheckInScreenState
                                                 >()
                                                 .state;
 
-                                        if (blocState.position == null ||
+                                        if (blocState.address == '' ||
                                             _odometerController.text.isEmpty) {
                                           ScaffoldMessenger.of(
                                             context,
                                           ).showSnackBar(
                                             const SnackBar(
                                               content: Text(
-                                                "Mohon isi odometer dan pastikan lokasi tersedia.",
+                                                "Mohon isi odometer dan pastikan alamat tersedia.",
                                               ),
                                               backgroundColor: Colors.orange,
                                             ),
@@ -312,8 +321,7 @@ class _SalesActivityFormCheckInScreenState
                                         }
 
                                         final formData = SalesActivityFormData(
-                                          checkboxCar:
-                                              salesmanVehicle ? 'Y' : 'N',
+                                          checkboxCar: selectedSalesmanVehicle,
                                           latitude:
                                               blocState.position!.latitude,
                                           longitude:
