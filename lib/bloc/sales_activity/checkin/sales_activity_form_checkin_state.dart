@@ -84,3 +84,10 @@ class CheckinError extends SalesActivityFormCheckInState {
 
   const CheckinError(this.message);
 }
+
+class CurrentLocationLoading extends SalesActivityFormCheckInState {}
+
+class CurrentLocationSuccess extends SalesActivityFormCheckInState {
+  final Position initialPosition;
+  const CurrentLocationSuccess(this.initialPosition);
+}
