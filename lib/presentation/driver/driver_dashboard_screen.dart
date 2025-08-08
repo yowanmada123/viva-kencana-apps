@@ -63,7 +63,7 @@ class MyGridLayout extends StatelessWidget {
         routeAction = () async {
           final bloc = context.read<SalesActivityFormCheckInBloc>();
           bloc.add(LoadCheckinStatus());
-          await Future.delayed(Duration(milliseconds: 500));
+          await Future.delayed(Duration(milliseconds: 700));
 
           final state = bloc.state;
           if (state is CheckinLoaded) {
@@ -80,7 +80,7 @@ class MyGridLayout extends StatelessWidget {
             }
           } else if (state is CheckinError) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text("Gagal memuat status check-in: ${state.message}")),
+              SnackBar(content: Text("Gagal memuat status check-in. Mohon coba lagi!")),
             );
           } else {
             ScaffoldMessenger.of(context).showSnackBar(

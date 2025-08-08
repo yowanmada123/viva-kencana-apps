@@ -5,7 +5,7 @@ class SalesActivityFormCheckInState extends Equatable {
   final File? imageCheckOut;
   final String odometer;
   final Position? position;
-  final String address;
+  final String? address;
   final bool isCheckedIn;
   final bool isCheckedOut;
 
@@ -70,13 +70,52 @@ class CheckinInitial extends SalesActivityFormCheckInState {}
 
 class CheckinLoading extends SalesActivityFormCheckInState {}
 
-class   CheckinLoaded extends SalesActivityFormCheckInState {
+class CheckinLoaded extends SalesActivityFormCheckInState {
   final CheckinInfo checkinInfo;
 
-  const CheckinLoaded(this.checkinInfo);
+  const CheckinLoaded(this.checkinInfo, {
+    File? imageCheckIn,
+    File? imageCheckOut,
+    String odometer = '',
+    Position? position,
+    String? address = '',
+    bool isCheckedIn = false,
+    bool isCheckedOut = false,
+  }) : super(
+    imageCheckIn: imageCheckIn,
+    imageCheckOut: imageCheckOut,
+    odometer: odometer,
+    position: position,
+    address: address,
+    isCheckedIn: isCheckedIn,
+    isCheckedOut: isCheckedOut,
+  );
 
   @override
   bool get isCheckedIn => checkinInfo.stat == 'Y';
+
+  @override
+  CheckinLoaded copyWith({
+    File? imageCheckIn,
+    File? imageCheckOut,
+    String? odometer,
+    Position? position,
+    String? address,
+    bool? isCheckedIn,
+    bool? isCheckedOut,
+    CheckinInfo? checkinInfo,
+  }) {
+    return CheckinLoaded(
+      checkinInfo ?? this.checkinInfo,
+      imageCheckIn: imageCheckIn ?? this.imageCheckIn,
+      imageCheckOut: imageCheckOut ?? this.imageCheckOut,
+      odometer: odometer ?? this.odometer,
+      position: position ?? this.position,
+      address: address ?? this.address,
+      isCheckedIn: isCheckedIn ?? this.isCheckedIn,
+      isCheckedOut: isCheckedOut ?? this.isCheckedOut,
+    );
+  }
 }
 
 class CheckinError extends SalesActivityFormCheckInState {

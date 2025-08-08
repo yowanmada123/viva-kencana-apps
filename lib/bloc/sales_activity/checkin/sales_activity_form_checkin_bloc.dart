@@ -19,10 +19,8 @@ class SalesActivityFormCheckInBloc extends Bloc<SalesActivityFormCheckInEvent, S
     on<SubmitSalesActivityCheckInForm>(_onSubmitSalesActivityForm);
     on<LoadCheckinStatus>(_onGetCheckinStatus);
     on<LoadCurrentLocation>(_onLoadCurrentLocation);
+    on<SetImageEvent>(_onSetImageEvent);
 
-    on<SetImageEvent>((event, emit) {
-      emit(state.copyWith(imageCheckIn: event.image));
-    });
     on<SetOdometerEvent>((event, emit) {
       emit(state.copyWith(odometer: event.odometer));
     });
@@ -59,6 +57,18 @@ class SalesActivityFormCheckInBloc extends Bloc<SalesActivityFormCheckInEvent, S
         print("Failed to get location: $e");
       }
     });
+  }
+
+  Future<void> _onSetImageEvent(
+    SetImageEvent event,
+    Emitter<SalesActivityFormCheckInState> emit,
+  ) async {
+    if (state is CheckinLoaded) {
+      final current = state as CheckinLoaded;
+      emit(current.copyWith(imageCheckIn: event.image));
+    } else {
+      emit(state.copyWith(imageCheckIn: event.image));
+    }
   }
 
   Future<void> _onSubmitSalesActivityForm(
@@ -105,17 +115,17 @@ class SalesActivityFormCheckInBloc extends Bloc<SalesActivityFormCheckInEvent, S
     emit(CurrentLocationLoading());
     try {
       final position = await StrictLocation.getCurrentPosition();
-      final placemarks = await placemarkFromCoordinates(
-        position.latitude,
-        position.longitude,
-      );
+      // final placemarks = await placemarkFromCoordinates(
+      //   position.latitude,
+      //   position.longitude,
+      // );
 
-      final address =
-          placemarks.isNotEmpty
-              ? "${placemarks.first.street}, ${placemarks.first.locality}, ${placemarks.first.administrativeArea}"
-              : "Address not found";
+      // final address =
+      //     placemarks.isNotEmpty
+      //         ? "${placemarks.first.street}, ${placemarks.first.locality}, ${placemarks.first.administrativeArea}"
+      //         : "Address not found";
 
-      emit(state.copyWith(position: position, address: address));
+      emit(state.copyWith(position: position));
     } catch (e) {
       print(e.toString());
     }

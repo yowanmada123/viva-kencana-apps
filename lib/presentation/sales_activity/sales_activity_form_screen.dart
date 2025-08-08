@@ -16,6 +16,7 @@ import '../../models/errors/custom_exception.dart';
 import '../../models/sales_activity/customer_info.dart';
 import '../../models/sales_activity/submit_data.dart' as model;
 import '../../utils/image_to_base_64_converter.dart';
+import '../widgets/base_dropdown_button.dart';
 import '../widgets/base_dropdown_search.dart';
 import '../widgets/base_pop_up.dart';
 import '../widgets/base_primary_button.dart';
@@ -69,6 +70,17 @@ class _SalesActivityFormScreenState extends State<SalesActivityFormScreen> {
   List<String> custOfficeType = ["GEDUNG", "RUKO", "RUMAH", "PABRIK/GUDANG"];
   List<String> custOfficeOwnership = ["SENDIRI", "SEWA", "KONTRAK", "LAINNYA"];
   List<String> custType = ["RETAIL", "PROJECT", "OTHER"];
+  dynamic salesmanVehicle = {
+    "Y": "Company Car",
+    "N": "Private Car",
+    "M": "Private Motorcycle",
+    "L": "Online Transport",
+  };
+
+  dynamic newOrExisting = {
+    "Y": "New Customer",
+    "N": "Existing Customer",
+  };
 
   String customerType = 'Existing Customer';
   String? selectedCustomer;
@@ -84,11 +96,11 @@ class _SalesActivityFormScreenState extends State<SalesActivityFormScreen> {
   String? selectedOfficeType;
   String? selectedOwnership;
   String? selectedCustomerType;
+  String? selectedSalesmanVehicle;
+  String? selectedNewOrExist;
 
   int currentStep = 0;
   double progress = 1;
-
-  bool salesmanVehicle = false;
 
   final nameController = TextEditingController();
   final ktpController = TextEditingController();
@@ -309,32 +321,42 @@ class _SalesActivityFormScreenState extends State<SalesActivityFormScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               // Customer Type
-                              DropdownButtonFormField<String>(
-                                value: customerType,
-                                padding: EdgeInsets.fromLTRB(0, 0, 16, 0),
-                                decoration: const InputDecoration(
-                                  labelText: 'Customer Type',
-                                ),
-                                items:
-                                    ['Existing Customer', 'New Customer']
-                                        .map(
-                                          (type) => DropdownMenuItem(
-                                            value: type,
-                                            child: Text(type),
-                                          ),
-                                        )
-                                        .toList(),
-                                onChanged: (value) {
+                              BaseDropdownButton(
+                                label: "New/Existing",
+                                items: newOrExisting,
+                                value: selectedNewOrExist,
+                                onChanged: (val){
                                   setState(() {
-                                    customerType = value!;
-                                    selectedCustomer = null;
-
-                                    if (customerType == 'New Customer') {
-                                      resetCustomerForm();
-                                    }
+                                    selectedNewOrExist = val;
                                   });
-                                },
+                                }
                               ),
+                              // DropdownButtonFormField<String>(
+                              //   value: customerType,
+                              //   padding: EdgeInsets.fromLTRB(0, 0, 16, 0),
+                              //   decoration: const InputDecoration(
+                              //     labelText: 'New/Existing',
+                              //   ),
+                              //   items:
+                              //       ['Existing Customer', 'New Customer']
+                              //           .map(
+                              //             (type) => DropdownMenuItem(
+                              //               value: type,
+                              //               child: Text(type),
+                              //             ),
+                              //           )
+                              //           .toList(),
+                              //   onChanged: (value) {
+                              //     setState(() {
+                              //       customerType = value!;
+                              //       selectedCustomer = null;
+
+                              //       if (customerType == 'New Customer') {
+                              //         resetCustomerForm();
+                              //       }
+                              //     });
+                              //   },
+                              // ),
                               const SizedBox(height: 6),
 
                               if (isExisting) ...[
@@ -564,7 +586,7 @@ class _SalesActivityFormScreenState extends State<SalesActivityFormScreen> {
                                 },
                               ),
                               if (!isExisting) ...[
-                                buildDropdownField(
+                                BaseDropdownButton(
                                   label: "Kind of Business",
                                   items: custBusiness,
                                   value: selectedKindOfBusiness,
@@ -575,7 +597,7 @@ class _SalesActivityFormScreenState extends State<SalesActivityFormScreen> {
                                   },
                                 ),
 
-                                buildDropdownField(
+                                BaseDropdownButton(
                                   label: "Business Status",
                                   items: custBusinessStatus,
                                   value: selectedBusinessStatus,
@@ -586,7 +608,7 @@ class _SalesActivityFormScreenState extends State<SalesActivityFormScreen> {
                                   },
                                 ),
 
-                                buildDropdownField(
+                                BaseDropdownButton(
                                   label: "Business Type",
                                   items: custBusinessType,
                                   value: selectedBusinessType,
@@ -597,7 +619,7 @@ class _SalesActivityFormScreenState extends State<SalesActivityFormScreen> {
                                   },
                                 ),
 
-                                buildDropdownField(
+                                BaseDropdownButton(
                                   label: "Tax Type",
                                   items: custTaxType,
                                   value: selectedTaxType,
@@ -608,7 +630,7 @@ class _SalesActivityFormScreenState extends State<SalesActivityFormScreen> {
                                   },
                                 ),
 
-                                buildDropdownField(
+                                BaseDropdownButton(
                                   label: "Office Type",
                                   items: custOfficeType,
                                   value: selectedOfficeType,
@@ -619,7 +641,7 @@ class _SalesActivityFormScreenState extends State<SalesActivityFormScreen> {
                                   },
                                 ),
 
-                                buildDropdownField(
+                                BaseDropdownButton(
                                   label: "Ownership",
                                   items: custOfficeOwnership,
                                   value: selectedOwnership,
@@ -630,7 +652,7 @@ class _SalesActivityFormScreenState extends State<SalesActivityFormScreen> {
                                   },
                                 ),
 
-                                buildDropdownField(
+                                BaseDropdownButton(
                                   label: "Customer Type",
                                   items: custType,
                                   value: selectedCustomerType,
@@ -642,18 +664,13 @@ class _SalesActivityFormScreenState extends State<SalesActivityFormScreen> {
                                 ),
                               ],
 
-                              CheckboxListTile(
-                                value: salesmanVehicle,
-                                contentPadding: EdgeInsets.zero,
-                                title: Text(
-                                  'Salesman Vehicle',
-                                  style: const TextStyle(fontSize: 14),
-                                ),
-                                controlAffinity:
-                                    ListTileControlAffinity.leading,
-                                onChanged: (bool? value) {
+                              BaseDropdownButton(
+                                label: "Salesman Vehicle",
+                                items: salesmanVehicle,
+                                value: selectedSalesmanVehicle,
+                                onChanged: (val) {
                                   setState(() {
-                                    salesmanVehicle = value ?? false;
+                                    selectedSalesmanVehicle = val;
                                   });
                                 },
                               ),
@@ -719,7 +736,8 @@ class _SalesActivityFormScreenState extends State<SalesActivityFormScreen> {
                       custOfficeType: selectedOfficeType,
                       custOwnership: selectedOwnership,
                       custType: selectedCustomerType,
-                      salesVehicle: salesmanVehicle,
+                      salesVehicle: selectedSalesmanVehicle,
+                      newOrExist: selectedNewOrExist,
                     ),
                   ],
                 );
@@ -742,27 +760,6 @@ class _SalesActivityFormScreenState extends State<SalesActivityFormScreen> {
       controller: controller,
     );
   }
-
-  Widget buildDropdownField({
-    required String label,
-    required List<String> items,
-    required String? value,
-    required void Function(String?) onChanged,
-    bool isDisabled = false,
-  }) {
-    return DropdownButtonFormField<String>(
-      menuMaxHeight: 300.w,
-      value: value,
-      isExpanded: true,
-      padding: EdgeInsets.fromLTRB(0, 0, 16, 0),
-      decoration: InputDecoration(labelText: label),
-      items:
-          items
-              .map((item) => DropdownMenuItem(value: item, child: Text(item)))
-              .toList(),
-      onChanged: isDisabled ? null : onChanged,
-    );
-  }
 }
 
 class _SalesActivityFormSecondStep extends StatefulWidget {
@@ -783,7 +780,8 @@ class _SalesActivityFormSecondStep extends StatefulWidget {
   final String? custOfficeType;
   final String? custOwnership;
   final String? custType;
-  final bool salesVehicle;
+  final String? salesVehicle;
+  final String? newOrExist;
 
   const _SalesActivityFormSecondStep({
     required this.onBackFunction,
@@ -803,6 +801,7 @@ class _SalesActivityFormSecondStep extends StatefulWidget {
     this.custOfficeType,
     this.custOwnership,
     this.custType,
+    this.newOrExist,
     required this.salesVehicle,
   });
 
@@ -1077,7 +1076,7 @@ class _SalesActivityFormSecondStepState
                       ),
                     ),
                     const SizedBox(height: 8),
-                        Text(state.address),
+                    Text(state.address),
                     // BlocBuilder<SalesActivityFormBloc, SalesActivityFormState>(
                     //   builder: (context, state) {
                     //   },
@@ -1237,7 +1236,7 @@ class _SalesActivityFormSecondStepState
                             custOfficeType: widget.custOfficeType ?? '',
                             custOfficeOwnership: widget.custOwnership ?? '',
                             custType: widget.custType ?? '',
-                            checkboxCar: widget.salesVehicle ? 'Y' : 'N',
+                            checkboxCar: widget.salesVehicle,
                             checkbox1: selected.contains(activities[0]),
                             checkbox2: selected.contains(activities[1]),
                             checkbox3: selected.contains(activities[2]),
@@ -1250,7 +1249,7 @@ class _SalesActivityFormSecondStepState
                             remark: "",
                             image: "",
                             images: modelImages,
-                            new_: "",
+                            new_: widget.newOrExist,
                             checkpoint: "",
                             salesid: "",
                             speedoKmModel: "",
