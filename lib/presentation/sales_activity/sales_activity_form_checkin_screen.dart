@@ -19,10 +19,12 @@ class SalesActivityFormCheckInScreen extends StatefulWidget {
   const SalesActivityFormCheckInScreen({Key? key}) : super(key: key);
 
   @override
-  State<SalesActivityFormCheckInScreen> createState() => _SalesActivityFormCheckInScreenState();
+  State<SalesActivityFormCheckInScreen> createState() =>
+      _SalesActivityFormCheckInScreenState();
 }
 
-class _SalesActivityFormCheckInScreenState extends State<SalesActivityFormCheckInScreen> {
+class _SalesActivityFormCheckInScreenState
+    extends State<SalesActivityFormCheckInScreen> {
   final _picker = ImagePicker();
   final _odometerController = TextEditingController();
   bool salesmanVehicle = false;
@@ -258,11 +260,10 @@ class _SalesActivityFormCheckInScreenState extends State<SalesActivityFormCheckI
                           }
                         },
                         builder: (context, state) {
-                          if(state is CheckinLoading){
+                          if (state is CheckinLoading) {
                             return Center(child: CircularProgressIndicator());
-                          } else if (state is CheckinLoaded){
-                            final isLoading =
-                                state is SalesActivityFormCheckInLoading;
+                          } else if (state is CheckinLoaded) {
+                            final isLoading = state is CheckinLoading;
                             final isCheckedIn = state.isCheckedIn;
 
                             return BasePrimaryButton(
@@ -297,26 +298,36 @@ class _SalesActivityFormCheckInScreenState extends State<SalesActivityFormCheckI
                                         final formData = SalesActivityFormData(
                                           checkboxCar:
                                               salesmanVehicle ? 'Y' : 'N',
-                                          latitude: blocState.position!.latitude,
+                                          latitude:
+                                              blocState.position!.latitude,
                                           longitude:
                                               blocState.position!.longitude,
                                           remark: "Tes Remark",
                                           image: imagePath,
-                                          speedoKmModel: _odometerController.text,
+                                          speedoKmModel:
+                                              _odometerController.text,
                                           checkpoint:
-                                              blocState.isCheckedIn ? "OE" : "OS",
+                                              blocState.isCheckedIn
+                                                  ? "OE"
+                                                  : "OS",
                                           salesid: "WIT001",
                                           officeid: "10",
                                         );
 
                                         context
-                                            .read<SalesActivityFormCheckInBloc>()
+                                            .read<
+                                              SalesActivityFormCheckInBloc
+                                            >()
                                             .add(
                                               SubmitSalesActivityCheckInForm(
                                                 formData,
                                               ),
                                             );
                                       },
+                            );
+                          } else if (state is CheckinError) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text("error checkin")),
                             );
                           }
                           return SizedBox();

@@ -67,7 +67,6 @@ class MyGridLayout extends StatelessWidget {
 
           final state = bloc.state;
           if (state is CheckinLoaded) {
-            print(state.checkinInfo.stat);
             if (state.checkinInfo.stat == 'Y') {
               Navigator.push(
                 context,
