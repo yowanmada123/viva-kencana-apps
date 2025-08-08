@@ -189,10 +189,6 @@ class _SalesActivityFormScreenState extends State<SalesActivityFormScreen> {
             appBar: AppBar(
               backgroundColor: Color(0xff1E4694),
               iconTheme: const IconThemeData(color: Colors.white),
-              // leading: IconButton(
-              //   icon: Icon(Icons.menu, color: Color(0xffffffff)),
-              //   onPressed: () => print("Menu"),
-              // ),
               title: Text(
                 'SALES ACTIVITY',
                 textAlign: TextAlign.center,
@@ -346,20 +342,25 @@ class _SalesActivityFormScreenState extends State<SalesActivityFormScreen> {
                                   SalesActivityFormBloc,
                                   SalesActivityFormState
                                 >(
-                                  listenWhen: (previous, current) => current is CustomerDetailLoadSuccess,
+                                  listenWhen:
+                                      (previous, current) =>
+                                          current is CustomerDetailLoadSuccess,
                                   listener: (context, state) {
                                     if (state is CustomerDetailLoadSuccess) {
                                       final detail = state.customerDetail;
 
                                       setState(() {
-                                        nameController.text = detail.namaCustomer;
+                                        nameController.text =
+                                            detail.namaCustomer;
                                         ktpController.text = detail.npwp;
-                                        phoneController.text  = detail.telepon;
+                                        phoneController.text = detail.telepon;
                                         emailController.text = detail.email;
                                         addressController.text = detail.alamat;
-                                        provinceController.text = detail.propinsi;
+                                        provinceController.text =
+                                            detail.propinsi;
                                         cityController.text = detail.real_City;
-                                        districtController.text = detail.district;
+                                        districtController.text =
+                                            detail.district;
                                         villageController.text = detail.vilage;
                                       });
                                     }
@@ -368,7 +369,9 @@ class _SalesActivityFormScreenState extends State<SalesActivityFormScreen> {
                                     SalesActivityFormBloc,
                                     SalesActivityFormState
                                   >(
-                                    listenWhen: (previous, current) => current is CustomerSearchSuccess,
+                                    listenWhen:
+                                        (previous, current) =>
+                                            current is CustomerSearchSuccess,
                                     listener: (context, state) {
                                       if (state is CustomerSearchSuccess) {
                                         setState(() {
@@ -379,7 +382,8 @@ class _SalesActivityFormScreenState extends State<SalesActivityFormScreen> {
                                     child: BaseDropdownSearch<CustomerInfo>(
                                       label: "Customer",
                                       items: customerList,
-                                      getLabel: (customer) => customer.namaCustomer,
+                                      getLabel:
+                                          (customer) => customer.namaCustomer,
                                       selectedValue: selectedCustomerInfo,
                                       onChanged: (val) {
                                         setState(() {
@@ -809,10 +813,12 @@ class _SalesActivityFormSecondStep extends StatefulWidget {
 
 class _SalesActivityFormSecondStepState
     extends State<_SalesActivityFormSecondStep> {
+  final MapController _mapController = MapController();
   String? selectedOfficePoint;
   String? selectedUserPoint;
 
   final ImagePicker _picker = ImagePicker();
+
   Future<void> _getImageFromCamera() async {
     final status = await Permission.camera.status;
 
@@ -994,21 +1000,49 @@ class _SalesActivityFormSecondStepState
                     const SizedBox(height: 16),
                     SizedBox(
                       height: 200,
-                      child: BlocBuilder<
-                        SalesActivityFormBloc,
-                        SalesActivityFormState
-                      >(
-                        builder: (context, state) {
-                          if (state is CurrentLocationLoading) {
-                            return Center(child: CircularProgressIndicator());
-                          } else if (state is CurrentLocationSuccess) {
+                      child: MultiBlocListener(
+                        listeners: [
+                          BlocListener<
+                            SalesActivityFormBloc,
+                            SalesActivityFormState
+                          >(
+                            listenWhen:
+                                (previous, current) =>
+                                    current is! CurrentLocationLoading &&
+                                    current.position != null,
+                            listener: (context, state) {
+                              if (state.position != null) {
+                                WidgetsBinding.instance.addPostFrameCallback((
+                                  _,
+                                ) {
+                                  _mapController.move(
+                                    LatLng(
+                                      state.position!.latitude,
+                                      state.position!.longitude,
+                                    ),
+                                    17.0,
+                                  );
+                                });
+                              }
+                            },
+                          ),
+                        ],
+                        child: BlocBuilder<
+                          SalesActivityFormBloc,
+                          SalesActivityFormState
+                        >(
+                          builder: (context, state) {
+                            if (state is CurrentLocationLoading) {
+                              return const Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            }
+
                             return FlutterMap(
+                              mapController: _mapController,
                               options: MapOptions(
-                                initialCenter: LatLng(
-                                  state.initialPosition.latitude,
-                                  state.initialPosition.longitude,
-                                ),
-                                initialZoom: 17.0,
+                                initialCenter: LatLng(-7.250445, 112.768845),
+                                initialZoom: 10.0,
                               ),
                               children: [
                                 TileLayer(
@@ -1038,13 +1072,16 @@ class _SalesActivityFormSecondStepState
                                   ),
                               ],
                             );
-                          }
-                          return SizedBox();
-                        },
+                          },
+                        ),
                       ),
                     ),
                     const SizedBox(height: 8),
-                    Text(state.address),
+                        Text(state.address),
+                    // BlocBuilder<SalesActivityFormBloc, SalesActivityFormState>(
+                    //   builder: (context, state) {
+                    //   },
+                    // ),
                   ],
                 ),
               ),
@@ -1152,7 +1189,7 @@ class _SalesActivityFormSecondStepState
                           backgroundColor: Color(0xffff0000),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(4),
-                          ), // Adjust radius here
+                          ),
                         ),
                         onPressed: () {
                           widget.onBackFunction();

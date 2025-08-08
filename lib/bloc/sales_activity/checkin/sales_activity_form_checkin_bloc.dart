@@ -18,6 +18,7 @@ class SalesActivityFormCheckInBloc extends Bloc<SalesActivityFormCheckInEvent, S
   SalesActivityFormCheckInBloc({required this.salesActivityRepository}) : super(const SalesActivityFormCheckInState()) {
     on<SubmitSalesActivityCheckInForm>(_onSubmitSalesActivityForm);
     on<LoadCheckinStatus>(_onGetCheckinStatus);
+    on<LoadCurrentLocation>(_onLoadCurrentLocation);
 
     on<SetImageEvent>((event, emit) {
       emit(state.copyWith(imageCheckIn: event.image));
@@ -94,6 +95,29 @@ class SalesActivityFormCheckInBloc extends Bloc<SalesActivityFormCheckInEvent, S
       );
     } catch (e) {
       emit(CheckinError(e.toString()));
+    }
+  }
+
+  Future<void> _onLoadCurrentLocation(
+    LoadCurrentLocation event,
+    Emitter<SalesActivityFormCheckInState> emit,
+  ) async {
+    emit(CurrentLocationLoading());
+    try {
+      final position = await StrictLocation.getCurrentPosition();
+      final placemarks = await placemarkFromCoordinates(
+        position.latitude,
+        position.longitude,
+      );
+
+      final address =
+          placemarks.isNotEmpty
+              ? "${placemarks.first.street}, ${placemarks.first.locality}, ${placemarks.first.administrativeArea}"
+              : "Address not found";
+
+      emit(state.copyWith(position: position, address: address));
+    } catch (e) {
+      print(e.toString());
     }
   }
 }

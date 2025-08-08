@@ -158,12 +158,7 @@ class SalesActivityFormBloc
     try {
       StrictLocation.checkLocationRequirements();
 
-      final position = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(
-          accuracy: LocationAccuracy.high,
-          distanceFilter: 100,
-        ),
-      );
+      final position = await StrictLocation.getCurrentPosition();
 
       final placemarks = await placemarkFromCoordinates(
         position.latitude,
@@ -202,7 +197,17 @@ class SalesActivityFormBloc
     emit(CurrentLocationLoading());
     try {
       final position = await StrictLocation.getCurrentPosition();
-      emit(CurrentLocationSuccess(position));
+      final placemarks = await placemarkFromCoordinates(
+        position.latitude,
+        position.longitude,
+      );
+
+      final address =
+          placemarks.isNotEmpty
+              ? "${placemarks.first.street}, ${placemarks.first.locality}, ${placemarks.first.administrativeArea}"
+              : "Address not found";
+
+      emit(state.copyWith(position: position, address: address));
     } catch (e) {
       print(e.toString());
     }

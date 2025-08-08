@@ -29,6 +29,7 @@ class _SalesActivityFormCheckInScreenState
   final _odometerController = TextEditingController();
   bool salesmanVehicle = false;
   String imagePath = '';
+  final MapController _mapController = MapController();
 
   String? _extractOdometerFromText(String text) {
     final regex = RegExp(r'\b\d{4,7}\b');
@@ -92,6 +93,7 @@ class _SalesActivityFormCheckInScreenState
   void initState() {
     StrictLocation.checkLocationRequirements();
     context.read<SalesActivityFormCheckInBloc>().add(LoadCheckinStatus());
+    context.read<SalesActivityFormCheckInBloc>().add(LoadCurrentLocation());
     super.initState();
   }
 
@@ -162,38 +164,52 @@ class _SalesActivityFormCheckInScreenState
                       const SizedBox(height: 16),
                       SizedBox(
                         height: 200,
-                        child: FlutterMap(
-                          options: MapOptions(
-                            initialCenter: LatLng(-7.245953, 112.7371463),
-                            initialZoom: 17.0,
-                          ),
-                          children: [
-                            TileLayer(
-                              urlTemplate:
-                                  'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                              subdomains: const ['a', 'b', 'c'],
-                              userAgentPackageName:
-                                  'com.example.vivakencanaapp',
-                            ),
-                            if (state.position != null)
-                              MarkerLayer(
-                                markers: [
-                                  Marker(
-                                    point: LatLng(
-                                      state.position!.latitude,
-                                      state.position!.longitude,
-                                    ),
-                                    width: 40,
-                                    height: 40,
-                                    child: const Icon(
-                                      Icons.location_pin,
-                                      color: Colors.red,
-                                      size: 40,
-                                    ),
+                        child: BlocBuilder<SalesActivityFormCheckInBloc, SalesActivityFormCheckInState>(
+                          builder: (context, state) {
+                            if(state is CurrentLocationLoading){
+                              return Center(child: CircularProgressIndicator());
+                            } else {
+                              if (state.position != null) {
+                                _mapController.move(
+                                  LatLng(state.position!.latitude, state.position!.longitude),
+                                  17.0,
+                                );
+                              }
+                              return FlutterMap(
+                                mapController: _mapController,
+                                options: MapOptions(
+                                  initialCenter: LatLng(-7.250445, 112.768845),
+                                  initialZoom: 10,
+                                ),
+                                children: [
+                                  TileLayer(
+                                    urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                                    subdomains: const ['a', 'b', 'c'],
+                                    userAgentPackageName:
+                                        'com.example.vivakencanaapp',
                                   ),
+                                  if (state.position != null)
+                                    MarkerLayer(
+                                      markers: [
+                                        Marker(
+                                          point: LatLng(
+                                            state.position!.latitude,
+                                            state.position!.longitude,
+                                          ),
+                                          width: 40,
+                                          height: 40,
+                                          child: const Icon(
+                                            Icons.location_pin,
+                                            color: Colors.red,
+                                            size: 40,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                 ],
-                              ),
-                          ],
+                              );
+                            }
+                          },
                         ),
                       ),
                       const SizedBox(height: 8),

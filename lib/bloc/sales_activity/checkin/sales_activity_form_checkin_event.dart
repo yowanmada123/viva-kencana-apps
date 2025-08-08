@@ -44,3 +44,4 @@ class SubmitSalesActivityCheckInForm extends SalesActivityFormCheckInEvent {
 }
 
 class LoadCheckinStatus extends SalesActivityFormCheckInEvent {}
+class LoadCurrentLocation extends SalesActivityFormCheckInEvent {}
