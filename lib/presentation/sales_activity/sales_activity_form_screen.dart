@@ -346,31 +346,64 @@ class _SalesActivityFormScreenState extends State<SalesActivityFormScreen> {
                                   SalesActivityFormBloc,
                                   SalesActivityFormState
                                 >(
+                                  listenWhen: (previous, current) => current is CustomerDetailLoadSuccess,
                                   listener: (context, state) {
-                                    if (state is CustomerSearchSuccess) {
+                                    if (state is CustomerDetailLoadSuccess) {
+                                      final detail = state.customerDetail;
+
                                       setState(() {
-                                        customerList = state.customers;
+                                        nameController.text = detail.namaCustomer;
+                                        ktpController.text = detail.npwp;
+                                        phoneController.text  = detail.telepon;
+                                        emailController.text = detail.email;
+                                        addressController.text = detail.alamat;
+                                        provinceController.text = detail.propinsi;
+                                        cityController.text = detail.real_City;
+                                        districtController.text = detail.district;
+                                        villageController.text = detail.vilage;
                                       });
                                     }
                                   },
-                                  child: BaseDropdownSearch<CustomerInfo>(
-                                    label: "Customer",
-                                    items: customerList,
-                                    getLabel:
-                                        (customer) => customer.namaCustomer,
-                                    selectedValue: selectedCustomerInfo,
-                                    onChanged: (val) {
-                                      setState(() {
-                                        selectedCustomerInfo = val;
-                                      });
-                                    },
-                                    onSearchChanged: (query) {
-                                      if (query.isNotEmpty) {
-                                        context
-                                            .read<SalesActivityFormBloc>()
-                                            .add(SearchCustomerData(query));
+                                  child: BlocListener<
+                                    SalesActivityFormBloc,
+                                    SalesActivityFormState
+                                  >(
+                                    listenWhen: (previous, current) => current is CustomerSearchSuccess,
+                                    listener: (context, state) {
+                                      if (state is CustomerSearchSuccess) {
+                                        setState(() {
+                                          customerList = state.customers;
+                                        });
                                       }
                                     },
+                                    child: BaseDropdownSearch<CustomerInfo>(
+                                      label: "Customer",
+                                      items: customerList,
+                                      getLabel: (customer) => customer.namaCustomer,
+                                      selectedValue: selectedCustomerInfo,
+                                      onChanged: (val) {
+                                        setState(() {
+                                          selectedCustomerInfo = val;
+                                        });
+
+                                        if (val != null) {
+                                          context
+                                              .read<SalesActivityFormBloc>()
+                                              .add(
+                                                FetchCustomerDetail(
+                                                  val.customerId,
+                                                ),
+                                              );
+                                        }
+                                      },
+                                      onSearchChanged: (query) {
+                                        if (query.isNotEmpty) {
+                                          context
+                                              .read<SalesActivityFormBloc>()
+                                              .add(SearchCustomerData(query));
+                                        }
+                                      },
+                                    ),
                                   ),
                                 ),
                               ],

@@ -26,7 +26,6 @@ class SalesActivityRest {
         "api/kmb/sales/CustomerVisit/getSalesData",
       );
       if (response.statusCode == 200) {
-        log('Response body: ${response.data}');
         final body = response.data;
         final salesInfo = SalesInfo.fromMap(body);
         return Right(salesInfo);
@@ -55,8 +54,6 @@ class SalesActivityRest {
         "api/kmb/sales/CustomerVisit/getProvinceMobile",
       );
       if (response.statusCode == 200) {
-        log('Response body: ${response.data}');
-
         final body = response.data;
 
         List<String> provinceList =
@@ -93,8 +90,6 @@ class SalesActivityRest {
         data: {"province": province},
       );
       if (response.statusCode == 200) {
-        log('Response body: ${response.data}');
-
         final body = response.data;
 
         List<String> cityList =
@@ -131,8 +126,6 @@ class SalesActivityRest {
         data: {"city": city},
       );
       if (response.statusCode == 200) {
-        log('Response body: ${response.data}');
-
         final body = response.data;
 
         List<String> districtList =
@@ -169,8 +162,6 @@ class SalesActivityRest {
         data: {"district": district},
       );
       if (response.statusCode == 200) {
-        log('Response body: ${response.data}');
-
         final body = response.data;
 
         List<String> villageList =
@@ -207,8 +198,6 @@ class SalesActivityRest {
         data: {"id": searchQuery},
       );
       if (response.statusCode == 200) {
-        log('Response body: ${response.data}');
-
         final body = response.data;
 
         final List<CustomerInfo> customers =
@@ -245,8 +234,6 @@ class SalesActivityRest {
         data: formData.toMap(),
       );
       if (response.statusCode == 200) {
-        log('Response body: ${response.data}');
-
         final body = response.data;
 
         return Right(body['message']);
@@ -278,8 +265,6 @@ class SalesActivityRest {
         data: formData.toMap(),
       );
       if (response.statusCode == 200) {
-        log('Response body: ${response.data}');
-
         final body = response.data;
 
         return Right(body['message']);
@@ -311,8 +296,6 @@ class SalesActivityRest {
         data: {"customer_id": customerId},
       );
       if (response.statusCode == 200) {
-        log('Response body: ${response.data}');
-
         final body = response.data;
 
         return Right(CustomerDetail.fromMap(body['customer']));
@@ -344,8 +327,6 @@ class SalesActivityRest {
       );
 
       if (response.statusCode == 200) {
-        log('Response body: ${response.data}');
-
         final body = response.data;
 
         return Right(CheckinInfo.fromMap(body));
