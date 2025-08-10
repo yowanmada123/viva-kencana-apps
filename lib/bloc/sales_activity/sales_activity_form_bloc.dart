@@ -32,6 +32,14 @@ class SalesActivityFormBloc
     on<SetLocationEvent>(_onSetLocation);
     on<SubmitSalesActivityForm>(_onSalesActivitySubmit);
     on<LoadCurrentLocation>(_onLoadCurrentLocation);
+    on<SetOdometerEvent>(_onSetOdometerEvent);
+  }
+
+  Future<void> _onSetOdometerEvent(
+    SetOdometerEvent event,
+    Emitter<SalesActivityFormState> emit,
+  ) async {
+    emit(state.copyWith(odometer: event.odometer));
   }
 
   Future<void> _onSearchCustomer(
@@ -197,17 +205,7 @@ class SalesActivityFormBloc
     emit(CurrentLocationLoading());
     try {
       final position = await StrictLocation.getCurrentPosition();
-      final placemarks = await placemarkFromCoordinates(
-        position.latitude,
-        position.longitude,
-      );
-
-      final address =
-          placemarks.isNotEmpty
-              ? "${placemarks.first.street}, ${placemarks.first.locality}, ${placemarks.first.administrativeArea}"
-              : "Address not found";
-
-      emit(state.copyWith(position: position, address: address));
+      emit(state.copyWith(position: position));
     } catch (e) {
       print(e.toString());
     }

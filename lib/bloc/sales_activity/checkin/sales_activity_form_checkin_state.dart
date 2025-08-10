@@ -130,3 +130,27 @@ class CurrentLocationSuccess extends SalesActivityFormCheckInState {
   final Position initialPosition;
   const CurrentLocationSuccess(this.initialPosition);
 }
+
+class SalesDataLoading extends SalesActivityFormCheckInState {}
+
+class SalesDataSuccess extends SalesActivityFormCheckInState {
+  final String salesId;
+  final String officeId;
+
+  const SalesDataSuccess({
+    required this.salesId,
+    required this.officeId,
+  });
+
+  @override
+  List<Object?> get props => [salesId, officeId];
+}
+
+class SalesDataError extends SalesActivityFormCheckInState {
+  final String message;
+
+  const SalesDataError(this.message);
+
+  @override
+  List<Object?> get props => [message];
+}

@@ -52,6 +52,14 @@ class SetUserOption extends SalesActivityFormEvent {
   List<Object?> get props => [option];
 }
 
+class SetOdometerEvent extends SalesActivityFormEvent {
+  final String odometer;
+  const SetOdometerEvent(this.odometer);
+
+  @override
+  List<Object?> get props => [odometer];
+}
+
 class SetLocationEvent extends SalesActivityFormEvent {}
 
 class SearchCustomerData extends SalesActivityFormEvent {

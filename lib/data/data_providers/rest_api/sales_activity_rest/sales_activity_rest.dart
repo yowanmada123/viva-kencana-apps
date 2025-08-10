@@ -229,6 +229,7 @@ class SalesActivityRest {
       log(
         'Request to https://v2.kencana.org/api/kmb/sales/CustomerVisit/getActivityData (POST)',
       );
+      log("formData: $formData");
       final response = await http.post(
         "api/kmb/sales/CustomerVisit/storeActivityData",
         data: formData.toMap(),

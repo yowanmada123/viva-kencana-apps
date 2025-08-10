@@ -45,3 +45,10 @@ class SubmitSalesActivityCheckInForm extends SalesActivityFormCheckInEvent {
 
 class LoadCheckinStatus extends SalesActivityFormCheckInEvent {}
 class LoadCurrentLocation extends SalesActivityFormCheckInEvent {}
+
+class LoadSalesData extends SalesActivityFormCheckInEvent {
+  const LoadSalesData();
+
+  @override
+  List<Object?> get props => [];
+}

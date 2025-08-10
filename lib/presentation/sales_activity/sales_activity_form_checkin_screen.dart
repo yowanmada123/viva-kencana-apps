@@ -17,7 +17,9 @@ import '../widgets/base_primary_button.dart';
 import 'sales_activity_form_screen.dart';
 
 class SalesActivityFormCheckInScreen extends StatefulWidget {
-  const SalesActivityFormCheckInScreen({Key? key}) : super(key: key);
+  final String salesId;
+  final String officeId;
+  const SalesActivityFormCheckInScreen({Key? key, required this.salesId, required this.officeId}) : super(key: key);
 
   @override
   State<SalesActivityFormCheckInScreen> createState() =>
@@ -28,9 +30,10 @@ class _SalesActivityFormCheckInScreenState
     extends State<SalesActivityFormCheckInScreen> {
   final _picker = ImagePicker();
   final _odometerController = TextEditingController();
+  final MapController _mapController = MapController();
+
   String? selectedSalesmanVehicle;
   String imagePath = '';
-  final MapController _mapController = MapController();
 
   String? _extractOdometerFromText(String text) {
     final regex = RegExp(r'\b\d{4,7}\b');
@@ -159,9 +162,6 @@ class _SalesActivityFormCheckInScreenState
                     label: "Get Location",
                     icon: Icons.location_on,
                   ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
                       const SizedBox(height: 16),
                       SizedBox(
                         height: 200,
@@ -222,8 +222,6 @@ class _SalesActivityFormCheckInScreenState
                       ),
                       const SizedBox(height: 8),
                       Text(state.address!),
-                    ],
-                  ),
                   BaseDropdownButton(
                     label: "Salesman Vehicle",
                     items: {
@@ -243,7 +241,15 @@ class _SalesActivityFormCheckInScreenState
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      BaseDangerButton(onPressed: () {}, label: 'Back'),
+                      BaseDangerButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        }, 
+                        label: 'Back',
+                        // width: double.infinity,
+                      ),
+
+                      SizedBox(width: 16),
 
                       BlocConsumer<
                         SalesActivityFormCheckInBloc,
@@ -268,7 +274,7 @@ class _SalesActivityFormCheckInScreenState
                                 Navigator.of(context).pushReplacement(
                                   MaterialPageRoute(
                                     builder:
-                                        (_) => const SalesActivityFormScreen(),
+                                        (_) => SalesActivityFormScreen(salesId: widget.salesId, officeId: widget.salesId),
                                   ),
                                 );
                               },
@@ -319,6 +325,18 @@ class _SalesActivityFormCheckInScreenState
                                           );
                                           return;
                                         }
+                                        if (selectedSalesmanVehicle == null) {
+                                          ScaffoldMessenger.of(context,
+                                          ).showSnackBar(
+                                            const SnackBar(
+                                              content: Text(
+                                                "Mohon pilih jenis transportasi anda.",
+                                              ),
+                                              backgroundColor: Colors.orange,
+                                            ),
+                                          );
+                                          return;
+                                        }
 
                                         final formData = SalesActivityFormData(
                                           checkboxCar: selectedSalesmanVehicle,
@@ -334,8 +352,8 @@ class _SalesActivityFormCheckInScreenState
                                               blocState.isCheckedIn
                                                   ? "OE"
                                                   : "OS",
-                                          salesid: "WIT001",
-                                          officeid: "10",
+                                          salesid: widget.salesId,
+                                          officeid: widget.officeId,
                                         );
 
                                         context
@@ -351,7 +369,7 @@ class _SalesActivityFormCheckInScreenState
                             );
                           } else if (state is CheckinError) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text("error checkin")),
+                              SnackBar(content: Text("Terjadi kesalahan mohon coba lagi.")),
                             );
                           }
                           return SizedBox();
