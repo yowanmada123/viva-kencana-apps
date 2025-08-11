@@ -20,6 +20,7 @@ class SalesActivityFormCheckInBloc extends Bloc<SalesActivityFormCheckInEvent, S
     on<LoadCheckinStatus>(_onGetCheckinStatus);
     on<LoadCurrentLocation>(_onLoadCurrentLocation);
     on<SetImageEvent>(_onSetImageEvent);
+    on<LoadSalesData>(_onGetSalesData);
 
     on<SetOdometerEvent>((event, emit) {
       emit(state.copyWith(odometer: event.odometer));
@@ -115,19 +116,31 @@ class SalesActivityFormCheckInBloc extends Bloc<SalesActivityFormCheckInEvent, S
     emit(CurrentLocationLoading());
     try {
       final position = await StrictLocation.getCurrentPosition();
-      // final placemarks = await placemarkFromCoordinates(
-      //   position.latitude,
-      //   position.longitude,
-      // );
-
-      // final address =
-      //     placemarks.isNotEmpty
-      //         ? "${placemarks.first.street}, ${placemarks.first.locality}, ${placemarks.first.administrativeArea}"
-      //         : "Address not found";
 
       emit(state.copyWith(position: position));
     } catch (e) {
       print(e.toString());
+    }
+  }
+
+  Future<void> _onGetSalesData(
+    LoadSalesData event,
+    Emitter<SalesActivityFormCheckInState> emit,
+  ) async {
+    emit(SalesDataLoading());
+    try {
+      final result = await salesActivityRepository.getSalesInfo();
+      result.fold(
+        (failure) {
+          emit(SalesDataError(failure.message!));
+        },
+        (success) {
+          final firstData = success.salesData.first;
+          emit(SalesDataSuccess(salesId: firstData.salesId, officeId: firstData.officeId));
+        },
+      );
+    } catch (e) {
+      emit(SalesDataError(e.toString()));
     }
   }
 }

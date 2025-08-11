@@ -5,6 +5,8 @@ class BasePrimaryButton extends StatelessWidget {
   final String label;
   final IconData? icon;
   final bool isLoading;
+  final double? width;
+  final double? height;
 
   const BasePrimaryButton({
     Key? key,
@@ -12,6 +14,8 @@ class BasePrimaryButton extends StatelessWidget {
     required this.label,
     this.icon,
     this.isLoading = false,
+    this.width,
+    this.height
   }) : super(key: key);
 
   @override
@@ -25,6 +29,7 @@ class BasePrimaryButton extends StatelessWidget {
       ),
       onPressed: isLoading ? null : onPressed,
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
         children: [
           if (icon != null) ...[

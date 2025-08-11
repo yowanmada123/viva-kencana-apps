@@ -61,22 +61,39 @@ class MyGridLayout extends StatelessWidget {
         break;
       case 'mnuSalesActivity':
         routeAction = () async {
-          final bloc = context.read<SalesActivityFormCheckInBloc>();
+        final bloc = context.read<SalesActivityFormCheckInBloc>();
+
+        bloc.add(const LoadSalesData());
+        await Future.delayed(const Duration(milliseconds: 500));
+
+        final salesState = bloc.state;
+        if (salesState is SalesDataSuccess) {
+          final salesId = salesState.salesId;
+          final officeId = salesState.officeId;
+
           bloc.add(LoadCheckinStatus());
-          await Future.delayed(Duration(milliseconds: 700));
+          await Future.delayed(const Duration(milliseconds: 500));
 
           final state = bloc.state;
           if (state is CheckinLoaded) {
             if (state.checkinInfo.stat == 'Y') {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => SalesActivityFormScreen()),
+                MaterialPageRoute(
+                  builder: (_) => SalesActivityFormScreen(
+                    salesId: salesId,
+                    officeId: officeId,
+                  ),
+                ),
               );
             } else {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => SalesActivityFormCheckInScreen(),
+                  builder: (_) => SalesActivityFormCheckInScreen(
+                    salesId: salesId,
+                    officeId: officeId,
+                  ),
                 ),
               );
             }
@@ -91,7 +108,12 @@ class MyGridLayout extends StatelessWidget {
               const SnackBar(content: Text("Sedang memuat status check-in...")),
             );
           }
-        };
+        } else if (salesState is SalesDataError) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("Gagal memuat data sales: ${salesState.message}")),
+          );
+        }
+      };
         break;
       default:
         routeAction = null;
