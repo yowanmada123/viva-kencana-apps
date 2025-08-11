@@ -75,12 +75,16 @@ class MyGridLayout extends StatelessWidget {
             } else {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => SalesActivityFormCheckInScreen()),
+                MaterialPageRoute(
+                  builder: (_) => SalesActivityFormCheckInScreen(),
+                ),
               );
             }
           } else if (state is CheckinError) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text("Gagal memuat status check-in. Mohon coba lagi!")),
+              SnackBar(
+                content: Text("Gagal memuat status check-in. Mohon coba lagi!"),
+              ),
             );
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -93,11 +97,7 @@ class MyGridLayout extends StatelessWidget {
         routeAction = null;
     }
 
-    return {
-      'icon': icon,
-      'text': caption,
-      'action': routeAction,
-    };
+    return {'icon': icon, 'text': caption, 'action': routeAction};
   }
 
   IconData _getIconForMenuId(String? menuId) {
@@ -111,7 +111,10 @@ class MyGridLayout extends StatelessWidget {
     }
   }
 
-  void _navigateToScreen(BuildContext context, Map<String, dynamic> button) async {
+  void _navigateToScreen(
+    BuildContext context,
+    Map<String, dynamic> button,
+  ) async {
     final action = button['action'] as Future<void> Function()?;
 
     if (action == null) {
@@ -196,9 +199,7 @@ class MyGridLayout extends StatelessWidget {
                 context.read<AuthenticationBloc>().add(
                   SetAuthenticationStatus(isAuthenticated: false),
                 );
-                Navigator.of(
-                  context,
-                ).popUntil((route) => route.isFirst);
+                Navigator.of(context).popUntil((route) => route.isFirst);
               }
             }
           },
@@ -207,13 +208,9 @@ class MyGridLayout extends StatelessWidget {
               final menus = state.menus;
               return _buildGroupMenu(context, menus);
             } else if (state is AccessMenuLoading) {
-              return Center(
-                child: CircularProgressIndicator(),
-              );
+              return Center(child: CircularProgressIndicator());
             } else {
-              return Center(
-                child: Text("Tidak ada menu yang dapat diakses.")
-              );
+              return Center(child: Text("Tidak ada menu yang dapat diakses."));
             }
           },
         ),
@@ -247,45 +244,36 @@ class MyGridLayout extends StatelessWidget {
   Widget _buildMenuCard(BuildContext context, Map<String, dynamic> button) {
     return Container(
       padding: EdgeInsets.all(4.w),
-      child: SizedBox.square(
-        dimension: 80.w,
+      child: GestureDetector(
+        onTap: () => _navigateToScreen(context, button),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             Container(
-              padding: EdgeInsets.all(2.w),
+              width: 48.w,
+              height: 48.w,
               decoration: BoxDecoration(
                 color: const Color(0xff1E4694),
                 borderRadius: BorderRadius.circular(10.w),
               ),
-              child: GestureDetector(
-                onTap: () => _navigateToScreen(context, button),
-                child: Container(
-                  padding: EdgeInsets.all(8.w),
-                  decoration: BoxDecoration(
-                    color: const Color(0xff1E4694),
-                    borderRadius: BorderRadius.circular(10.w),
-                  ),
-                  child: Icon(
-                    button['icon'],
-                    size: 24.w,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
+              child: Icon(button['icon'], size: 24.w, color: Colors.white),
             ),
             SizedBox(height: 4.w),
-            Text(
+            Expanded(
+              child: Text(
                 button['text'],
-                maxLines: 2, 
+                maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 12.w,
                   color: const Color(0xff1E4694),
                   fontWeight: FontWeight.bold,
+                  height: 1.2,
                 ),
               ),
+            ),
           ],
         ),
       ),
