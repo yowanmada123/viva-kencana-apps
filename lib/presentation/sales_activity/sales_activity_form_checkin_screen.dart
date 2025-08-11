@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:google_ml_kit/google_ml_kit.dart';
+import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -19,7 +19,11 @@ import 'sales_activity_form_screen.dart';
 class SalesActivityFormCheckInScreen extends StatefulWidget {
   final String salesId;
   final String officeId;
-  const SalesActivityFormCheckInScreen({Key? key, required this.salesId, required this.officeId}) : super(key: key);
+  const SalesActivityFormCheckInScreen({
+    Key? key,
+    required this.salesId,
+    required this.officeId,
+  }) : super(key: key);
 
   @override
   State<SalesActivityFormCheckInScreen> createState() =>
@@ -154,74 +158,77 @@ class _SalesActivityFormCheckInScreenState
                     keyboardType: TextInputType.number,
                   ),
                   const SizedBox(height: 16),
-                  BasePrimaryButton(
-                    onPressed:
-                        () => context.read<SalesActivityFormCheckInBloc>().add(
-                          SetLocationEvent(),
-                        ),
-                    label: "Get Location",
-                    icon: Icons.location_on,
-                  ),
-                      const SizedBox(height: 16),
-                      SizedBox(
-                        height: 200,
-                        child: BlocBuilder<
-                          SalesActivityFormCheckInBloc,
-                          SalesActivityFormCheckInState
-                        >(
-                          builder: (context, state) {
-                            if (state is CurrentLocationLoading) {
-                              return Center(child: CircularProgressIndicator());
-                            } else {
-                              if (state.position != null) {
-                                _mapController.move(
-                                  LatLng(
-                                    state.position!.latitude,
-                                    state.position!.longitude,
-                                  ),
-                                  17.0,
-                                );
-                              }
-                              return FlutterMap(
-                                mapController: _mapController,
-                                options: MapOptions(
-                                  initialCenter: LatLng(-7.250445, 112.768845),
-                                  initialZoom: 10,
-                                ),
-                                children: [
-                                  TileLayer(
-                                    urlTemplate:
-                                        'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                                    subdomains: const ['a', 'b', 'c'],
-                                    userAgentPackageName:
-                                        'com.example.vivakencanaapp',
-                                  ),
-                                  if (state.position != null)
-                                    MarkerLayer(
-                                      markers: [
-                                        Marker(
-                                          point: LatLng(
-                                            state.position!.latitude,
-                                            state.position!.longitude,
-                                          ),
-                                          width: 40,
-                                          height: 40,
-                                          child: const Icon(
-                                            Icons.location_pin,
-                                            color: Colors.red,
-                                            size: 40,
-                                          ),
-                                        ),
-                                      ],
+                  SizedBox(
+                    height: 200,
+                    child: BlocBuilder<
+                      SalesActivityFormCheckInBloc,
+                      SalesActivityFormCheckInState
+                    >(
+                      builder: (context, state) {
+                        if (state is CurrentLocationLoading) {
+                          return Center(child: CircularProgressIndicator());
+                        } else {
+                          if (state.position != null) {
+                            _mapController.move(
+                              LatLng(
+                                state.position!.latitude,
+                                state.position!.longitude,
+                              ),
+                              17.0,
+                            );
+                          }
+                          return FlutterMap(
+                            mapController: _mapController,
+                            options: MapOptions(
+                              initialCenter: LatLng(-7.250445, 112.768845),
+                              initialZoom: 10,
+                            ),
+                            children: [
+                              TileLayer(
+                                urlTemplate:
+                                    'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                                subdomains: const ['a', 'b', 'c'],
+                                userAgentPackageName:
+                                    'com.example.vivakencanaapp',
+                              ),
+                              if (state.position != null)
+                                MarkerLayer(
+                                  markers: [
+                                    Marker(
+                                      point: LatLng(
+                                        state.position!.latitude,
+                                        state.position!.longitude,
+                                      ),
+                                      width: 40,
+                                      height: 40,
+                                      child: const Icon(
+                                        Icons.location_pin,
+                                        color: Colors.red,
+                                        size: 40,
+                                      ),
                                     ),
-                                ],
-                              );
-                            }
-                          },
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(state.address!),
+                                  ],
+                                ),
+                            ],
+                          );
+                        }
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(state.address!),
+                  const SizedBox(height: 8),
+                  SizedBox(
+                    width: double.infinity,
+                    child: BasePrimaryButton(
+                      onPressed:
+                          () => context.read<SalesActivityFormCheckInBloc>().add(
+                            SetLocationEvent(),
+                          ),
+                      label: "Get Location",
+                      icon: Icons.location_on,
+                    ),
+                  ),
                   BaseDropdownButton(
                     label: "Salesman Vehicle",
                     items: {
@@ -244,7 +251,7 @@ class _SalesActivityFormCheckInScreenState
                       BaseDangerButton(
                         onPressed: () {
                           Navigator.pop(context);
-                        }, 
+                        },
                         label: 'Back',
                         // width: double.infinity,
                       ),
@@ -274,7 +281,10 @@ class _SalesActivityFormCheckInScreenState
                                 Navigator.of(context).pushReplacement(
                                   MaterialPageRoute(
                                     builder:
-                                        (_) => SalesActivityFormScreen(salesId: widget.salesId, officeId: widget.salesId),
+                                        (_) => SalesActivityFormScreen(
+                                          salesId: widget.salesId,
+                                          officeId: widget.salesId,
+                                        ),
                                   ),
                                 );
                               },
@@ -297,79 +307,94 @@ class _SalesActivityFormCheckInScreenState
                             final isLoading = state is CheckinLoading;
                             final isCheckedIn = state.isCheckedIn;
 
-                            return BasePrimaryButton(
-                              isLoading: isLoading,
-                              label: isCheckedIn ? "Checkout" : "Checkin",
-                              onPressed:
-                                  isLoading
-                                      ? null
-                                      : () {
-                                        final blocState =
-                                            context
-                                                .read<
-                                                  SalesActivityFormCheckInBloc
-                                                >()
-                                                .state;
+                            return Expanded(
+                              child: BasePrimaryButton(
+                                isLoading: isLoading,
+                                label: isCheckedIn ? "Checkout" : "Checkin",
+                                onPressed:
+                                    isLoading
+                                        ? null
+                                        : () {
+                                          final blocState =
+                                              context
+                                                  .read<
+                                                    SalesActivityFormCheckInBloc
+                                                  >()
+                                                  .state;
 
-                                        if (blocState.address == '' ||
-                                            _odometerController.text.isEmpty) {
-                                          ScaffoldMessenger.of(
-                                            context,
-                                          ).showSnackBar(
-                                            const SnackBar(
-                                              content: Text(
-                                                "Mohon isi odometer dan pastikan alamat tersedia.",
-                                              ),
-                                              backgroundColor: Colors.orange,
-                                            ),
-                                          );
-                                          return;
-                                        }
-                                        if (selectedSalesmanVehicle == null) {
-                                          ScaffoldMessenger.of(context,
-                                          ).showSnackBar(
-                                            const SnackBar(
-                                              content: Text(
-                                                "Mohon pilih jenis transportasi anda.",
-                                              ),
-                                              backgroundColor: Colors.orange,
-                                            ),
-                                          );
-                                          return;
-                                        }
-
-                                        final formData = SalesActivityFormData(
-                                          checkboxCar: selectedSalesmanVehicle,
-                                          latitude:
-                                              blocState.position!.latitude,
-                                          longitude:
-                                              blocState.position!.longitude,
-                                          remark: "Tes Remark",
-                                          image: imagePath,
-                                          speedoKmModel:
-                                              _odometerController.text,
-                                          checkpoint:
-                                              blocState.isCheckedIn
-                                                  ? "OE"
-                                                  : "OS",
-                                          salesid: widget.salesId,
-                                          officeid: widget.officeId,
-                                        );
-
-                                        context
-                                            .read<
-                                              SalesActivityFormCheckInBloc
-                                            >()
-                                            .add(
-                                              SubmitSalesActivityCheckInForm(
-                                                formData,
+                                          if (blocState.address == '' ||
+                                              _odometerController
+                                                  .text
+                                                  .isEmpty) {
+                                            ScaffoldMessenger.of(
+                                              context,
+                                            ).showSnackBar(
+                                              const SnackBar(
+                                                content: Text(
+                                                  "Mohon isi odometer dan pastikan alamat tersedia.",
+                                                ),
+                                                backgroundColor: Colors.orange,
                                               ),
                                             );
-                                      },
+                                            return;
+                                          }
+                                          if (selectedSalesmanVehicle == null) {
+                                            ScaffoldMessenger.of(
+                                              context,
+                                            ).showSnackBar(
+                                              const SnackBar(
+                                                content: Text(
+                                                  "Mohon pilih jenis transportasi anda.",
+                                                ),
+                                                backgroundColor: Colors.orange,
+                                              ),
+                                            );
+                                            return;
+                                          }
+
+                                          final formData =
+                                              SalesActivityFormData(
+                                                checkboxCar:
+                                                    selectedSalesmanVehicle,
+                                                latitude:
+                                                    blocState
+                                                        .position!
+                                                        .latitude,
+                                                longitude:
+                                                    blocState
+                                                        .position!
+                                                        .longitude,
+                                                remark: "Tes Remark",
+                                                image: imagePath,
+                                                speedoKmModel:
+                                                    _odometerController.text,
+                                                checkpoint:
+                                                    blocState.isCheckedIn
+                                                        ? "OE"
+                                                        : "OS",
+                                                salesid: widget.salesId,
+                                                officeid: widget.officeId,
+                                              );
+
+                                          context
+                                              .read<
+                                                SalesActivityFormCheckInBloc
+                                              >()
+                                              .add(
+                                                SubmitSalesActivityCheckInForm(
+                                                  formData,
+                                                ),
+                                              );
+                                        },
+                              ),
                             );
                           } else if (state is CheckinError) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text("Terjadi kesalahan mohon coba lagi.")),
+                              SnackBar(
+                                content: Text(
+                                  "Terjadi kesalahan mohon coba lagi.",
+                                ),
+                              ),
                             );
                           }
                           return SizedBox();

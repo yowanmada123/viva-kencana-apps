@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:google_ml_kit/google_ml_kit.dart';
+import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -1044,17 +1044,6 @@ class _SalesActivityFormSecondStepState
               ),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.w),
-                child: BasePrimaryButton(
-                  onPressed:
-                      () => context.read<SalesActivityFormBloc>().add(
-                        SetLocationEvent(),
-                      ),
-                  label: 'Get Location',
-                  icon: Icons.location_on,
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.w),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -1141,6 +1130,20 @@ class _SalesActivityFormSecondStepState
                     Text(state.address),
                   ],
                 ),
+              ),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.w),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: BasePrimaryButton(
+                    onPressed:
+                        () => context.read<SalesActivityFormBloc>().add(
+                          SetLocationEvent(),
+                        ),
+                    label: 'Get Location',
+                    icon: Icons.location_on,
+                  ),
+                )
               ),
               // Padding(
               //   padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.w),
@@ -1284,6 +1287,19 @@ class _SalesActivityFormSecondStepState
                         },
                         child: BasePrimaryButton(
                           onPressed: () async {
+                            if (state.address == '' || odometerController.text.isEmpty) {
+                              ScaffoldMessenger.of(
+                                context,
+                              ).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    "Mohon isi odometer dan pastikan alamat tersedia.",
+                                  ),
+                                  backgroundColor: Colors.orange,
+                                ),
+                              );
+                              return;
+                            }
                             final activities = [
                               'Registrasi Customer Baru',
                               'Penawaran Produk',

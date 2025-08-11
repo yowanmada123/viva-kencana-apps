@@ -20,35 +20,31 @@ class BasePrimaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-        width: 200,
-        // height: height ?? 48,
-        child: FilledButton(
-          style: FilledButton.styleFrom(
-            backgroundColor: const Color(0xff1C3FAA),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(4),
-            ),
-          ),
-          onPressed: isLoading ? null : onPressed,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (icon != null) ...[
-                Icon(icon, size: 18),
-                const SizedBox(width: 6),
-              ],
-              isLoading
-                ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                  )
-                : Text(label),
-            ],
-          ),
+    return FilledButton(
+      style: FilledButton.styleFrom(
+        backgroundColor: const Color(0xff1C3FAA),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(4),
         ),
-      );
+      ),
+      onPressed: isLoading ? null : onPressed,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (icon != null) ...[
+            Icon(icon, size: 18),
+            const SizedBox(width: 6),
+          ],
+          isLoading
+            ? const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+              )
+            : Text(label),
+        ],
+      ),
+    );
   }
 }
