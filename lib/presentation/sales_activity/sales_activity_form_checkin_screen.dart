@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:latlong2/latlong.dart';
@@ -116,51 +117,13 @@ class _SalesActivityFormCheckInScreenState
           appBar: AppBar(title: Text("Sales Form")),
           body: SafeArea(
             child: Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
               child: SingleChildScrollView(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text("Image"),
-                    const SizedBox(height: 8),
-                    GestureDetector(
-                      onTap: _getImageFromCamera,
-                      child: Container(
-                        height: 350,
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey),
-                          borderRadius: BorderRadius.circular(8),
-                          color: Colors.grey[100],
-                          image:
-                              state.imageCheckIn != null
-                                  ? DecorationImage(
-                                    image: FileImage(state.imageCheckIn!),
-                                    fit: BoxFit.cover,
-                                  )
-                                  : null,
-                        ),
-                        child:
-                            state.imageCheckIn == null
-                                ? const Center(
-                                  child: Icon(
-                                    Icons.camera_alt,
-                                    color: Colors.grey,
-                                    size: 40,
-                                  ),
-                                )
-                                : null,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    TextFormField(
-                      controller: _odometerController..text = state.odometer,
-                      decoration: const InputDecoration(labelText: 'Odometer'),
-                      keyboardType: TextInputType.number,
-                    ),
-                    const SizedBox(height: 16),
                     SizedBox(
-                      height: 200,
+                      height: 200.w,
                       child: BlocBuilder<
                         SalesActivityFormCheckInBloc,
                         SalesActivityFormCheckInState
@@ -218,7 +181,6 @@ class _SalesActivityFormCheckInScreenState
                     ),
                     const SizedBox(height: 8),
                     Text(state.address!),
-                    const SizedBox(height: 8),
                     SizedBox(
                       width: double.infinity,
                       child: BasePrimaryButton(
@@ -229,6 +191,46 @@ class _SalesActivityFormCheckInScreenState
                         label: "Get Location",
                         icon: Icons.location_on,
                       ),
+                    ),
+                    const Text("Image"),
+                    const SizedBox(height: 8),
+                    GestureDetector(
+                      onTap: _getImageFromCamera,
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(
+                          maxHeight: 200,
+                        ),
+                        child: AspectRatio(
+                          aspectRatio: 3 / 4,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey),
+                              borderRadius: BorderRadius.circular(8.w),
+                              color: Colors.grey[100],
+                              image: state.imageCheckIn != null
+                                  ? DecorationImage(
+                                      image: FileImage(state.imageCheckIn!),
+                                      fit: BoxFit.cover,
+                                    )
+                                  : null,
+                            ),
+                            child: state.imageCheckIn == null
+                                ? const Center(
+                                    child: Icon(
+                                      Icons.camera_alt,
+                                      color: Colors.grey,
+                                      size: 40,
+                                    ),
+                                  )
+                                : null,
+                          ),
+                        ),
+                      ),
+                    ),
+                    TextFormField(
+                      controller: _odometerController..text = state.odometer,
+                      decoration: const InputDecoration(labelText: 'Odometer'),
+                      keyboardType: TextInputType.number,
                     ),
                     BaseDropdownButton(
                       label: "Salesman Vehicle",
@@ -245,7 +247,7 @@ class _SalesActivityFormCheckInScreenState
                         });
                       },
                     ),
-                    const SizedBox(height: 32),
+                    const SizedBox(height: 8),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
