@@ -13,8 +13,7 @@ import '../../data/repository/authorization_repository.dart';
 import '../../models/errors/custom_exception.dart';
 import '../../models/menu.dart';
 import '../qr_code/qr_code_screen.dart';
-import '../sales_activity/sales_activity_form_checkin_screen.dart';
-import '../sales_activity/sales_activity_form_screen.dart';
+import '../sales_activity/sales_activity_dashboard_screen.dart';
 import '../widgets/base_pop_up.dart';
 
 class DriverDashboardScreen extends StatelessWidget {
@@ -71,43 +70,53 @@ class MyGridLayout extends StatelessWidget {
           final salesId = salesState.salesId;
           final officeId = salesState.officeId;
 
-          bloc.add(LoadCheckinStatus());
-          await Future.delayed(const Duration(milliseconds: 500));
-
-          final state = bloc.state;
-          if (state is CheckinLoaded) {
-            if (state.checkinInfo.stat == 'Y') {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => SalesActivityFormScreen(
-                    salesId: salesId,
-                    officeId: officeId,
-                  ),
-                ),
-              );
-            } else {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => SalesActivityFormCheckInScreen(
-                    salesId: salesId,
-                    officeId: officeId,
-                  ),
-                ),
-              );
-            }
-          } else if (state is CheckinError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text("Gagal memuat status check-in. Mohon coba lagi!"),
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => SalesActivityDashboardScreen(
+                salesId: salesId,
+                officeId: officeId,
               ),
-            );
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("Sedang memuat status check-in...")),
-            );
-          }
+            ),
+          );
+
+          // bloc.add(LoadCheckinStatus());
+          // await Future.delayed(const Duration(milliseconds: 500));
+
+          // final state = bloc.state;
+          // if (state is CheckinLoaded) {
+          //   if (state.checkinInfo.stat == 'Y') {
+          //     Navigator.push(
+          //       context,
+          //       MaterialPageRoute(
+          //         builder: (_) => SalesActivityFormScreen(
+          //           salesId: salesId,
+          //           officeId: officeId,
+          //         ),
+          //       ),
+          //     );
+          //   } else {
+          //     Navigator.push(
+          //       context,
+          //       MaterialPageRoute(
+          //         builder: (_) => SalesActivityFormCheckInScreen(
+          //           salesId: salesId,
+          //           officeId: officeId,
+          //         ),
+          //       ),
+          //     );
+          //   }
+          // } else if (state is CheckinError) {
+          //   ScaffoldMessenger.of(context).showSnackBar(
+          //     SnackBar(
+          //       content: Text("Gagal memuat status check-in. Mohon coba lagi!"),
+          //     ),
+          //   );
+          // } else {
+          //   ScaffoldMessenger.of(context).showSnackBar(
+          //     const SnackBar(content: Text("Sedang memuat status check-in...")),
+          //   );
+          // }
         } else if (salesState is SalesDataError) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text("Gagal memuat data sales: ${salesState.message}")),

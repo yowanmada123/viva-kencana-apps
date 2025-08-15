@@ -114,7 +114,20 @@ class _SalesActivityFormCheckInScreenState
     >(
       builder: (context, state) {
         return Scaffold(
-          appBar: AppBar(title: Text("Sales Form")),
+          appBar: AppBar(
+            title: Text(
+              'Sales Form',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontFamily: "Poppins",
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+                fontSize: 18.w,
+              ),
+            ),
+            backgroundColor: Theme.of(context).primaryColor,
+            iconTheme: const IconThemeData(color: Colors.white),
+          ),
           body: SafeArea(
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
@@ -133,13 +146,17 @@ class _SalesActivityFormCheckInScreenState
                             return Center(child: CircularProgressIndicator());
                           } else {
                             if (state.position != null) {
-                              _mapController.move(
-                                LatLng(
-                                  state.position!.latitude,
-                                  state.position!.longitude,
-                                ),
-                                17.0,
-                              );
+                              WidgetsBinding.instance.addPostFrameCallback((_) {
+                                if (mounted) {
+                                  _mapController.move(
+                                    LatLng(
+                                      state.position!.latitude,
+                                      state.position!.longitude,
+                                    ),
+                                    17.0,
+                                  );
+                                }
+                              });
                             }
                             return FlutterMap(
                               mapController: _mapController,
