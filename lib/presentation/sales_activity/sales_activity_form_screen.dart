@@ -22,7 +22,6 @@ import '../widgets/base_dropdown_button.dart';
 import '../widgets/base_dropdown_search.dart';
 import '../widgets/base_pop_up.dart';
 import '../widgets/base_primary_button.dart';
-import 'sales_activity_form_checkin_screen.dart';
 
 class SalesActivityFormScreen extends StatefulWidget {
   final String salesId;
@@ -153,31 +152,31 @@ class _SalesActivityFormScreenState extends State<SalesActivityFormScreen> {
   void initState() {
     super.initState();
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder:
-            (_) => BasePopUpDialog(
-              noText: "Kembali",
-              yesText: "Lanjutkan",
-              autoPopOnPressed: false,
-              onNoPressed: () {
-                Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(
-                    builder:
-                        (_) => SalesActivityFormCheckInScreen(
-                          salesId: widget.salesId,
-                          officeId: widget.officeId,
-                        ),
-                  ),
-                );
-              },
-              onYesPressed: () {},
-              question: "Ingin Sudahi Trip?",
-            ),
-      );
-    });
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   showDialog(
+    //     context: context,
+    //     barrierDismissible: false,
+    //     builder:
+    //         (_) => BasePopUpDialog(
+    //           noText: "Kembali",
+    //           yesText: "Lanjutkan",
+    //           autoPopOnPressed: false,
+    //           onNoPressed: () {
+    //             Navigator.of(context).pushReplacement(
+    //               MaterialPageRoute(
+    //                 builder:
+    //                     (_) => SalesActivityFormCheckInScreen(
+    //                       salesId: widget.salesId,
+    //                       officeId: widget.officeId,
+    //                     ),
+    //               ),
+    //             );
+    //           },
+    //           onYesPressed: () {},
+    //           question: "Ingin Sudahi Trip?",
+    //         ),
+    //   );
+    // });
 
     context.read<SalesActivityFormBloc>().add(FetchProvinces());
   }
