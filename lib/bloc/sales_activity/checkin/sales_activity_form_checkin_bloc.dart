@@ -135,8 +135,7 @@ class SalesActivityFormCheckInBloc extends Bloc<SalesActivityFormCheckInEvent, S
           emit(SalesDataError(failure.message!));
         },
         (success) {
-          final firstData = success.salesData.first;
-          emit(SalesDataSuccess(salesId: firstData.salesId, officeId: firstData.officeId));
+          emit(SalesDataSuccess(salesId: success.salesId, officeId: success.officeId));
         },
       );
     } catch (e) {

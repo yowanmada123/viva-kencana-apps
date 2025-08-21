@@ -12,99 +12,99 @@ class CustomerDetail {
   final String npwp;
   final String person;
   final String jabatan;
-  final String real_City;
+  final String realCity;
   final String propinsi;
   final String region;
   final String banned;
   final String payterm;
-  final String credit_limit;
-  final String banned_fee;
-  final String cust_group;
+  final String creditLimit;
+  final String bannedFee;
+  final String custGroup;
   final String email;
-  final String business_start_date;
-  final String business_status;
-  final String business_entities;
-  final String kind_of_business;
+  final String businessStartDate;
+  final String businessStatus;
+  final String businessEntities;
+  final String kindOfBusiness;
   final String building;
-  final String employee_num;
-  final String tax_status;
-  final String office_tipe;
+  final String employeeNum;
+  final String taxStatus;
+  final String officeType;
   final String ownership;
-  final String known_from;
+  final String knownFrom;
   final String omzet;
-  final String owner_name;
+  final String ownerName;
   final String dob;
-  final String city_of_birth;
-  final String husband_wife;
-  final String id_card;
-  final String id_card_no;
-  final String copi_id_card;
-  final String owner_address;
-  final String owner_province;
-  final String owner_city;
-  final String owner_phone;
-  final String owner_hp;
-  final String owner_email;
-  final String hari_raya;
+  final String cityOfBirth;
+  final String husbandWife;
+  final String idCard;
+  final String idCardNo;
+  final String copiIdCard;
+  final String ownerAddress;
+  final String ownerProvince;
+  final String ownerCity;
+  final String ownerPhone;
+  final String ownerHp;
+  final String ownerEmail;
+  final String hariRaya;
   final String bank1;
   final String bank2;
   final String bank3;
-  final String bank_atas_nama1;
-  final String bank_atas_nama2;
-  final String bank_atas_nama3;
-  final String payment_tipe1;
-  final String payment_tipe2;
-  final String payment_tipe3;
-  final String alamat_penagihan;
-  final String propinsi_penagihan;
-  final String kota_penagihan;
-  final String tlp_penagihan;
-  final String fax_penagihan;
-  final String hari_penagihan;
+  final String bankAtasNama1;
+  final String bankAtasNama2;
+  final String bankAtasNama3;
+  final String paymentTipe1;
+  final String paymentTipe2;
+  final String paymentTipe3;
+  final String alamatPenagihan;
+  final String propinsiPenagihan;
+  final String kotaPenagihan;
+  final String tlpPenagihan;
+  final String faxPenagihan;
+  final String hariPenagihan;
   final String character;
-  final String character_desc;
+  final String characterDesc;
   final String capacity;
-  final String capacity_desc;
+  final String capacityDesc;
   final String capital;
-  final String capital_desc;
+  final String capitalDesc;
   final String collateral;
-  final String collateral_dessc;
+  final String collateralDesc;
   final String condition;
-  final String condition_desc;
-  final String cust_note;
-  final String tr_date;
-  final String approve1_date;
-  final String approve2_date;
-  final String active_flag;
-  final String coffice_id;
+  final String conditionDesc;
+  final String custNote;
+  final String trDate;
+  final String approve1Date;
+  final String approve2Date;
+  final String activeFlag;
+  final String cofficeId;
   final String salesman;
   final String affiliate;
   final String district;
   final String vilage;
   final String cv;
-  final String price_role;
-  final String price_role2;
-  final String cv_id;
-  final String no_nib;
-  final String no_skd;
-  final String pic_order;
-  final String pic_order_jabatan;
-  final String pic_order_telp;
-  final String pic_order_email;
-  final String pic_tagihan;
-  final String pic_tagihan_jabatan;
-  final String pic_tagihan_telp;
-  final String pic_tagihan_email;
-  final String metode_bayar;
-  final String dt_modified;
+  final String priceRole;
+  final String priceRole2;
+  final String cvId;
+  final String noNib;
+  final String noSkd;
+  final String picOrder;
+  final String picOrderJabatan;
+  final String picOrderTelp;
+  final String picOrderEmail;
+  final String picTagihan;
+  final String picTagihanJabatan;
+  final String picTagihanTelp;
+  final String picTagihanEmail;
+  final String metodeBayar;
+  final String dtModified;
   final String skbdn;
-  final String cust_type;
-  final String npwp_group;
+  final String custType;
+  final String npwpGroup;
   final String latitude;
   final String longitude;
-  final String gps_set_by;
-  final String gps_dt_modified;
-  final String noo_date;
+  final String gpsSetBy;
+  final String gpsDtModified;
+  final String nooDate;
   CustomerDetail({
     required this.customerId,
     required this.salesId,
@@ -117,99 +117,99 @@ class CustomerDetail {
     required this.npwp,
     required this.person,
     required this.jabatan,
-    required this.real_City,
+    required this.realCity,
     required this.propinsi,
     required this.region,
     required this.banned,
     required this.payterm,
-    required this.credit_limit,
-    required this.banned_fee,
-    required this.cust_group,
+    required this.creditLimit,
+    required this.bannedFee,
+    required this.custGroup,
     required this.email,
-    required this.business_start_date,
-    required this.business_status,
-    required this.business_entities,
-    required this.kind_of_business,
+    required this.businessStartDate,
+    required this.businessStatus,
+    required this.businessEntities,
+    required this.kindOfBusiness,
     required this.building,
-    required this.employee_num,
-    required this.tax_status,
-    required this.office_tipe,
+    required this.employeeNum,
+    required this.taxStatus,
+    required this.officeType,
     required this.ownership,
-    required this.known_from,
+    required this.knownFrom,
     required this.omzet,
-    required this.owner_name,
+    required this.ownerName,
     required this.dob,
-    required this.city_of_birth,
-    required this.husband_wife,
-    required this.id_card,
-    required this.id_card_no,
-    required this.copi_id_card,
-    required this.owner_address,
-    required this.owner_province,
-    required this.owner_city,
-    required this.owner_phone,
-    required this.owner_hp,
-    required this.owner_email,
-    required this.hari_raya,
+    required this.cityOfBirth,
+    required this.husbandWife,
+    required this.idCard,
+    required this.idCardNo,
+    required this.copiIdCard,
+    required this.ownerAddress,
+    required this.ownerProvince,
+    required this.ownerCity,
+    required this.ownerPhone,
+    required this.ownerHp,
+    required this.ownerEmail,
+    required this.hariRaya,
     required this.bank1,
     required this.bank2,
     required this.bank3,
-    required this.bank_atas_nama1,
-    required this.bank_atas_nama2,
-    required this.bank_atas_nama3,
-    required this.payment_tipe1,
-    required this.payment_tipe2,
-    required this.payment_tipe3,
-    required this.alamat_penagihan,
-    required this.propinsi_penagihan,
-    required this.kota_penagihan,
-    required this.tlp_penagihan,
-    required this.fax_penagihan,
-    required this.hari_penagihan,
+    required this.bankAtasNama1,
+    required this.bankAtasNama2,
+    required this.bankAtasNama3,
+    required this.paymentTipe1,
+    required this.paymentTipe2,
+    required this.paymentTipe3,
+    required this.alamatPenagihan,
+    required this.propinsiPenagihan,
+    required this.kotaPenagihan,
+    required this.tlpPenagihan,
+    required this.faxPenagihan,
+    required this.hariPenagihan,
     required this.character,
-    required this.character_desc,
+    required this.characterDesc,
     required this.capacity,
-    required this.capacity_desc,
+    required this.capacityDesc,
     required this.capital,
-    required this.capital_desc,
+    required this.capitalDesc,
     required this.collateral,
-    required this.collateral_dessc,
+    required this.collateralDesc,
     required this.condition,
-    required this.condition_desc,
-    required this.cust_note,
-    required this.tr_date,
-    required this.approve1_date,
-    required this.approve2_date,
-    required this.active_flag,
-    required this.coffice_id,
+    required this.conditionDesc,
+    required this.custNote,
+    required this.trDate,
+    required this.approve1Date,
+    required this.approve2Date,
+    required this.activeFlag,
+    required this.cofficeId,
     required this.salesman,
     required this.affiliate,
     required this.district,
     required this.vilage,
     required this.cv,
-    required this.price_role,
-    required this.price_role2,
-    required this.cv_id,
-    required this.no_nib,
-    required this.no_skd,
-    required this.pic_order,
-    required this.pic_order_jabatan,
-    required this.pic_order_telp,
-    required this.pic_order_email,
-    required this.pic_tagihan,
-    required this.pic_tagihan_jabatan,
-    required this.pic_tagihan_telp,
-    required this.pic_tagihan_email,
-    required this.metode_bayar,
-    required this.dt_modified,
+    required this.priceRole,
+    required this.priceRole2,
+    required this.cvId,
+    required this.noNib,
+    required this.noSkd,
+    required this.picOrder,
+    required this.picOrderJabatan,
+    required this.picOrderTelp,
+    required this.picOrderEmail,
+    required this.picTagihan,
+    required this.picTagihanJabatan,
+    required this.picTagihanTelp,
+    required this.picTagihanEmail,
+    required this.metodeBayar,
+    required this.dtModified,
     required this.skbdn,
-    required this.cust_type,
-    required this.npwp_group,
+    required this.custType,
+    required this.npwpGroup,
     required this.latitude,
     required this.longitude,
-    required this.gps_set_by,
-    required this.gps_dt_modified,
-    required this.noo_date,
+    required this.gpsSetBy,
+    required this.gpsDtModified,
+    required this.nooDate,
   });
 
   CustomerDetail copyWith({
@@ -224,99 +224,99 @@ class CustomerDetail {
     String? npwp,
     String? person,
     String? jabatan,
-    String? real_City,
+    String? realCity,
     String? propinsi,
     String? region,
     String? banned,
     String? payterm,
-    String? credit_limit,
-    String? banned_fee,
-    String? cust_group,
+    String? creditLimit,
+    String? bannedFee,
+    String? custGroup,
     String? email,
-    String? business_start_date,
-    String? business_status,
-    String? business_entities,
-    String? kind_of_business,
+    String? businessStartDate,
+    String? businessStatus,
+    String? businessEntities,
+    String? kindOfBusiness,
     String? building,
-    String? employee_num,
-    String? tax_status,
-    String? office_tipe,
+    String? employeeNum,
+    String? taxStatus,
+    String? officeType,
     String? ownership,
-    String? known_from,
+    String? knownFrom,
     String? omzet,
-    String? owner_name,
+    String? ownerName,
     String? dob,
-    String? city_of_birth,
-    String? husband_wife,
-    String? id_card,
-    String? id_card_no,
-    String? copi_id_card,
-    String? owner_address,
-    String? owner_province,
-    String? owner_city,
-    String? owner_phone,
-    String? owner_hp,
-    String? owner_email,
-    String? hari_raya,
+    String? cityOfBirth,
+    String? husbandWife,
+    String? idCard,
+    String? idCardNo,
+    String? copiIdCard,
+    String? ownerAddress,
+    String? ownerProvince,
+    String? ownerCity,
+    String? ownerPhone,
+    String? ownerHp,
+    String? ownerEmail,
+    String? hariRaya,
     String? bank1,
     String? bank2,
     String? bank3,
-    String? bank_atas_nama1,
-    String? bank_atas_nama2,
-    String? bank_atas_nama3,
-    String? payment_tipe1,
-    String? payment_tipe2,
-    String? payment_tipe3,
-    String? alamat_penagihan,
-    String? propinsi_penagihan,
-    String? kota_penagihan,
-    String? tlp_penagihan,
-    String? fax_penagihan,
-    String? hari_penagihan,
+    String? bankAtasNama1,
+    String? bankAtasNama2,
+    String? bankAtasNama3,
+    String? paymentTipe1,
+    String? paymentTipe2,
+    String? paymentTipe3,
+    String? alamatPenagihan,
+    String? propinsiPenagihan,
+    String? kotaPenagihan,
+    String? tlpPenagihan,
+    String? faxPenagihan,
+    String? hariPenagihan,
     String? character,
-    String? character_desc,
+    String? characterDesc,
     String? capacity,
-    String? capacity_desc,
+    String? capacityDesc,
     String? capital,
-    String? capital_desc,
+    String? capitalDesc,
     String? collateral,
-    String? collateral_dessc,
+    String? collateralDesc,
     String? condition,
-    String? condition_desc,
-    String? cust_note,
-    String? tr_date,
-    String? approve1_date,
-    String? approve2_date,
-    String? active_flag,
-    String? coffice_id,
+    String? conditionDesc,
+    String? custNote,
+    String? trDate,
+    String? approve1Date,
+    String? approve2Date,
+    String? activeFlag,
+    String? cofficeId,
     String? salesman,
     String? affiliate,
     String? district,
     String? vilage,
     String? cv,
-    String? price_role,
-    String? price_role2,
-    String? cv_id,
-    String? no_nib,
-    String? no_skd,
-    String? pic_order,
-    String? pic_order_jabatan,
-    String? pic_order_telp,
-    String? pic_order_email,
-    String? pic_tagihan,
-    String? pic_tagihan_jabatan,
-    String? pic_tagihan_telp,
-    String? pic_tagihan_email,
-    String? metode_bayar,
-    String? dt_modified,
+    String? priceRole,
+    String? priceRole2,
+    String? cvId,
+    String? noNib,
+    String? noSkd,
+    String? picOrder,
+    String? picOrderJabatan,
+    String? picOrderTelp,
+    String? picOrderEmail,
+    String? picTagihan,
+    String? picTagihanJabatan,
+    String? picTagihanTelp,
+    String? picTagihanEmail,
+    String? metodeBayar,
+    String? dtModified,
     String? skbdn,
-    String? cust_type,
-    String? npwp_group,
+    String? custType,
+    String? npwpGroup,
     String? latitude,
     String? longitude,
-    String? gps_set_by,
-    String? gps_dt_modified,
-    String? noo_date,
+    String? gpsSetBy,
+    String? gpsDtModified,
+    String? nooDate,
   }) {
     return CustomerDetail(
       customerId: customerId ?? this.customerId,
@@ -330,99 +330,99 @@ class CustomerDetail {
       npwp: npwp ?? this.npwp,
       person: person ?? this.person,
       jabatan: jabatan ?? this.jabatan,
-      real_City: real_City ?? this.real_City,
+      realCity: realCity ?? this.realCity,
       propinsi: propinsi ?? this.propinsi,
       region: region ?? this.region,
       banned: banned ?? this.banned,
       payterm: payterm ?? this.payterm,
-      credit_limit: credit_limit ?? this.credit_limit,
-      banned_fee: banned_fee ?? this.banned_fee,
-      cust_group: cust_group ?? this.cust_group,
+      creditLimit: creditLimit ?? this.creditLimit,
+      bannedFee: bannedFee ?? this.bannedFee,
+      custGroup: custGroup ?? this.custGroup,
       email: email ?? this.email,
-      business_start_date: business_start_date ?? this.business_start_date,
-      business_status: business_status ?? this.business_status,
-      business_entities: business_entities ?? this.business_entities,
-      kind_of_business: kind_of_business ?? this.kind_of_business,
+      businessStartDate: businessStartDate ?? this.businessStartDate,
+      businessStatus: businessStatus ?? this.businessStatus,
+      businessEntities: businessEntities ?? this.businessEntities,
+      kindOfBusiness: kindOfBusiness ?? this.kindOfBusiness,
       building: building ?? this.building,
-      employee_num: employee_num ?? this.employee_num,
-      tax_status: tax_status ?? this.tax_status,
-      office_tipe: office_tipe ?? this.office_tipe,
+      employeeNum: employeeNum ?? this.employeeNum,
+      taxStatus: taxStatus ?? this.taxStatus,
+      officeType: officeType ?? this.officeType,
       ownership: ownership ?? this.ownership,
-      known_from: known_from ?? this.known_from,
+      knownFrom: knownFrom ?? this.knownFrom,
       omzet: omzet ?? this.omzet,
-      owner_name: owner_name ?? this.owner_name,
+      ownerName: ownerName ?? this.ownerName,
       dob: dob ?? this.dob,
-      city_of_birth: city_of_birth ?? this.city_of_birth,
-      husband_wife: husband_wife ?? this.husband_wife,
-      id_card: id_card ?? this.id_card,
-      id_card_no: id_card_no ?? this.id_card_no,
-      copi_id_card: copi_id_card ?? this.copi_id_card,
-      owner_address: owner_address ?? this.owner_address,
-      owner_province: owner_province ?? this.owner_province,
-      owner_city: owner_city ?? this.owner_city,
-      owner_phone: owner_phone ?? this.owner_phone,
-      owner_hp: owner_hp ?? this.owner_hp,
-      owner_email: owner_email ?? this.owner_email,
-      hari_raya: hari_raya ?? this.hari_raya,
+      cityOfBirth: cityOfBirth ?? this.cityOfBirth,
+      husbandWife: husbandWife ?? this.husbandWife,
+      idCard: idCard ?? this.idCard,
+      idCardNo: idCardNo ?? this.idCardNo,
+      copiIdCard: copiIdCard ?? this.copiIdCard,
+      ownerAddress: ownerAddress ?? this.ownerAddress,
+      ownerProvince: ownerProvince ?? this.ownerProvince,
+      ownerCity: ownerCity ?? this.ownerCity,
+      ownerPhone: ownerPhone ?? this.ownerPhone,
+      ownerHp: ownerHp ?? this.ownerHp,
+      ownerEmail: ownerEmail ?? this.ownerEmail,
+      hariRaya: hariRaya ?? this.hariRaya,
       bank1: bank1 ?? this.bank1,
       bank2: bank2 ?? this.bank2,
       bank3: bank3 ?? this.bank3,
-      bank_atas_nama1: bank_atas_nama1 ?? this.bank_atas_nama1,
-      bank_atas_nama2: bank_atas_nama2 ?? this.bank_atas_nama2,
-      bank_atas_nama3: bank_atas_nama3 ?? this.bank_atas_nama3,
-      payment_tipe1: payment_tipe1 ?? this.payment_tipe1,
-      payment_tipe2: payment_tipe2 ?? this.payment_tipe2,
-      payment_tipe3: payment_tipe3 ?? this.payment_tipe3,
-      alamat_penagihan: alamat_penagihan ?? this.alamat_penagihan,
-      propinsi_penagihan: propinsi_penagihan ?? this.propinsi_penagihan,
-      kota_penagihan: kota_penagihan ?? this.kota_penagihan,
-      tlp_penagihan: tlp_penagihan ?? this.tlp_penagihan,
-      fax_penagihan: fax_penagihan ?? this.fax_penagihan,
-      hari_penagihan: hari_penagihan ?? this.hari_penagihan,
+      bankAtasNama1: bankAtasNama1 ?? this.bankAtasNama1,
+      bankAtasNama2: bankAtasNama2 ?? this.bankAtasNama2,
+      bankAtasNama3: bankAtasNama3 ?? this.bankAtasNama3,
+      paymentTipe1: paymentTipe1 ?? this.paymentTipe1,
+      paymentTipe2: paymentTipe2 ?? this.paymentTipe2,
+      paymentTipe3: paymentTipe3 ?? this.paymentTipe3,
+      alamatPenagihan: alamatPenagihan ?? this.alamatPenagihan,
+      propinsiPenagihan: propinsiPenagihan ?? this.propinsiPenagihan,
+      kotaPenagihan: kotaPenagihan ?? this.kotaPenagihan,
+      tlpPenagihan: tlpPenagihan ?? this.tlpPenagihan,
+      faxPenagihan: faxPenagihan ?? this.faxPenagihan,
+      hariPenagihan: hariPenagihan ?? this.hariPenagihan,
       character: character ?? this.character,
-      character_desc: character_desc ?? this.character_desc,
+      characterDesc: characterDesc ?? this.characterDesc,
       capacity: capacity ?? this.capacity,
-      capacity_desc: capacity_desc ?? this.capacity_desc,
+      capacityDesc: capacityDesc ?? this.capacityDesc,
       capital: capital ?? this.capital,
-      capital_desc: capital_desc ?? this.capital_desc,
+      capitalDesc: capitalDesc ?? this.capitalDesc,
       collateral: collateral ?? this.collateral,
-      collateral_dessc: collateral_dessc ?? this.collateral_dessc,
+      collateralDesc: collateralDesc ?? this.collateralDesc,
       condition: condition ?? this.condition,
-      condition_desc: condition_desc ?? this.condition_desc,
-      cust_note: cust_note ?? this.cust_note,
-      tr_date: tr_date ?? this.tr_date,
-      approve1_date: approve1_date ?? this.approve1_date,
-      approve2_date: approve2_date ?? this.approve2_date,
-      active_flag: active_flag ?? this.active_flag,
-      coffice_id: coffice_id ?? this.coffice_id,
+      conditionDesc: conditionDesc ?? this.conditionDesc,
+      custNote: custNote ?? this.custNote,
+      trDate: trDate ?? this.trDate,
+      approve1Date: approve1Date ?? this.approve1Date,
+      approve2Date: approve2Date ?? this.approve2Date,
+      activeFlag: activeFlag ?? this.activeFlag,
+      cofficeId: cofficeId ?? this.cofficeId,
       salesman: salesman ?? this.salesman,
       affiliate: affiliate ?? this.affiliate,
       district: district ?? this.district,
       vilage: vilage ?? this.vilage,
       cv: cv ?? this.cv,
-      price_role: price_role ?? this.price_role,
-      price_role2: price_role2 ?? this.price_role2,
-      cv_id: cv_id ?? this.cv_id,
-      no_nib: no_nib ?? this.no_nib,
-      no_skd: no_skd ?? this.no_skd,
-      pic_order: pic_order ?? this.pic_order,
-      pic_order_jabatan: pic_order_jabatan ?? this.pic_order_jabatan,
-      pic_order_telp: pic_order_telp ?? this.pic_order_telp,
-      pic_order_email: pic_order_email ?? this.pic_order_email,
-      pic_tagihan: pic_tagihan ?? this.pic_tagihan,
-      pic_tagihan_jabatan: pic_tagihan_jabatan ?? this.pic_tagihan_jabatan,
-      pic_tagihan_telp: pic_tagihan_telp ?? this.pic_tagihan_telp,
-      pic_tagihan_email: pic_tagihan_email ?? this.pic_tagihan_email,
-      metode_bayar: metode_bayar ?? this.metode_bayar,
-      dt_modified: dt_modified ?? this.dt_modified,
+      priceRole: priceRole ?? this.priceRole,
+      priceRole2: priceRole2 ?? this.priceRole2,
+      cvId: cvId ?? this.cvId,
+      noNib: noNib ?? this.noNib,
+      noSkd: noSkd ?? this.noSkd,
+      picOrder: picOrder ?? this.picOrder,
+      picOrderJabatan: picOrderJabatan ?? this.picOrderJabatan,
+      picOrderTelp: picOrderTelp ?? this.picOrderTelp,
+      picOrderEmail: picOrderEmail ?? this.picOrderEmail,
+      picTagihan: picTagihan ?? this.picTagihan,
+      picTagihanJabatan: picTagihanJabatan ?? this.picTagihanJabatan,
+      picTagihanTelp: picTagihanTelp ?? this.picTagihanTelp,
+      picTagihanEmail: picTagihanEmail ?? this.picTagihanEmail,
+      metodeBayar: metodeBayar ?? this.metodeBayar,
+      dtModified: dtModified ?? this.dtModified,
       skbdn: skbdn ?? this.skbdn,
-      cust_type: cust_type ?? this.cust_type,
-      npwp_group: npwp_group ?? this.npwp_group,
+      custType: custType ?? this.custType,
+      npwpGroup: npwpGroup ?? this.npwpGroup,
       latitude: latitude ?? this.latitude,
       longitude: longitude ?? this.longitude,
-      gps_set_by: gps_set_by ?? this.gps_set_by,
-      gps_dt_modified: gps_dt_modified ?? this.gps_dt_modified,
-      noo_date: noo_date ?? this.noo_date,
+      gpsSetBy: gpsSetBy ?? this.gpsSetBy,
+      gpsDtModified: gpsDtModified ?? this.gpsDtModified,
+      nooDate: nooDate ?? this.nooDate,
     );
   }
 
@@ -439,99 +439,99 @@ class CustomerDetail {
       'NPWP': npwp,
       'Person': person,
       'Jabatan': jabatan,
-      'Real_City': real_City,
+      'Real_City': realCity,
       'Propinsi': propinsi,
       'Region': region,
       'Banned': banned,
       'payterm': payterm,
-      'credit_limit': credit_limit,
-      'banned_fee': banned_fee,
-      'cust_group': cust_group,
+      'credit_limit': creditLimit,
+      'banned_fee': bannedFee,
+      'cust_group': custGroup,
       'email': email,
-      'business_start_date': business_start_date,
-      'business_status': business_status,
-      'business_entities': business_entities,
-      'kind_of_business': kind_of_business,
+      'business_start_date': businessStartDate,
+      'business_status': businessStatus,
+      'business_entities': businessEntities,
+      'kind_of_business': kindOfBusiness,
       'building': building,
-      'employee_num': employee_num,
-      'tax_status': tax_status,
-      'office_tipe': office_tipe,
+      'employee_num': employeeNum,
+      'tax_status': taxStatus,
+      'office_tipe': officeType,
       'ownership': ownership,
-      'known_from': known_from,
+      'known_from': knownFrom,
       'omzet': omzet,
-      'owner_name': owner_name,
+      'owner_name': ownerName,
       'dob': dob,
-      'city_of_birth': city_of_birth,
-      'husband_wife': husband_wife,
-      'id_card': id_card,
-      'id_card_no': id_card_no,
-      'copi_id_card': copi_id_card,
-      'owner_address': owner_address,
-      'owner_province': owner_province,
-      'owner_city': owner_city,
-      'owner_phone': owner_phone,
-      'owner_hp': owner_hp,
-      'owner_email': owner_email,
-      'hari_raya': hari_raya,
+      'city_of_birth': cityOfBirth,
+      'husband_wife': husbandWife,
+      'id_card': idCard,
+      'id_card_no': idCardNo,
+      'copi_id_card': copiIdCard,
+      'owner_address': ownerAddress,
+      'owner_province': ownerProvince,
+      'owner_city': ownerCity,
+      'owner_phone': ownerPhone,
+      'owner_hp': ownerHp,
+      'owner_email': ownerEmail,
+      'hari_raya': hariRaya,
       'bank1': bank1,
       'bank2': bank2,
       'bank3': bank3,
-      'bank_atas_nama1': bank_atas_nama1,
-      'bank_atas_nama2': bank_atas_nama2,
-      'bank_atas_nama3': bank_atas_nama3,
-      'payment_tipe1': payment_tipe1,
-      'payment_tipe2': payment_tipe2,
-      'payment_tipe3': payment_tipe3,
-      'alamat_penagihan': alamat_penagihan,
-      'propinsi_penagihan': propinsi_penagihan,
-      'kota_penagihan': kota_penagihan,
-      'tlp_penagihan': tlp_penagihan,
-      'fax_penagihan': fax_penagihan,
-      'hari_penagihan': hari_penagihan,
+      'bank_atas_nama1': bankAtasNama1,
+      'bank_atas_nama2': bankAtasNama2,
+      'bank_atas_nama3': bankAtasNama3,
+      'payment_tipe1': paymentTipe1,
+      'payment_tipe2': paymentTipe2,
+      'payment_tipe3': paymentTipe3,
+      'alamat_penagihan': alamatPenagihan,
+      'propinsi_penagihan': propinsiPenagihan,
+      'kota_penagihan': kotaPenagihan,
+      'tlp_penagihan': tlpPenagihan,
+      'fax_penagihan': faxPenagihan,
+      'hari_penagihan': hariPenagihan,
       'character': character,
-      'character_desc': character_desc,
+      'character_desc': characterDesc,
       'capacity': capacity,
-      'capacity_desc': capacity_desc,
+      'capacity_desc': capacityDesc,
       'capital': capital,
-      'capital_desc': capital_desc,
+      'capital_desc': capitalDesc,
       'collateral': collateral,
-      'collateral_dessc': collateral_dessc,
+      'collateral_dessc': collateralDesc,
       'condition': condition,
-      'condition_desc': condition_desc,
-      'cust_note': cust_note,
-      'tr_date': tr_date,
-      'approve1_date': approve1_date,
-      'approve2_date': approve2_date,
-      'active_flag': active_flag,
-      'coffice_id': coffice_id,
+      'condition_desc': conditionDesc,
+      'cust_note': custNote,
+      'tr_date': trDate,
+      'approve1_date': approve1Date,
+      'approve2_date': approve2Date,
+      'active_flag': activeFlag,
+      'coffice_id': cofficeId,
       'salesman': salesman,
       'affiliate': affiliate,
       'district': district,
       'vilage': vilage,
       'cv': cv,
-      'price_role': price_role,
-      'price_role2': price_role2,
-      'cv_id': cv_id,
-      'no_nib': no_nib,
-      'no_skd': no_skd,
-      'pic_order': pic_order,
-      'pic_order_jabatan': pic_order_jabatan,
-      'pic_order_telp': pic_order_telp,
-      'pic_order_email': pic_order_email,
-      'pic_tagihan': pic_tagihan,
-      'pic_tagihan_jabatan': pic_tagihan_jabatan,
-      'pic_tagihan_telp': pic_tagihan_telp,
-      'pic_tagihan_email': pic_tagihan_email,
-      'metode_bayar': metode_bayar,
-      'dt_modified': dt_modified,
+      'price_role': priceRole,
+      'price_role2': priceRole2,
+      'cv_id': cvId,
+      'no_nib': noNib,
+      'no_skd': noSkd,
+      'pic_order': picOrder,
+      'pic_order_jabatan': picOrderJabatan,
+      'pic_order_telp': picOrderTelp,
+      'pic_order_email': picOrderEmail,
+      'pic_tagihan': picTagihan,
+      'pic_tagihan_jabatan': picTagihanJabatan,
+      'pic_tagihan_telp': picTagihanTelp,
+      'pic_tagihan_email': picTagihanEmail,
+      'metode_bayar': metodeBayar,
+      'dt_modified': dtModified,
       'skbdn': skbdn,
-      'cust_type': cust_type,
-      'npwp_group': npwp_group,
+      'cust_type': custType,
+      'npwp_group': npwpGroup,
       'latitude': latitude,
       'longitude': longitude,
-      'gps_set_by': gps_set_by,
-      'gps_dt_modified': gps_dt_modified,
-      'noo_date': noo_date,
+      'gps_set_by': gpsSetBy,
+      'gps_dt_modified': gpsDtModified,
+      'noo_date': nooDate,
     };
   }
 
@@ -548,99 +548,99 @@ class CustomerDetail {
       npwp: map['NPWP'] ?? '',
       person: map['Person'] ?? '',
       jabatan: map['Jabatan'] ?? '',
-      real_City: map['Real_City'] ?? '',
+      realCity: map['Real_City'] ?? '',
       propinsi: map['Propinsi'] ?? '',
       region: map['Region'] ?? '',
       banned: map['Banned'] ?? '',
       payterm: map['payterm'] ?? '',
-      credit_limit: map['credit_limit'] ?? '',
-      banned_fee: map['banned_fee'] ?? '',
-      cust_group: map['cust_group'] ?? '',
+      creditLimit: map['credit_limit'] ?? '',
+      bannedFee: map['banned_fee'] ?? '',
+      custGroup: map['cust_group'] ?? '',
       email: map['email'] ?? '',
-      business_start_date: map['business_start_date'] ?? '',
-      business_status: map['business_status'] ?? '',
-      business_entities: map['business_entities'] ?? '',
-      kind_of_business: map['kind_of_business'] ?? '',
+      businessStartDate: map['business_start_date'] ?? '',
+      businessStatus: map['business_status'] ?? '',
+      businessEntities: map['business_entities'] ?? '',
+      kindOfBusiness: map['kind_of_business'] ?? '',
       building: map['building'] ?? '',
-      employee_num: map['employee_num'] ?? '',
-      tax_status: map['tax_status'] ?? '',
-      office_tipe: map['office_tipe'] ?? '',
+      employeeNum: map['employee_num'] ?? '',
+      taxStatus: map['tax_status'] ?? '',
+      officeType: map['office_tipe'] ?? '',
       ownership: map['ownership'] ?? '',
-      known_from: map['known_from'] ?? '',
+      knownFrom: map['known_from'] ?? '',
       omzet: map['omzet'] ?? '',
-      owner_name: map['owner_name'] ?? '',
+      ownerName: map['owner_name'] ?? '',
       dob: map['dob'] ?? '',
-      city_of_birth: map['city_of_birth'] ?? '',
-      husband_wife: map['husband_wife'] ?? '',
-      id_card: map['id_card'] ?? '',
-      id_card_no: map['id_card_no'] ?? '',
-      copi_id_card: map['copi_id_card'] ?? '',
-      owner_address: map['owner_address'] ?? '',
-      owner_province: map['owner_province'] ?? '',
-      owner_city: map['owner_city'] ?? '',
-      owner_phone: map['owner_phone'] ?? '',
-      owner_hp: map['owner_hp'] ?? '',
-      owner_email: map['owner_email'] ?? '',
-      hari_raya: map['hari_raya'] ?? '',
+      cityOfBirth: map['city_of_birth'] ?? '',
+      husbandWife: map['husband_wife'] ?? '',
+      idCard: map['id_card'] ?? '',
+      idCardNo: map['id_card_no'] ?? '',
+      copiIdCard: map['copi_id_card'] ?? '',
+      ownerAddress: map['owner_address'] ?? '',
+      ownerProvince: map['owner_province'] ?? '',
+      ownerCity: map['owner_city'] ?? '',
+      ownerPhone: map['owner_phone'] ?? '',
+      ownerHp: map['owner_hp'] ?? '',
+      ownerEmail: map['owner_email'] ?? '',
+      hariRaya: map['hari_raya'] ?? '',
       bank1: map['bank1'] ?? '',
       bank2: map['bank2'] ?? '',
       bank3: map['bank3'] ?? '',
-      bank_atas_nama1: map['bank_atas_nama1'] ?? '',
-      bank_atas_nama2: map['bank_atas_nama2'] ?? '',
-      bank_atas_nama3: map['bank_atas_nama3'] ?? '',
-      payment_tipe1: map['payment_tipe1'] ?? '',
-      payment_tipe2: map['payment_tipe2'] ?? '',
-      payment_tipe3: map['payment_tipe3'] ?? '',
-      alamat_penagihan: map['alamat_penagihan'] ?? '',
-      propinsi_penagihan: map['propinsi_penagihan'] ?? '',
-      kota_penagihan: map['kota_penagihan'] ?? '',
-      tlp_penagihan: map['tlp_penagihan'] ?? '',
-      fax_penagihan: map['fax_penagihan'] ?? '',
-      hari_penagihan: map['hari_penagihan'] ?? '',
+      bankAtasNama1: map['bank_atas_nama1'] ?? '',
+      bankAtasNama2: map['bank_atas_nama2'] ?? '',
+      bankAtasNama3: map['bank_atas_nama3'] ?? '',
+      paymentTipe1: map['payment_tipe1'] ?? '',
+      paymentTipe2: map['payment_tipe2'] ?? '',
+      paymentTipe3: map['payment_tipe3'] ?? '',
+      alamatPenagihan: map['alamat_penagihan'] ?? '',
+      propinsiPenagihan: map['propinsi_penagihan'] ?? '',
+      kotaPenagihan: map['kota_penagihan'] ?? '',
+      tlpPenagihan: map['tlp_penagihan'] ?? '',
+      faxPenagihan: map['fax_penagihan'] ?? '',
+      hariPenagihan: map['hari_penagihan'] ?? '',
       character: map['character'] ?? '',
-      character_desc: map['character_desc'] ?? '',
+      characterDesc: map['character_desc'] ?? '',
       capacity: map['capacity'] ?? '',
-      capacity_desc: map['capacity_desc'] ?? '',
+      capacityDesc: map['capacity_desc'] ?? '',
       capital: map['capital'] ?? '',
-      capital_desc: map['capital_desc'] ?? '',
+      capitalDesc: map['capital_desc'] ?? '',
       collateral: map['collateral'] ?? '',
-      collateral_dessc: map['collateral_dessc'] ?? '',
+      collateralDesc: map['collateral_dessc'] ?? '',
       condition: map['condition'] ?? '',
-      condition_desc: map['condition_desc'] ?? '',
-      cust_note: map['cust_note'] ?? '',
-      tr_date: map['tr_date'] ?? '',
-      approve1_date: map['approve1_date'] ?? '',
-      approve2_date: map['approve2_date'] ?? '',
-      active_flag: map['active_flag'] ?? '',
-      coffice_id: map['coffice_id'] ?? '',
+      conditionDesc: map['condition_desc'] ?? '',
+      custNote: map['cust_note'] ?? '',
+      trDate: map['tr_date'] ?? '',
+      approve1Date: map['approve1_date'] ?? '',
+      approve2Date: map['approve2_date'] ?? '',
+      activeFlag: map['active_flag'] ?? '',
+      cofficeId: map['coffice_id'] ?? '',
       salesman: map['salesman'] ?? '',
       affiliate: map['affiliate'] ?? '',
       district: map['district'] ?? '',
       vilage: map['vilage'] ?? '',
       cv: map['cv'] ?? '',
-      price_role: map['price_role'] ?? '',
-      price_role2: map['price_role2'] ?? '',
-      cv_id: map['cv_id'] ?? '',
-      no_nib: map['no_nib'] ?? '',
-      no_skd: map['no_skd'] ?? '',
-      pic_order: map['pic_order'] ?? '',
-      pic_order_jabatan: map['pic_order_jabatan'] ?? '',
-      pic_order_telp: map['pic_order_telp'] ?? '',
-      pic_order_email: map['pic_order_email'] ?? '',
-      pic_tagihan: map['pic_tagihan'] ?? '',
-      pic_tagihan_jabatan: map['pic_tagihan_jabatan'] ?? '',
-      pic_tagihan_telp: map['pic_tagihan_telp'] ?? '',
-      pic_tagihan_email: map['pic_tagihan_email'] ?? '',
-      metode_bayar: map['metode_bayar'] ?? '',
-      dt_modified: map['dt_modified'] ?? '',
+      priceRole: map['price_role'] ?? '',
+      priceRole2: map['price_role2'] ?? '',
+      cvId: map['cv_id'] ?? '',
+      noNib: map['no_nib'] ?? '',
+      noSkd: map['no_skd'] ?? '',
+      picOrder: map['pic_order'] ?? '',
+      picOrderJabatan: map['pic_order_jabatan'] ?? '',
+      picOrderTelp: map['pic_order_telp'] ?? '',
+      picOrderEmail: map['pic_order_email'] ?? '',
+      picTagihan: map['pic_tagihan'] ?? '',
+      picTagihanJabatan: map['pic_tagihan_jabatan'] ?? '',
+      picTagihanTelp: map['pic_tagihan_telp'] ?? '',
+      picTagihanEmail: map['pic_tagihan_email'] ?? '',
+      metodeBayar: map['metode_bayar'] ?? '',
+      dtModified: map['dt_modified'] ?? '',
       skbdn: map['skbdn'] ?? '',
-      cust_type: map['cust_type'] ?? '',
-      npwp_group: map['npwp_group'] ?? '',
+      custType: map['cust_type'] ?? '',
+      npwpGroup: map['npwp_group'] ?? '',
       latitude: map['latitude'] ?? '',
       longitude: map['longitude'] ?? '',
-      gps_set_by: map['gps_set_by'] ?? '',
-      gps_dt_modified: map['gps_dt_modified'] ?? '',
-      noo_date: map['noo_date'] ?? '',
+      gpsSetBy: map['gps_set_by'] ?? '',
+      gpsDtModified: map['gps_dt_modified'] ?? '',
+      nooDate: map['noo_date'] ?? '',
     );
   }
 
@@ -651,7 +651,7 @@ class CustomerDetail {
 
   @override
   String toString() {
-    return 'CustomerDetail(customerId: $customerId, salesId: $salesId, namaCustomer: $namaCustomer, alamat: $alamat, kota: $kota, telepon: $telepon, perTanggal: $perTanggal, fax: $fax, npwp: $npwp, person: $person, jabatan: $jabatan, real_City: $real_City, propinsi: $propinsi, region: $region, banned: $banned, payterm: $payterm, credit_limit: $credit_limit, banned_fee: $banned_fee, cust_group: $cust_group, email: $email, business_start_date: $business_start_date, business_status: $business_status, business_entities: $business_entities, kind_of_business: $kind_of_business, building: $building, employee_num: $employee_num, tax_status: $tax_status, office_tipe: $office_tipe, ownership: $ownership, known_from: $known_from, omzet: $omzet, owner_name: $owner_name, dob: $dob, city_of_birth: $city_of_birth, husband_wife: $husband_wife, id_card: $id_card, id_card_no: $id_card_no, copi_id_card: $copi_id_card, owner_address: $owner_address, owner_province: $owner_province, owner_city: $owner_city, owner_phone: $owner_phone, owner_hp: $owner_hp, owner_email: $owner_email, hari_raya: $hari_raya, bank1: $bank1, bank2: $bank2, bank3: $bank3, bank_atas_nama1: $bank_atas_nama1, bank_atas_nama2: $bank_atas_nama2, bank_atas_nama3: $bank_atas_nama3, payment_tipe1: $payment_tipe1, payment_tipe2: $payment_tipe2, payment_tipe3: $payment_tipe3, alamat_penagihan: $alamat_penagihan, propinsi_penagihan: $propinsi_penagihan, kota_penagihan: $kota_penagihan, tlp_penagihan: $tlp_penagihan, fax_penagihan: $fax_penagihan, hari_penagihan: $hari_penagihan, character: $character, character_desc: $character_desc, capacity: $capacity, capacity_desc: $capacity_desc, capital: $capital, capital_desc: $capital_desc, collateral: $collateral, collateral_dessc: $collateral_dessc, condition: $condition, condition_desc: $condition_desc, cust_note: $cust_note, tr_date: $tr_date, approve1_date: $approve1_date, approve2_date: $approve2_date, active_flag: $active_flag, coffice_id: $coffice_id, salesman: $salesman, affiliate: $affiliate, district: $district, vilage: $vilage, cv: $cv, price_role: $price_role, price_role2: $price_role2, cv_id: $cv_id, no_nib: $no_nib, no_skd: $no_skd, pic_order: $pic_order, pic_order_jabatan: $pic_order_jabatan, pic_order_telp: $pic_order_telp, pic_order_email: $pic_order_email, pic_tagihan: $pic_tagihan, pic_tagihan_jabatan: $pic_tagihan_jabatan, pic_tagihan_telp: $pic_tagihan_telp, pic_tagihan_email: $pic_tagihan_email, metode_bayar: $metode_bayar, dt_modified: $dt_modified, skbdn: $skbdn, cust_type: $cust_type, npwp_group: $npwp_group, latitude: $latitude, longitude: $longitude, gps_set_by: $gps_set_by, gps_dt_modified: $gps_dt_modified, noo_date: $noo_date)';
+    return 'CustomerDetail(customerId: $customerId, salesId: $salesId, namaCustomer: $namaCustomer, alamat: $alamat, kota: $kota, telepon: $telepon, perTanggal: $perTanggal, fax: $fax, npwp: $npwp, person: $person, jabatan: $jabatan, realCity: $realCity, propinsi: $propinsi, region: $region, banned: $banned, payterm: $payterm, creditLimit: $creditLimit, bannedFee: $bannedFee, custGroup: $custGroup, email: $email, businessStartDate: $businessStartDate, businessStatus: $businessStatus, businessEntities: $businessEntities, kindOfBusiness: $kindOfBusiness, building: $building, employeeNum: $employeeNum, taxStatus: $taxStatus, officeType: $officeType, ownership: $ownership, knownFrom: $knownFrom, omzet: $omzet, ownerName: $ownerName, dob: $dob, cityOfBirth: $cityOfBirth, husbandWife: $husbandWife, idCard: $idCard, idCardNo: $idCardNo, copiIdCard: $copiIdCard, ownerAddress: $ownerAddress, ownerProvince: $ownerProvince, ownerCity: $ownerCity, ownerPhone: $ownerPhone, ownerHp: $ownerHp, ownerEmail: $ownerEmail, hariRaya: $hariRaya, bank1: $bank1, bank2: $bank2, bank3: $bank3, bankAtasNama1: $bankAtasNama1, bankAtasNama2: $bankAtasNama2, bankAtasNama3: $bankAtasNama3, paymentTipe1: $paymentTipe1, paymentTipe2: $paymentTipe2, paymentTipe3: $paymentTipe3, alamatPenagihan: $alamatPenagihan, propinsiPenagihan: $propinsiPenagihan, kotaPenagihan: $kotaPenagihan, tlpPenagihan: $tlpPenagihan, faxPenagihan: $faxPenagihan, hariPenagihan: $hariPenagihan, character: $character, characterDesc: $characterDesc, capacity: $capacity, capacityDesc: $capacityDesc, capital: $capital, capitalDesc: $capitalDesc, collateral: $collateral, collateralDesc: $collateralDesc, condition: $condition, conditionDesc: $conditionDesc, custNote: $custNote, trDate: $trDate, approve1Date: $approve1Date, approve2Date: $approve2Date, activeFlag: $activeFlag, cofficeId: $cofficeId, salesman: $salesman, affiliate: $affiliate, district: $district, vilage: $vilage, cv: $cv, priceRole: $priceRole, priceRole2: $priceRole2, cvId: $cvId, noNib: $noNib, noSkd: $noSkd, picOrder: $picOrder, picOrderJabatan: $picOrderJabatan, picOrderTelp: $picOrderTelp, picOrderEmail: $picOrderEmail, picTagihan: $picTagihan, picTagihanJabatan: $picTagihanJabatan, picTagihanTelp: $picTagihanTelp, picTagihanEmail: $picTagihanEmail, metodeBayar: $metodeBayar, dtModified: $dtModified, skbdn: $skbdn, custType: $custType, npwpGroup: $npwpGroup, latitude: $latitude, longitude: $longitude, gpsSetBy: $gpsSetBy, gpsDtModified: $gpsDtModified, nooDate: $nooDate)';
   }
 
   @override
@@ -670,99 +670,99 @@ class CustomerDetail {
         other.npwp == npwp &&
         other.person == person &&
         other.jabatan == jabatan &&
-        other.real_City == real_City &&
+        other.realCity == realCity &&
         other.propinsi == propinsi &&
         other.region == region &&
         other.banned == banned &&
         other.payterm == payterm &&
-        other.credit_limit == credit_limit &&
-        other.banned_fee == banned_fee &&
-        other.cust_group == cust_group &&
+        other.creditLimit == creditLimit &&
+        other.bannedFee == bannedFee &&
+        other.custGroup == custGroup &&
         other.email == email &&
-        other.business_start_date == business_start_date &&
-        other.business_status == business_status &&
-        other.business_entities == business_entities &&
-        other.kind_of_business == kind_of_business &&
+        other.businessStartDate == businessStartDate &&
+        other.businessStatus == businessStatus &&
+        other.businessEntities == businessEntities &&
+        other.kindOfBusiness == kindOfBusiness &&
         other.building == building &&
-        other.employee_num == employee_num &&
-        other.tax_status == tax_status &&
-        other.office_tipe == office_tipe &&
+        other.employeeNum == employeeNum &&
+        other.taxStatus == taxStatus &&
+        other.officeType == officeType &&
         other.ownership == ownership &&
-        other.known_from == known_from &&
+        other.knownFrom == knownFrom &&
         other.omzet == omzet &&
-        other.owner_name == owner_name &&
+        other.ownerName == ownerName &&
         other.dob == dob &&
-        other.city_of_birth == city_of_birth &&
-        other.husband_wife == husband_wife &&
-        other.id_card == id_card &&
-        other.id_card_no == id_card_no &&
-        other.copi_id_card == copi_id_card &&
-        other.owner_address == owner_address &&
-        other.owner_province == owner_province &&
-        other.owner_city == owner_city &&
-        other.owner_phone == owner_phone &&
-        other.owner_hp == owner_hp &&
-        other.owner_email == owner_email &&
-        other.hari_raya == hari_raya &&
+        other.cityOfBirth == cityOfBirth &&
+        other.husbandWife == husbandWife &&
+        other.idCard == idCard &&
+        other.idCardNo == idCardNo &&
+        other.copiIdCard == copiIdCard &&
+        other.ownerAddress == ownerAddress &&
+        other.ownerProvince == ownerProvince &&
+        other.ownerCity == ownerCity &&
+        other.ownerPhone == ownerPhone &&
+        other.ownerHp == ownerHp &&
+        other.ownerEmail == ownerEmail &&
+        other.hariRaya == hariRaya &&
         other.bank1 == bank1 &&
         other.bank2 == bank2 &&
         other.bank3 == bank3 &&
-        other.bank_atas_nama1 == bank_atas_nama1 &&
-        other.bank_atas_nama2 == bank_atas_nama2 &&
-        other.bank_atas_nama3 == bank_atas_nama3 &&
-        other.payment_tipe1 == payment_tipe1 &&
-        other.payment_tipe2 == payment_tipe2 &&
-        other.payment_tipe3 == payment_tipe3 &&
-        other.alamat_penagihan == alamat_penagihan &&
-        other.propinsi_penagihan == propinsi_penagihan &&
-        other.kota_penagihan == kota_penagihan &&
-        other.tlp_penagihan == tlp_penagihan &&
-        other.fax_penagihan == fax_penagihan &&
-        other.hari_penagihan == hari_penagihan &&
+        other.bankAtasNama1 == bankAtasNama1 &&
+        other.bankAtasNama2 == bankAtasNama2 &&
+        other.bankAtasNama3 == bankAtasNama3 &&
+        other.paymentTipe1 == paymentTipe1 &&
+        other.paymentTipe2 == paymentTipe2 &&
+        other.paymentTipe3 == paymentTipe3 &&
+        other.alamatPenagihan == alamatPenagihan &&
+        other.propinsiPenagihan == propinsiPenagihan &&
+        other.kotaPenagihan == kotaPenagihan &&
+        other.tlpPenagihan == tlpPenagihan &&
+        other.faxPenagihan == faxPenagihan &&
+        other.hariPenagihan == hariPenagihan &&
         other.character == character &&
-        other.character_desc == character_desc &&
+        other.characterDesc == characterDesc &&
         other.capacity == capacity &&
-        other.capacity_desc == capacity_desc &&
+        other.capacityDesc == capacityDesc &&
         other.capital == capital &&
-        other.capital_desc == capital_desc &&
+        other.capitalDesc == capitalDesc &&
         other.collateral == collateral &&
-        other.collateral_dessc == collateral_dessc &&
+        other.collateralDesc == collateralDesc &&
         other.condition == condition &&
-        other.condition_desc == condition_desc &&
-        other.cust_note == cust_note &&
-        other.tr_date == tr_date &&
-        other.approve1_date == approve1_date &&
-        other.approve2_date == approve2_date &&
-        other.active_flag == active_flag &&
-        other.coffice_id == coffice_id &&
+        other.conditionDesc == conditionDesc &&
+        other.custNote == custNote &&
+        other.trDate == trDate &&
+        other.approve1Date == approve1Date &&
+        other.approve2Date == approve2Date &&
+        other.activeFlag == activeFlag &&
+        other.cofficeId == cofficeId &&
         other.salesman == salesman &&
         other.affiliate == affiliate &&
         other.district == district &&
         other.vilage == vilage &&
         other.cv == cv &&
-        other.price_role == price_role &&
-        other.price_role2 == price_role2 &&
-        other.cv_id == cv_id &&
-        other.no_nib == no_nib &&
-        other.no_skd == no_skd &&
-        other.pic_order == pic_order &&
-        other.pic_order_jabatan == pic_order_jabatan &&
-        other.pic_order_telp == pic_order_telp &&
-        other.pic_order_email == pic_order_email &&
-        other.pic_tagihan == pic_tagihan &&
-        other.pic_tagihan_jabatan == pic_tagihan_jabatan &&
-        other.pic_tagihan_telp == pic_tagihan_telp &&
-        other.pic_tagihan_email == pic_tagihan_email &&
-        other.metode_bayar == metode_bayar &&
-        other.dt_modified == dt_modified &&
+        other.priceRole == priceRole &&
+        other.priceRole2 == priceRole2 &&
+        other.cvId == cvId &&
+        other.noNib == noNib &&
+        other.noSkd == noSkd &&
+        other.picOrder == picOrder &&
+        other.picOrderJabatan == picOrderJabatan &&
+        other.picOrderTelp == picOrderTelp &&
+        other.picOrderEmail == picOrderEmail &&
+        other.picTagihan == picTagihan &&
+        other.picTagihanJabatan == picTagihanJabatan &&
+        other.picTagihanTelp == picTagihanTelp &&
+        other.picTagihanEmail == picTagihanEmail &&
+        other.metodeBayar == metodeBayar &&
+        other.dtModified == dtModified &&
         other.skbdn == skbdn &&
-        other.cust_type == cust_type &&
-        other.npwp_group == npwp_group &&
+        other.custType == custType &&
+        other.npwpGroup == npwpGroup &&
         other.latitude == latitude &&
         other.longitude == longitude &&
-        other.gps_set_by == gps_set_by &&
-        other.gps_dt_modified == gps_dt_modified &&
-        other.noo_date == noo_date;
+        other.gpsSetBy == gpsSetBy &&
+        other.gpsDtModified == gpsDtModified &&
+        other.nooDate == nooDate;
   }
 
   @override
@@ -778,98 +778,98 @@ class CustomerDetail {
         npwp.hashCode ^
         person.hashCode ^
         jabatan.hashCode ^
-        real_City.hashCode ^
+        realCity.hashCode ^
         propinsi.hashCode ^
         region.hashCode ^
         banned.hashCode ^
         payterm.hashCode ^
-        credit_limit.hashCode ^
-        banned_fee.hashCode ^
-        cust_group.hashCode ^
+        creditLimit.hashCode ^
+        bannedFee.hashCode ^
+        custGroup.hashCode ^
         email.hashCode ^
-        business_start_date.hashCode ^
-        business_status.hashCode ^
-        business_entities.hashCode ^
-        kind_of_business.hashCode ^
+        businessStartDate.hashCode ^
+        businessStatus.hashCode ^
+        businessEntities.hashCode ^
+        kindOfBusiness.hashCode ^
         building.hashCode ^
-        employee_num.hashCode ^
-        tax_status.hashCode ^
-        office_tipe.hashCode ^
+        employeeNum.hashCode ^
+        taxStatus.hashCode ^
+        officeType.hashCode ^
         ownership.hashCode ^
-        known_from.hashCode ^
+        knownFrom.hashCode ^
         omzet.hashCode ^
-        owner_name.hashCode ^
+        ownerName.hashCode ^
         dob.hashCode ^
-        city_of_birth.hashCode ^
-        husband_wife.hashCode ^
-        id_card.hashCode ^
-        id_card_no.hashCode ^
-        copi_id_card.hashCode ^
-        owner_address.hashCode ^
-        owner_province.hashCode ^
-        owner_city.hashCode ^
-        owner_phone.hashCode ^
-        owner_hp.hashCode ^
-        owner_email.hashCode ^
-        hari_raya.hashCode ^
+        cityOfBirth.hashCode ^
+        husbandWife.hashCode ^
+        idCard.hashCode ^
+        idCardNo.hashCode ^
+        copiIdCard.hashCode ^
+        ownerAddress.hashCode ^
+        ownerProvince.hashCode ^
+        ownerCity.hashCode ^
+        ownerPhone.hashCode ^
+        ownerHp.hashCode ^
+        ownerEmail.hashCode ^
+        hariRaya.hashCode ^
         bank1.hashCode ^
         bank2.hashCode ^
         bank3.hashCode ^
-        bank_atas_nama1.hashCode ^
-        bank_atas_nama2.hashCode ^
-        bank_atas_nama3.hashCode ^
-        payment_tipe1.hashCode ^
-        payment_tipe2.hashCode ^
-        payment_tipe3.hashCode ^
-        alamat_penagihan.hashCode ^
-        propinsi_penagihan.hashCode ^
-        kota_penagihan.hashCode ^
-        tlp_penagihan.hashCode ^
-        fax_penagihan.hashCode ^
-        hari_penagihan.hashCode ^
+        bankAtasNama1.hashCode ^
+        bankAtasNama2.hashCode ^
+        bankAtasNama3.hashCode ^
+        paymentTipe1.hashCode ^
+        paymentTipe2.hashCode ^
+        paymentTipe3.hashCode ^
+        alamatPenagihan.hashCode ^
+        propinsiPenagihan.hashCode ^
+        kotaPenagihan.hashCode ^
+        tlpPenagihan.hashCode ^
+        faxPenagihan.hashCode ^
+        hariRaya.hashCode ^
         character.hashCode ^
-        character_desc.hashCode ^
+        characterDesc.hashCode ^
         capacity.hashCode ^
-        capacity_desc.hashCode ^
+        capacityDesc.hashCode ^
         capital.hashCode ^
-        capital_desc.hashCode ^
+        capitalDesc.hashCode ^
         collateral.hashCode ^
-        collateral_dessc.hashCode ^
+        collateralDesc.hashCode ^
         condition.hashCode ^
-        condition_desc.hashCode ^
-        cust_note.hashCode ^
-        tr_date.hashCode ^
-        approve1_date.hashCode ^
-        approve2_date.hashCode ^
-        active_flag.hashCode ^
-        coffice_id.hashCode ^
+        conditionDesc.hashCode ^
+        custNote.hashCode ^
+        trDate.hashCode ^
+        approve1Date.hashCode ^
+        approve2Date.hashCode ^
+        activeFlag.hashCode ^
+        cofficeId.hashCode ^
         salesman.hashCode ^
         affiliate.hashCode ^
         district.hashCode ^
         vilage.hashCode ^
         cv.hashCode ^
-        price_role.hashCode ^
-        price_role2.hashCode ^
-        cv_id.hashCode ^
-        no_nib.hashCode ^
-        no_skd.hashCode ^
-        pic_order.hashCode ^
-        pic_order_jabatan.hashCode ^
-        pic_order_telp.hashCode ^
-        pic_order_email.hashCode ^
-        pic_tagihan.hashCode ^
-        pic_tagihan_jabatan.hashCode ^
-        pic_tagihan_telp.hashCode ^
-        pic_tagihan_email.hashCode ^
-        metode_bayar.hashCode ^
-        dt_modified.hashCode ^
+        priceRole.hashCode ^
+        priceRole2.hashCode ^
+        cvId.hashCode ^
+        noNib.hashCode ^
+        noSkd.hashCode ^
+        picOrder.hashCode ^
+        picOrderJabatan.hashCode ^
+        picOrderTelp.hashCode ^
+        picOrderEmail.hashCode ^
+        picTagihan.hashCode ^
+        picTagihanJabatan.hashCode ^
+        picTagihanTelp.hashCode ^
+        picTagihanEmail.hashCode ^
+        metodeBayar.hashCode ^
+        dtModified.hashCode ^
         skbdn.hashCode ^
-        cust_type.hashCode ^
-        npwp_group.hashCode ^
+        custType.hashCode ^
+        npwpGroup.hashCode ^
         latitude.hashCode ^
         longitude.hashCode ^
-        gps_set_by.hashCode ^
-        gps_dt_modified.hashCode ^
-        noo_date.hashCode;
+        gpsSetBy.hashCode ^
+        gpsDtModified.hashCode ^
+        nooDate.hashCode;
   }
 }

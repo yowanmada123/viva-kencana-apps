@@ -1,214 +1,138 @@
 import 'dart:convert';
 
 class SalesInfo {
-  final List<SalesData> salesData;
-  final LastVisit? lastVisit;
-
-  SalesInfo({required this.salesData, this.lastVisit});
+  final String companyId;
+  final String employeeId;
+  final String salesId;
+  final String salesName;
+  final String officeId;
+  final String officeName;
+  final String officeAddress;
+  final String officeLat;
+  final String officeLng;
+  final String userId;
+  final String todayCheckin;
+  final String todayCheckout;
+  SalesInfo({
+    required this.companyId,
+    required this.employeeId,
+    required this.salesId,
+    required this.salesName,
+    required this.officeId,
+    required this.officeName,
+    required this.officeAddress,
+    required this.officeLat,
+    required this.officeLng,
+    required this.userId,
+    required this.todayCheckin,
+    required this.todayCheckout,
+  });
 
   SalesInfo copyWith({
-    List<SalesData>? salesData,
-    LastVisit? lastVisit,
+    String? companyId,
+    String? employeeId,
+    String? salesId,
+    String? salesName,
+    String? officeId,
+    String? officeName,
+    String? officeAddress,
+    String? officeLat,
+    String? officeLng,
+    String? userId,
+    String? todayCheckin,
+    String? todayCheckout,
   }) {
     return SalesInfo(
-      salesData: salesData ?? this.salesData,
-      lastVisit: lastVisit ?? this.lastVisit,
+      companyId: companyId ?? this.companyId,
+      employeeId: employeeId ?? this.employeeId,
+      salesId: salesId ?? this.salesId,
+      salesName: salesName ?? this.salesName,
+      officeId: officeId ?? this.officeId,
+      officeName: officeName ?? this.officeName,
+      officeAddress: officeAddress ?? this.officeAddress,
+      officeLat: officeLat ?? this.officeLat,
+      officeLng: officeLng ?? this.officeLng,
+      userId: userId ?? this.userId,
+      todayCheckin: todayCheckin ?? this.todayCheckin,
+      todayCheckout: todayCheckout ?? this.todayCheckout,
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
-      'salesData': salesData.map((x) => x.toMap()).toList(),
-      'lastVisit': lastVisit?.toMap(),
+      'company_id': companyId,
+      'employee_id': employeeId,
+      'sales_id': salesId,
+      'sales_name': salesName,
+      'office_id': officeId,
+      'office_name': officeName,
+      'office_address': officeAddress,
+      'office_lat': officeLat,
+      'office_lng': officeLng,
+      'user_id': userId,
+      'today_checkin': todayCheckin,
+      'today_checkout': todayCheckout,
     };
   }
 
   factory SalesInfo.fromMap(Map<String, dynamic> map) {
     return SalesInfo(
-      salesData: List<SalesData>.from(
-        map['salesData']?.map((x) => SalesData.fromMap(x)),
-      ),
-      lastVisit: map['lastVisit'] != null
-          ? LastVisit.fromMap(map['lastVisit'])
-          : null,
-    );
-  }
-
-  String toJson() => json.encode(toMap());
-
-  factory SalesInfo.fromJson(String source) =>
-      SalesInfo.fromMap(json.decode(source));
-
-  @override
-  String toString() =>
-      'SalesInfo(salesData: $salesData, lastVisit: $lastVisit)';
-
-  @override
-  int get hashCode => salesData.hashCode ^ lastVisit.hashCode;
-}
-
-class LastVisit {
-  final String trId;
-  final String trDate;
-  LastVisit({required this.trId, required this.trDate});
-
-  LastVisit copyWith({String? trId, String? trDate}) {
-    return LastVisit(trId: trId ?? this.trId, trDate: trDate ?? this.trDate);
-  }
-
-  Map<String, dynamic> toMap() {
-    return {'tr_id': trId, 'tr_date': trDate};
-  }
-
-  factory LastVisit.fromMap(Map<String, dynamic> map) {
-    return LastVisit(trId: map['tr_id'] ?? '', trDate: map['tr_date'] ?? '');
-  }
-
-  String toJson() => json.encode(toMap());
-
-  factory LastVisit.fromJson(String source) =>
-      LastVisit.fromMap(json.decode(source));
-
-  @override
-  String toString() => 'LastVisit(trId: $trId, trDate: $trDate)';
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-
-    return other is LastVisit && other.trId == trId && other.trDate == trDate;
-  }
-
-  @override
-  int get hashCode => trId.hashCode ^ trDate.hashCode;
-}
-
-class SalesData {
-  final String salesId;
-  final String namaSales;
-  final String alamat;
-  final String kota;
-  final String telepon;
-  final String region;
-  final String email;
-  final String officeId;
-  final String office;
-  final String officeLat;
-  final String officeLng;
-  SalesData({
-    required this.salesId,
-    required this.namaSales,
-    required this.alamat,
-    required this.kota,
-    required this.telepon,
-    required this.region,
-    required this.email,
-    required this.officeId,
-    required this.office,
-    required this.officeLat,
-    required this.officeLng,
-  });
-
-  SalesData copyWith({
-    String? salesId,
-    String? namaSales,
-    String? alamat,
-    String? kota,
-    String? telepon,
-    String? region,
-    String? email,
-    String? officeId,
-    String? office,
-    String? officeLat,
-    String? officeLng,
-  }) {
-    return SalesData(
-      salesId: salesId ?? this.salesId,
-      namaSales: namaSales ?? this.namaSales,
-      alamat: alamat ?? this.alamat,
-      kota: kota ?? this.kota,
-      telepon: telepon ?? this.telepon,
-      region: region ?? this.region,
-      email: email ?? this.email,
-      officeId: officeId ?? this.officeId,
-      office: office ?? this.office,
-      officeLat: officeLat ?? this.officeLat,
-      officeLng: officeLng ?? this.officeLng,
-    );
-  }
-
-  Map<String, dynamic> toMap() {
-    return {
-      'SalesId': salesId,
-      'NamaSales': namaSales,
-      'Alamat': alamat,
-      'Kota': kota,
-      'Telepon': telepon,
-      'region': region,
-      'e_mail': email,
-      'office_id': officeId,
-      'office': office,
-      'office_lat': officeLat,
-      'office_lng': officeLng,
-    };
-  }
-
-  factory SalesData.fromMap(Map<String, dynamic> map) {
-    return SalesData(
-      salesId: map['SalesId'] ?? '',
-      namaSales: map['NamaSales'] ?? '',
-      alamat: map['Alamat'] ?? '',
-      kota: map['Kota'] ?? '',
-      telepon: map['Telepon'] ?? '',
-      region: map['region'] ?? '',
-      email: map['e_mail'] ?? '',
+      companyId: map['company_id'] ?? '',
+      employeeId: map['employee_id'] ?? '',
+      salesId: map['sales_id'] ?? '',
+      salesName: map['sales_name'] ?? '',
       officeId: map['office_id'] ?? '',
-      office: map['office'] ?? '',
+      officeName: map['office_name'] ?? '',
+      officeAddress: map['office_address'] ?? '',
       officeLat: map['office_lat'] ?? '',
       officeLng: map['office_lng'] ?? '',
+      userId: map['user_id'] ?? '',
+      todayCheckin: map['today_checkin'] ?? '',
+      todayCheckout: map['today_checkout'] ?? '',
     );
   }
 
   String toJson() => json.encode(toMap());
 
-  factory SalesData.fromJson(String source) =>
-      SalesData.fromMap(json.decode(source));
+  factory SalesInfo.fromJson(String source) => SalesInfo.fromMap(json.decode(source));
 
   @override
   String toString() {
-    return 'SalesData(salesId: $salesId, namaSales: $namaSales, alamat: $alamat, kota: $kota, telepon: $telepon, region: $region, email: $email, officeId: $officeId, office: $office, officeLat: $officeLat, officeLng: $officeLng)';
+    return 'SalesInfo(companyId: $companyId, employeeId: $employeeId, salesId: $salesId, salesName: $salesName, officeId: $officeId, officeName: $officeName, officeAddress: $officeAddress, officeLat: $officeLat, officeLng: $officeLng, userId: $userId, todayCheckin: $todayCheckin, todayCheckout: $todayCheckout)';
   }
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-
-    return other is SalesData &&
-        other.salesId == salesId &&
-        other.namaSales == namaSales &&
-        other.alamat == alamat &&
-        other.kota == kota &&
-        other.telepon == telepon &&
-        other.region == region &&
-        other.email == email &&
-        other.officeId == officeId &&
-        other.office == office &&
-        other.officeLat == officeLat &&
-        other.officeLng == officeLng;
+  
+    return other is SalesInfo &&
+      other.companyId == companyId &&
+      other.employeeId == employeeId &&
+      other.salesId == salesId &&
+      other.salesName == salesName &&
+      other.officeId == officeId &&
+      other.officeName == officeName &&
+      other.officeAddress == officeAddress &&
+      other.officeLat == officeLat &&
+      other.officeLng == officeLng &&
+      other.userId == userId &&
+      other.todayCheckin == todayCheckin &&
+      other.todayCheckout == todayCheckout;
   }
 
   @override
   int get hashCode {
-    return salesId.hashCode ^
-        namaSales.hashCode ^
-        alamat.hashCode ^
-        kota.hashCode ^
-        telepon.hashCode ^
-        region.hashCode ^
-        email.hashCode ^
-        officeId.hashCode ^
-        office.hashCode ^
-        officeLat.hashCode ^
-        officeLng.hashCode;
+    return companyId.hashCode ^
+      employeeId.hashCode ^
+      salesId.hashCode ^
+      salesName.hashCode ^
+      officeId.hashCode ^
+      officeName.hashCode ^
+      officeAddress.hashCode ^
+      officeLat.hashCode ^
+      officeLng.hashCode ^
+      userId.hashCode ^
+      todayCheckin.hashCode ^
+      todayCheckout.hashCode;
   }
 }

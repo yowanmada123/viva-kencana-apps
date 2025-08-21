@@ -20,14 +20,14 @@ class SalesActivityRest {
     try {
       http.options.headers['requiresToken'] = true;
       log(
-        'Request to https://v2.kencana.org/api/kmb/sales/CustomerVisit/getSalesData (GET)',
+        'Request to https://v2.kencana.org/api/viva/sales_activity/CustomerVisit/getUserData (GET)',
       );
       final response = await http.get(
-        "api/kmb/sales/CustomerVisit/getSalesData",
+        "api/viva/sales_activity/CustomerVisit/getUserData",
       );
       if (response.statusCode == 200) {
         final body = response.data;
-        final salesInfo = SalesInfo.fromMap(body);
+        final salesInfo = SalesInfo.fromMap(body['data']);
         return Right(salesInfo);
       } else {
         return Left(NetUtils.parseErrorResponse(response: response.data));

@@ -388,7 +388,7 @@ class _SalesActivityFormScreenState extends State<SalesActivityFormScreen> {
                                         addressController.text = detail.alamat;
                                         provinceController.text =
                                             detail.propinsi;
-                                        cityController.text = detail.real_City;
+                                        cityController.text = detail.realCity;
                                         districtController.text =
                                             detail.district;
                                         villageController.text = detail.vilage;
@@ -908,7 +908,7 @@ class _SalesActivityFormSecondStepState
     return await Future.wait(
       images.map((img) async {
         final url = await imageToDataUri(img.file);
-        return model.Image(src: url, remark: img.remark, price: img.price);
+        return model.Image(src: url, remark: img.remark);
       }),
     );
   }
@@ -1300,42 +1300,42 @@ class _SalesActivityFormSecondStepState
                               return;
                             }
                             final activities = [
-                              'Registrasi Customer Baru',
                               'Penawaran Produk',
                               'Taking Order',
                               'Info Program/Hadiah',
                               'Penagihan',
                               'Customer Visit/Assistensi',
+                              'Registrasi Customer Baru',
                             ];
                             final selected = state.selectedActivities;
                             final List<model.Image> modelImages =
                                 await prepareImagesForSubmission(state.images);
                             final formData = model.SalesActivityFormData(
                               customerId: '',
-                              custName: widget.custName,
-                              custKtpNpwp: widget.ktpNpwp,
-                              custPhone: widget.phone,
-                              custEmail: widget.email,
-                              custAddress: widget.address,
-                              custProvince: widget.province,
-                              custCity: widget.city,
-                              custDistrict: widget.district,
-                              custVillage: widget.village,
-                              custBussiness: widget.custBusiness ?? '',
-                              custBussinessStatus:
+                              customerName: widget.custName,
+                              customerKtpNpwp: widget.ktpNpwp,
+                              customerPhone: widget.phone,
+                              customerEmail: widget.email,
+                              customerAddress: widget.address,
+                              customerProvince: widget.province,
+                              customerCity: widget.city,
+                              customerDistrict: widget.district,
+                              customerVillage: widget.village,
+                              customerBussiness: widget.custBusiness ?? '',
+                              customerBussinessStatus:
                                   widget.custBusinessStatus ?? '',
-                              custBussinessType: widget.custBusinessType ?? '',
-                              custTaxType: widget.custTaxType ?? '',
-                              custOfficeType: widget.custOfficeType ?? '',
-                              custOfficeOwnership: widget.custOwnership ?? '',
-                              custType: widget.custType ?? '',
+                              customerBussinessType: widget.custBusinessType ?? '',
+                              customerTaxType: widget.custTaxType ?? '',
+                              customerOfficeType: widget.custOfficeType ?? '',
+                              customerOfficeOwnership: widget.custOwnership ?? '',
+                              customerType: widget.custType ?? '',
                               checkboxCar: widget.salesVehicle,
-                              checkbox1: selected.contains(activities[0]),
-                              checkbox2: selected.contains(activities[1]),
-                              checkbox3: selected.contains(activities[2]),
-                              checkbox4: selected.contains(activities[3]),
-                              checkbox5: selected.contains(activities[4]),
-                              checkbox6: selected.contains(activities[5]),
+                              chkProductOffer: selected.contains(activities[0]),
+                              chkTakeOrder: selected.contains(activities[1]),
+                              chkInfoPromo: selected.contains(activities[2]),
+                              chkTakeBilling: selected.contains(activities[3]),
+                              chkCustomerVisit: selected.contains(activities[4]),
+                              chkNewCustRequest: selected.contains(activities[5]),
                               currentLocation: state.address,
                               latitude: state.position!.latitude,
                               longitude: state.position!.longitude,
