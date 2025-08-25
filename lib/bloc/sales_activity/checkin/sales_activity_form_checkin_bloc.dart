@@ -6,7 +6,7 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 
 import '../../../data/repository/sales_repository.dart';
-import '../../../models/sales_activity/checkin_info.dart';
+import '../../../models/sales_activity/sales_info.dart';
 import '../../../models/sales_activity/submit_data.dart';
 import '../../../utils/strict_location.dart';
 
@@ -17,19 +17,13 @@ class SalesActivityFormCheckInBloc extends Bloc<SalesActivityFormCheckInEvent, S
   final SalesActivityRepository salesActivityRepository;
   SalesActivityFormCheckInBloc({required this.salesActivityRepository}) : super(const SalesActivityFormCheckInState()) {
     on<SubmitSalesActivityCheckInForm>(_onSubmitSalesActivityForm);
-    on<LoadCheckinStatus>(_onGetCheckinStatus);
     on<LoadCurrentLocation>(_onLoadCurrentLocation);
-    on<SetImageEvent>(_onSetImageEvent);
     on<LoadSalesData>(_onGetSalesData);
+    on<AddImageEvent>(_onAddImageEvent);
+    on<UpdateRemarkEvent>(_onUpdateRemarkEvent);
 
     on<SetOdometerEvent>((event, emit) {
       emit(state.copyWith(odometer: event.odometer));
-    });
-    on<SetCheckInEvent>((event, emit){
-      emit(state.copyWith(isCheckedIn: true));
-    });
-    on<SetCheckOutEvent>((event, emit) {
-      emit(state.copyWith(isCheckedOut: true));
     });
 
     on<SetLocationEvent>((event, emit) async {
@@ -60,18 +54,6 @@ class SalesActivityFormCheckInBloc extends Bloc<SalesActivityFormCheckInEvent, S
     });
   }
 
-  Future<void> _onSetImageEvent(
-    SetImageEvent event,
-    Emitter<SalesActivityFormCheckInState> emit,
-  ) async {
-    if (state is CheckinLoaded) {
-      final current = state as CheckinLoaded;
-      emit(current.copyWith(imageCheckIn: event.image));
-    } else {
-      emit(state.copyWith(imageCheckIn: event.image));
-    }
-  }
-
   Future<void> _onSubmitSalesActivityForm(
     SubmitSalesActivityCheckInForm event,
     Emitter<SalesActivityFormCheckInState> emit,
@@ -87,26 +69,6 @@ class SalesActivityFormCheckInBloc extends Bloc<SalesActivityFormCheckInEvent, S
         emit(SalesActivityFormCheckInSuccess());
       },
     );
-  }
-
-  Future<void> _onGetCheckinStatus(
-    LoadCheckinStatus event,
-    Emitter<SalesActivityFormCheckInState> emit,
-  ) async {
-    emit(CheckinLoading());
-    try {
-      final result = await salesActivityRepository.getCheckinInfo();
-      result.fold(
-        (failure){
-          emit(CheckinError(failure.message!));
-        },
-        (success){
-          emit(CheckinLoaded(success));
-        }
-      );
-    } catch (e) {
-      emit(CheckinError(e.toString()));
-    }
   }
 
   Future<void> _onLoadCurrentLocation(
@@ -134,13 +96,30 @@ class SalesActivityFormCheckInBloc extends Bloc<SalesActivityFormCheckInEvent, S
         (failure) {
           emit(SalesDataError(failure.message!));
         },
-        (success) {
-          final firstData = success.salesData.first;
-          emit(SalesDataSuccess(salesId: firstData.salesId, officeId: firstData.officeId));
+        (sales) {
+          emit(SalesDataSuccess(sales: sales));
         },
       );
     } catch (e) {
       emit(SalesDataError(e.toString()));
     }
+  }
+
+  Future<void> _onAddImageEvent(
+    AddImageEvent event,
+    Emitter<SalesActivityFormCheckInState> emit,
+  ) async {
+    emit(state.copyWith(images: [...state.images, event.image]));
+  }
+
+  Future<void> _onUpdateRemarkEvent(
+    UpdateRemarkEvent event,
+    Emitter<SalesActivityFormCheckInState> emit,
+  ) async {
+    final updatedImages = [...state.images];
+    updatedImages[event.index] =
+        updatedImages[event.index].copyWith(remark: event.remark);
+
+    emit(state.copyWith(images: updatedImages));
   }
 }

@@ -16,40 +16,22 @@ class ToggleActivityEvent extends SalesActivityFormEvent {
   List<Object?> get props => [activity];
 }
 
-class SetImageEvent extends SalesActivityFormEvent {
-  final File image;
-
-  const SetImageEvent(this.image);
-
-  @override
-  List<Object?> get props => [image];
-}
-
 class AddImageEvent extends SalesActivityFormEvent {
-  final File image;
-
+  final ImageItem image;
   const AddImageEvent(this.image);
 
   @override
   List<Object?> get props => [image];
 }
 
-class SetOfficeOption extends SalesActivityFormEvent {
-  final String option;
+class UpdateRemarkEvent extends SalesActivityFormEvent {
+  final int index;
+  final String remark;
 
-  const SetOfficeOption(this.option);
-
-  @override
-  List<Object?> get props => [option];
-}
-
-class SetUserOption extends SalesActivityFormEvent {
-  final String option;
-
-  const SetUserOption(this.option);
+  const UpdateRemarkEvent(this.index, this.remark);
 
   @override
-  List<Object?> get props => [option];
+  List<Object?> get props => [index, remark];
 }
 
 class SetOdometerEvent extends SalesActivityFormEvent {
@@ -63,9 +45,10 @@ class SetOdometerEvent extends SalesActivityFormEvent {
 class SetLocationEvent extends SalesActivityFormEvent {}
 
 class SearchCustomerData extends SalesActivityFormEvent {
-  final String search;
+  final String entityId;
+  final String keyword;
 
-  const SearchCustomerData(this.search);
+  const SearchCustomerData(this.entityId, this.keyword);
 }
 
 class FetchProvinces extends SalesActivityFormEvent {}
@@ -86,8 +69,9 @@ class FetchVillages extends SalesActivityFormEvent {
 }
 
 class FetchCustomerDetail extends SalesActivityFormEvent {
+  final String entityId;
   final String customerId;
-  const FetchCustomerDetail(this.customerId);
+  const FetchCustomerDetail(this.entityId, this.customerId);
 }
 
 class SubmitSalesActivityForm extends SalesActivityFormEvent {

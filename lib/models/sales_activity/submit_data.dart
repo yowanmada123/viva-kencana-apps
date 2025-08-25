@@ -4,35 +4,35 @@ import 'package:flutter/foundation.dart';
 
 class SalesActivityFormData {
   final String? customerId;
-  final String? custName;
-  final String? custKtpNpwp;
-  final String? custPhone;
-  final String? custEmail;
-  final String? custAddress;
-  final String? custProvince;
-  final String? custCity;
-  final String? custDistrict;
-  final String? custVillage;
-  final String? custBussiness;
-  final String? custBussinessStatus;
-  final String? custBussinessType;
-  final String? custTaxType;
-  final String? custOfficeType;
-  final String? custOfficeOwnership;
-  final String? custType;
+  final String? customerName;
+  final String? customerKtpNpwp;
+  final String? customerPhone;
+  final String? customerEmail;
+  final String? customerAddress;
+  final String? customerProvince;
+  final String? customerCity;
+  final String? customerDistrict;
+  final String? customerVillage;
+  final String? customerBussiness;
+  final String? customerBussinessStatus;
+  final String? customerBussinessType;
+  final String? customerTaxType;
+  final String? customerOfficeType;
+  final String? customerOfficeOwnership;
+  final String? customerType;
   final String? checkboxCar;
-  final bool? checkbox1;
-  final bool? checkbox2;
-  final bool? checkbox3;
-  final bool? checkbox4;
-  final bool? checkbox5;
-  final bool? checkbox6;
+  final bool? chkProductOffer;
+  final bool? chkTakeOrder;
+  final bool? chkInfoPromo;
+  final bool? chkTakeBilling;
+  final bool? chkCustomerVisit;
+  final bool? chkNewCustRequest;
   final double? latitude;
   final double? longitude;
   final String? currentLocation;
   final String? remark;
   final String? image;
-  final List<Image>? images;
+  final List<ImageItem>? images;
   final String? new_;
   final String? speedoKmModel;
   final String? checkpoint;
@@ -40,29 +40,29 @@ class SalesActivityFormData {
   final String? officeid;
   SalesActivityFormData({
     this.customerId = '',
-    this.custName = '',
-    this.custKtpNpwp = '',
-    this.custPhone = '',
-    this.custEmail = '',
-    this.custAddress = '',
-    this.custProvince = '',
-    this.custCity = '',
-    this.custDistrict = '',
-    this.custVillage = '',
-    this.custBussiness = '',
-    this.custBussinessStatus = '',
-    this.custBussinessType = '',
-    this.custTaxType = '',
-    this.custOfficeType = '',
-    this.custOfficeOwnership = '',
-    this.custType = '',
+    this.customerName = '',
+    this.customerKtpNpwp = '',
+    this.customerPhone = '',
+    this.customerEmail = '',
+    this.customerAddress = '',
+    this.customerProvince = '',
+    this.customerCity = '',
+    this.customerDistrict = '',
+    this.customerVillage = '',
+    this.customerBussiness = '',
+    this.customerBussinessStatus = '',
+    this.customerBussinessType = '',
+    this.customerTaxType = '',
+    this.customerOfficeType = '',
+    this.customerOfficeOwnership = '',
+    this.customerType = '',
     this.checkboxCar = '',
-    this.checkbox1 = false,
-    this.checkbox2 = false,
-    this.checkbox3 = false,
-    this.checkbox4 = false,
-    this.checkbox5 = false,
-    this.checkbox6 = false,
+    this.chkProductOffer = false,
+    this.chkTakeOrder = false,
+    this.chkInfoPromo = false,
+    this.chkTakeBilling = false,
+    this.chkCustomerVisit = false,
+    this.chkNewCustRequest = false,
     this.latitude = 0.0,
     this.longitude = 0.0,
     this.currentLocation = '',
@@ -78,35 +78,36 @@ class SalesActivityFormData {
 
   SalesActivityFormData copyWith({
     String? customerId,
-    String? custName,
-    String? custKtpNpwp,
-    String? custPhone,
-    String? custEmail,
-    String? custAddress,
-    String? custProvince,
-    String? custCity,
-    String? custDistrict,
-    String? custVillage,
-    String? custBussiness,
-    String? custBussinessStatus,
-    String? custBussinessType,
-    String? custTaxType,
-    String? custOfficeType,
-    String? custOfficeOwnership,
-    String? custType,
+    String? customerName,
+    String? customerKtpNpwp,
+    String? customerPhone,
+    String? customerEmail,
+    String? customerAddress,
+    String? customerProvince,
+    String? customerCity,
+    String? customerDistrict,
+    String? customerVillage,
+    String? customerBussiness,
+    String? customerBussinessStatus,
+    String? customerBussinessType,
+    String? customerTaxType,
+    String? customerOfficeType,
+    String? customerOfficeOwnership,
+    String? customerType,
     String? checkboxCar,
-    bool? checkbox1,
-    bool? checkbox2,
-    bool? checkbox3,
-    bool? checkbox4,
-    bool? checkbox5,
-    bool? checkbox6,
+    bool? chkProductOffer,
+    bool? chkTakeOrder,
+    bool? chkInfoPromo,
+    bool? chkTakeBilling,
+    bool? chkCustomerVisit,
+    bool? chkNewCustRequest,
     double? latitude,
     double? longitude,
     String? currentLocation,
     String? remark,
     String? image,
-    List<Image>? images,
+    List<ImageItem>? images,
+    List<ImageItem>? imagesCheckpoint,
     String? new_,
     String? speedoKmModel,
     String? checkpoint,
@@ -115,29 +116,29 @@ class SalesActivityFormData {
   }) {
     return SalesActivityFormData(
       customerId: customerId ?? this.customerId,
-      custName: custName ?? this.custName,
-      custKtpNpwp: custKtpNpwp ?? this.custKtpNpwp,
-      custPhone: custPhone ?? this.custPhone,
-      custEmail: custEmail ?? this.custEmail,
-      custAddress: custAddress ?? this.custAddress,
-      custProvince: custProvince ?? this.custProvince,
-      custCity: custCity ?? this.custCity,
-      custDistrict: custDistrict ?? this.custDistrict,
-      custVillage: custVillage ?? this.custVillage,
-      custBussiness: custBussiness ?? this.custBussiness,
-      custBussinessStatus: custBussinessStatus ?? this.custBussinessStatus,
-      custBussinessType: custBussinessType ?? this.custBussinessType,
-      custTaxType: custTaxType ?? this.custTaxType,
-      custOfficeType: custOfficeType ?? this.custOfficeType,
-      custOfficeOwnership: custOfficeOwnership ?? this.custOfficeOwnership,
-      custType: custType ?? this.custType,
+      customerName: customerName ?? this.customerName,
+      customerKtpNpwp: customerKtpNpwp ?? this.customerKtpNpwp,
+      customerPhone: customerPhone ?? this.customerPhone,
+      customerEmail: customerEmail ?? this.customerEmail,
+      customerAddress: customerAddress ?? this.customerAddress,
+      customerProvince: customerProvince ?? this.customerProvince,
+      customerCity: customerCity ?? this.customerCity,
+      customerDistrict: customerDistrict ?? this.customerDistrict,
+      customerVillage: customerVillage ?? this.customerVillage,
+      customerBussiness: customerBussiness ?? this.customerBussiness,
+      customerBussinessStatus: customerBussinessStatus ?? this.customerBussinessStatus,
+      customerBussinessType: customerBussinessType ?? this.customerBussinessType,
+      customerTaxType: customerTaxType ?? this.customerTaxType,
+      customerOfficeType: customerOfficeType ?? this.customerOfficeType,
+      customerOfficeOwnership: customerOfficeOwnership ?? this.customerOfficeOwnership,
+      customerType: customerType ?? this.customerType,
       checkboxCar: checkboxCar ?? this.checkboxCar,
-      checkbox1: checkbox1 ?? this.checkbox1,
-      checkbox2: checkbox2 ?? this.checkbox2,
-      checkbox3: checkbox3 ?? this.checkbox3,
-      checkbox4: checkbox4 ?? this.checkbox4,
-      checkbox5: checkbox5 ?? this.checkbox5,
-      checkbox6: checkbox6 ?? this.checkbox6,
+      chkProductOffer: chkProductOffer ?? this.chkProductOffer,
+      chkTakeOrder: chkTakeOrder ?? this.chkTakeOrder,
+      chkInfoPromo: chkInfoPromo ?? this.chkInfoPromo,
+      chkTakeBilling: chkTakeBilling ?? this.chkTakeBilling,
+      chkCustomerVisit: chkCustomerVisit ?? this.chkCustomerVisit,
+      chkNewCustRequest: chkNewCustRequest ?? this.chkNewCustRequest,
       latitude: latitude ?? this.latitude,
       longitude: longitude ?? this.longitude,
       currentLocation: currentLocation ?? this.currentLocation,
@@ -154,76 +155,72 @@ class SalesActivityFormData {
 
   Map<String, dynamic> toMap() {
     return {
-      'customerId': customerId,
-      'custName': custName,
-      'custKtpNpwp': custKtpNpwp,
-      'custPhone': custPhone,
-      'custEmail': custEmail,
-      'custAddress': custAddress,
-      'custProvince': custProvince,
-      'custCity': custCity,
-      'custDistrict': custDistrict,
-      'custVillage': custVillage,
-      'custBussiness': custBussiness,
-      'custBussinessStatus': custBussinessStatus,
-      'custBussinessType': custBussinessType,
-      'custTaxType': custTaxType,
-      'custOfficeType': custOfficeType,
-      'custOfficeOwnership': custOfficeOwnership,
-      'custType': custType,
-      'checkboxCar': checkboxCar,
-      'checkbox1': checkbox1,
-      'checkbox2': checkbox2,
-      'checkbox3': checkbox3,
-      'checkbox4': checkbox4,
-      'checkbox5': checkbox5,
-      'checkbox6': checkbox6,
+      'customer_id': customerId,
+      'customer_name': customerName,
+      'customer_ktp_npwp': customerKtpNpwp,
+      'customer_phone': customerPhone,
+      'customer_email': customerEmail,
+      'customer_address': customerAddress,
+      'customer_province': customerProvince,
+      'customer_city': customerCity,
+      'customer_district': customerDistrict,
+      'customer_village': customerVillage,
+      'customer_bussiness': customerBussiness,
+      'customer_bussiness_status': customerBussinessStatus,
+      'customer_bussiness_type': customerBussinessType,
+      'customer_tax_type': customerTaxType,
+      'customer_office_type': customerOfficeType,
+      'customer_office_ownership': customerOfficeOwnership,
+      'customer_type': customerType,
+      'sales_vehicle': checkboxCar,
+      'chk_product_offer': chkProductOffer,
+      'chk_take_order': chkTakeOrder,
+      'chk_info_promo': chkInfoPromo,
+      'chk_take_billing': chkTakeBilling,
+      'chk_customer_visit': chkCustomerVisit,
+      'chk_new_cust_request': chkNewCustRequest,
       'latitude': latitude,
       'longitude': longitude,
-      'currentLocation': currentLocation,
+      'gps_location': currentLocation,
       'remark': remark,
-      'image': image,
       'images': images?.map((x) => x.toMap()).toList(),
-      'new': new_,
-      'speedoKmModel': speedoKmModel,
+      'vehicle_odometer': speedoKmModel,
       'checkpoint': checkpoint,
-      'salesid': salesid,
-      'officeid': officeid,
     };
   }
 
   factory SalesActivityFormData.fromMap(Map<String, dynamic> map) {
     return SalesActivityFormData(
       customerId: map['customerId'] ?? '',
-      custName: map['custName'] ?? '',
-      custKtpNpwp: map['custKtpNpwp'] ?? '',
-      custPhone: map['custPhone'] ?? '',
-      custEmail: map['custEmail'] ?? '',
-      custAddress: map['custAddress'] ?? '',
-      custProvince: map['custProvince'] ?? '',
-      custCity: map['custCity'] ?? '',
-      custDistrict: map['custDistrict'] ?? '',
-      custVillage: map['custVillage'] ?? '',
-      custBussiness: map['custBussiness'] ?? '',
-      custBussinessStatus: map['custBussinessStatus'] ?? '',
-      custBussinessType: map['custBussinessType'] ?? '',
-      custTaxType: map['custTaxType'] ?? '',
-      custOfficeType: map['custOfficeType'] ?? '',
-      custOfficeOwnership: map['custOfficeOwnership'] ?? '',
-      custType: map['custType'] ?? '',
+      customerName: map['customerName'] ?? '',
+      customerKtpNpwp: map['customerKtpNpwp'] ?? '',
+      customerPhone: map['customerPhone'] ?? '',
+      customerEmail: map['customerEmail'] ?? '',
+      customerAddress: map['customerAddress'] ?? '',
+      customerProvince: map['customerProvince'] ?? '',
+      customerCity: map['customerCity'] ?? '',
+      customerDistrict: map['customerDistrict'] ?? '',
+      customerVillage: map['customerVillage'] ?? '',
+      customerBussiness: map['customerBussiness'] ?? '',
+      customerBussinessStatus: map['customerBussinessStatus'] ?? '',
+      customerBussinessType: map['customerBussinessType'] ?? '',
+      customerTaxType: map['customerTaxType'] ?? '',
+      customerOfficeType: map['customerOfficeType'] ?? '',
+      customerOfficeOwnership: map['customerOfficeOwnership'] ?? '',
+      customerType: map['customerType'] ?? '',
       checkboxCar: map['checkboxCar'] ?? '',
-      checkbox1: map['checkbox1'] ?? false,
-      checkbox2: map['checkbox2'] ?? false,
-      checkbox3: map['checkbox3'] ?? false,
-      checkbox4: map['checkbox4'] ?? false,
-      checkbox5: map['checkbox5'] ?? false,
-      checkbox6: map['checkbox6'] ?? false,
+      chkProductOffer: map['chkProductOffer'] ?? false,
+      chkTakeOrder: map['chkTakeOrder'] ?? false,
+      chkInfoPromo: map['chkInfoPromo'] ?? false,
+      chkTakeBilling: map['chkTakeBilling'] ?? false,
+      chkCustomerVisit: map['chkCustomerVisit'] ?? false,
+      chkNewCustRequest: map['chkNewCustRequest'] ?? false,
       latitude: map['latitude']?.toDouble() ?? 0.0,
       longitude: map['longitude']?.toDouble() ?? 0.0,
       currentLocation: map['currentLocation'] ?? '',
       remark: map['remark'] ?? '',
       image: map['image'] ?? '',
-      images: List<Image>.from(map['images']?.map((x) => Image.fromMap(x))),
+      images: List<ImageItem>.from(map['images']?.map((x) => ImageItem.fromMap(x))),
       new_: map['new'] ?? '',
       speedoKmModel: map['speedoKmModel'] ?? '',
       checkpoint: map['checkpoint'] ?? '',
@@ -238,7 +235,7 @@ class SalesActivityFormData {
 
   @override
   String toString() {
-    return 'SalesActivityFormData(customerId: $customerId, custName: $custName, custKtpNpwp: $custKtpNpwp, custPhone: $custPhone, custEmail: $custEmail, custAddress: $custAddress, custProvince: $custProvince, custCity: $custCity, custDistrict: $custDistrict, custVillage: $custVillage, custBussiness: $custBussiness, custBussinessStatus: $custBussinessStatus, custBussinessType: $custBussinessType, custTaxType: $custTaxType, custOfficeType: $custOfficeType, custOfficeOwnership: $custOfficeOwnership, custType: $custType, checkboxCar: $checkboxCar, checkbox1: $checkbox1, checkbox2: $checkbox2, checkbox3: $checkbox3, checkbox4: $checkbox4, checkbox5: $checkbox5, checkbox6: $checkbox6, latitude: $latitude, longitude: $longitude, currentLocation: $currentLocation, remark: $remark, image: $image, images: $images, new_: $new_, speedoKmModel: $speedoKmModel, checkpoint: $checkpoint, salesid: $salesid, officeid: $officeid)';
+    return 'SalesActivityFormData(customerId: $customerId, customerName: $customerName, customerKtpNpwp: $customerKtpNpwp, customerPhone: $customerPhone, customerEmail: $customerEmail, customerAddress: $customerAddress, customerProvince: $customerProvince, customerCity: $customerCity, customerDistrict: $customerDistrict, customerVillage: $customerVillage, customerBussiness: $customerBussiness, customerBussinessStatus: $customerBussinessStatus, customerBussinessType: $customerBussinessType, customerTaxType: $customerTaxType, customerOfficeType: $customerOfficeType, customerOfficeOwnership: $customerOfficeOwnership, customerType: $customerType, checkboxCar: $checkboxCar, chkProductOffer: $chkProductOffer, chkTakeOrder: $chkTakeOrder, chkInfoPromo: $chkInfoPromo, chkTakeBilling: $chkTakeBilling, chkCustomerVisit: $chkCustomerVisit, chkNewCustRequest: $chkNewCustRequest, latitude: $latitude, longitude: $longitude, currentLocation: $currentLocation, remark: $remark, image: $image, images: $images, new_: $new_, speedoKmModel: $speedoKmModel, checkpoint: $checkpoint, salesid: $salesid, officeid: $officeid)';
   }
 
   @override
@@ -247,29 +244,29 @@ class SalesActivityFormData {
 
     return other is SalesActivityFormData &&
         other.customerId == customerId &&
-        other.custName == custName &&
-        other.custKtpNpwp == custKtpNpwp &&
-        other.custPhone == custPhone &&
-        other.custEmail == custEmail &&
-        other.custAddress == custAddress &&
-        other.custProvince == custProvince &&
-        other.custCity == custCity &&
-        other.custDistrict == custDistrict &&
-        other.custVillage == custVillage &&
-        other.custBussiness == custBussiness &&
-        other.custBussinessStatus == custBussinessStatus &&
-        other.custBussinessType == custBussinessType &&
-        other.custTaxType == custTaxType &&
-        other.custOfficeType == custOfficeType &&
-        other.custOfficeOwnership == custOfficeOwnership &&
-        other.custType == custType &&
+        other.customerName == customerName &&
+        other.customerKtpNpwp == customerKtpNpwp &&
+        other.customerPhone == customerPhone &&
+        other.customerEmail == customerEmail &&
+        other.customerAddress == customerAddress &&
+        other.customerProvince == customerProvince &&
+        other.customerCity == customerCity &&
+        other.customerDistrict == customerDistrict &&
+        other.customerVillage == customerVillage &&
+        other.customerBussiness == customerBussiness &&
+        other.customerBussinessStatus == customerBussinessStatus &&
+        other.customerBussinessType == customerBussinessType &&
+        other.customerTaxType == customerTaxType &&
+        other.customerOfficeType == customerOfficeType &&
+        other.customerOfficeOwnership == customerOfficeOwnership &&
+        other.customerType == customerType &&
         other.checkboxCar == checkboxCar &&
-        other.checkbox1 == checkbox1 &&
-        other.checkbox2 == checkbox2 &&
-        other.checkbox3 == checkbox3 &&
-        other.checkbox4 == checkbox4 &&
-        other.checkbox5 == checkbox5 &&
-        other.checkbox6 == checkbox6 &&
+        other.chkProductOffer == chkProductOffer &&
+        other.chkTakeOrder == chkTakeOrder &&
+        other.chkInfoPromo == chkInfoPromo &&
+        other.chkTakeBilling == chkTakeBilling &&
+        other.chkCustomerVisit == chkCustomerVisit &&
+        other.chkNewCustRequest == chkNewCustRequest &&
         other.latitude == latitude &&
         other.longitude == longitude &&
         other.currentLocation == currentLocation &&
@@ -286,29 +283,29 @@ class SalesActivityFormData {
   @override
   int get hashCode {
     return customerId.hashCode ^
-        custName.hashCode ^
-        custKtpNpwp.hashCode ^
-        custPhone.hashCode ^
-        custEmail.hashCode ^
-        custAddress.hashCode ^
-        custProvince.hashCode ^
-        custCity.hashCode ^
-        custDistrict.hashCode ^
-        custVillage.hashCode ^
-        custBussiness.hashCode ^
-        custBussinessStatus.hashCode ^
-        custBussinessType.hashCode ^
-        custTaxType.hashCode ^
-        custOfficeType.hashCode ^
-        custOfficeOwnership.hashCode ^
-        custType.hashCode ^
+        customerName.hashCode ^
+        customerKtpNpwp.hashCode ^
+        customerPhone.hashCode ^
+        customerEmail.hashCode ^
+        customerAddress.hashCode ^
+        customerProvince.hashCode ^
+        customerCity.hashCode ^
+        customerDistrict.hashCode ^
+        customerVillage.hashCode ^
+        customerBussiness.hashCode ^
+        customerBussinessStatus.hashCode ^
+        customerBussinessType.hashCode ^
+        customerTaxType.hashCode ^
+        customerOfficeType.hashCode ^
+        customerOfficeOwnership.hashCode ^
+        customerType.hashCode ^
         checkboxCar.hashCode ^
-        checkbox1.hashCode ^
-        checkbox2.hashCode ^
-        checkbox3.hashCode ^
-        checkbox4.hashCode ^
-        checkbox5.hashCode ^
-        checkbox6.hashCode ^
+        chkProductOffer.hashCode ^
+        chkTakeOrder.hashCode ^
+        chkInfoPromo.hashCode ^
+        chkTakeBilling.hashCode ^
+        chkCustomerVisit.hashCode ^
+        chkNewCustRequest.hashCode ^
         latitude.hashCode ^
         longitude.hashCode ^
         currentLocation.hashCode ^
@@ -323,49 +320,37 @@ class SalesActivityFormData {
   }
 }
 
-class Image {
-  final String src;
+class ImageItem {
+  final String file;
   final String remark;
-  final String price;
-  Image({required this.src, required this.remark, required this.price});
 
-  Image copyWith({String? src, String? remark, String? price}) {
-    return Image(
-      src: src ?? this.src,
+  ImageItem({required this.file, this.remark = ""});
+
+  ImageItem copyWith({String? file, String? remark}) {
+    return ImageItem(
+      file: file ?? this.file,
       remark: remark ?? this.remark,
-      price: price ?? this.price,
     );
   }
 
   Map<String, dynamic> toMap() {
-    return {'src': src, 'remark': remark, 'price': price};
+    return {'src': file, 'remark': remark};
   }
 
-  factory Image.fromMap(Map<String, dynamic> map) {
-    return Image(
-      src: map['src'] ?? '',
+  factory ImageItem.fromMap(Map<String, dynamic> map) {
+    return ImageItem(
+      file: map['src'] ?? '',
       remark: map['remark'] ?? '',
-      price: map['price'] ?? '',
     );
   }
 
-  String toJson() => json.encode(toMap());
-
-  factory Image.fromJson(String source) => Image.fromMap(json.decode(source));
-
-  @override
-  String toString() => 'Image(src: $src, remark: $remark, price: $price)';
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-
-    return other is Image &&
-        other.src == src &&
-        other.remark == remark &&
-        other.price == price;
+  Map<String, dynamic> toJson() {
+    return {
+      "src": file,
+      "remark": remark,
+    };
   }
 
   @override
-  int get hashCode => src.hashCode ^ remark.hashCode ^ price.hashCode;
+  String toString() => "ImageItem(file: $file, remark: $remark)";
 }

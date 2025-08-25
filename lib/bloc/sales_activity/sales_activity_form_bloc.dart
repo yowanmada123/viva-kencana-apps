@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geocoding/geocoding.dart';
@@ -26,9 +24,8 @@ class SalesActivityFormBloc
     on<FetchVillages>(_onFetchVillages);
     on<FetchCustomerDetail>(_onFetchCustomerDetail);
     on<ToggleActivityEvent>(_onToggleActivity);
-    on<AddImageEvent>(_onAddImage);
-    on<SetOfficeOption>(_onSetOfficeOption);
-    on<SetUserOption>(_onSetUserOption);
+    on<AddImageEvent>(_onAddImageEvent);
+    on<UpdateRemarkEvent>(_onUpdateRemarkEvent);
     on<SetLocationEvent>(_onSetLocation);
     on<SubmitSalesActivityForm>(_onSalesActivitySubmit);
     on<LoadCurrentLocation>(_onLoadCurrentLocation);
@@ -49,7 +46,8 @@ class SalesActivityFormBloc
     emit(CustomerSearchLoading());
     try {
       final res = await salesActivityRepository.getCustomers(
-        searchQuery: event.search,
+        entityId: event.entityId,
+        keyword: event.keyword,
       );
       res.fold(
         (failure) => emit(CustomerSearchError(failure.message!)),
@@ -117,6 +115,7 @@ class SalesActivityFormBloc
     Emitter<SalesActivityFormState> emit,
   ) async {
     final result = await salesActivityRepository.getCustomerDetail(
+      entityId: event.entityId,
       customerId: event.customerId,
     );
 
@@ -139,24 +138,22 @@ class SalesActivityFormBloc
     emit(state.copyWith(selectedActivities: updated));
   }
 
-  void _onAddImage(AddImageEvent event, Emitter<SalesActivityFormState> emit) {
-    final updatedImages = List<ImageWithFile>.from(state.images)
-      ..add(ImageWithFile(file: event.image));
+  Future<void> _onAddImageEvent(
+    AddImageEvent event,
+    Emitter<SalesActivityFormState> emit,
+  ) async {
+    emit(state.copyWith(images: [...state.images, event.image]));
+  }
+
+  Future<void> _onUpdateRemarkEvent(
+    UpdateRemarkEvent event,
+    Emitter<SalesActivityFormState> emit,
+  ) async {
+    final updatedImages = [...state.images];
+    updatedImages[event.index] =
+        updatedImages[event.index].copyWith(remark: event.remark);
+
     emit(state.copyWith(images: updatedImages));
-  }
-
-  void _onSetOfficeOption(
-    SetOfficeOption event,
-    Emitter<SalesActivityFormState> emit,
-  ) {
-    emit(state.copyWith(officeOption: event.option));
-  }
-
-  void _onSetUserOption(
-    SetUserOption event,
-    Emitter<SalesActivityFormState> emit,
-  ) {
-    emit(state.copyWith(userOption: event.option));
   }
 
   Future<void> _onSetLocation(

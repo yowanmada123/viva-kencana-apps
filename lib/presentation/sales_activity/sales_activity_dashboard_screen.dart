@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:vivakencanaapp/bloc/sales_activity/checkin/sales_activity_form_checkin_bloc.dart';
+import 'package:intl/intl.dart';
 
+import '../../bloc/sales_activity/checkin/sales_activity_form_checkin_bloc.dart';
+import '../../models/sales_activity/sales_info.dart';
 import '../widgets/base_primary_button.dart';
 import 'sales_activity_form_checkin_screen.dart';
 import 'sales_activity_form_screen.dart';
 
 class SalesActivityDashboardScreen extends StatefulWidget {
-  final String salesId;
-  final String officeId;
+  final SalesInfo sales;
   const SalesActivityDashboardScreen({
     super.key,
-    required this.salesId,
-    required this.officeId,
+    required this.sales,
   });
 
   @override
@@ -26,7 +26,6 @@ class _SalesActivityDashboardScreenState extends State<SalesActivityDashboardScr
   @override
   void initState() {
     super.initState();
-    context.read<SalesActivityFormCheckInBloc>().add(LoadCheckinStatus());
   }
 
   @override
@@ -46,94 +45,193 @@ class _SalesActivityDashboardScreenState extends State<SalesActivityDashboardScr
         backgroundColor: Theme.of(context).primaryColor,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
-      body: Center(
-        child: Padding(
-          padding: EdgeInsetsGeometry.symmetric(horizontal: 32),
-          child: BlocBuilder<SalesActivityFormCheckInBloc, SalesActivityFormCheckInState>(
-            builder: (context, state) {
-              bool isCheckedIn = false;
+      body: Column(
+        children: [
+          buildCheckCard(
+            time: widget.sales.todayCheckin,
+            isCheckin: true,
+          ),
+          buildCheckCard(
+            time: widget.sales.todayCheckout,
+            isCheckin: false,
+          ),
 
-              if (state is CheckinLoaded) {
-                isCheckedIn = state.isCheckedIn;
-              }
-
-              return Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SizedBox(
-                    width: double.infinity,
-                    child: BasePrimaryButton(
-                      onPressed: isCheckedIn
-                          ? null
-                          : () {
+          Expanded(
+            child: Center(
+              child: Padding(
+                padding: EdgeInsetsGeometry.symmetric(horizontal: 32),
+                child: BlocBuilder<SalesActivityFormCheckInBloc, SalesActivityFormCheckInState>(
+                  builder: (context, state) {
+                    bool isCheckedIn = widget.sales.todayCheckin.isNotEmpty;
+            
+                    return Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                          width: double.infinity,
+                          child: BasePrimaryButton(
+                            onPressed: () {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                   builder: (_) => SalesActivityFormCheckInScreen(
-                                    salesId: widget.salesId,
-                                    officeId: widget.officeId,
+                                    sales: widget.sales,
+                                    isCheckIn: true,
                                   ),
                                 ),
                               );
                             },
-                      label: "Check In",
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-
-                  SizedBox(
-                    width: double.infinity,
-                    child: BasePrimaryButton(
-                      onPressed: () {
-                        if (!isCheckedIn) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text("Anda belum check-in hari ini")),
-                          );
-                          return;
-                        }
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => SalesActivityFormCheckInScreen(
-                              salesId: widget.salesId,
-                              officeId: widget.officeId,
-                            ),
+                            label: "Check In",
                           ),
-                        );
-                      },
-                      label: "Check Out",
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-
-                  SizedBox(
-                    width: double.infinity,
-                    child: BasePrimaryButton(
-                      onPressed: () {
-                        if (!isCheckedIn) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text("Anda belum check-in hari ini")),
-                          );
-                          return;
-                        }
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => SalesActivityFormScreen(
-                              salesId: widget.salesId,
-                              officeId: widget.officeId,
-                            ),
+                        ),
+                        const SizedBox(height: 16),
+            
+                        SizedBox(
+                          width: double.infinity,
+                          child: BasePrimaryButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => SalesActivityFormCheckInScreen(
+                                    sales: widget.sales,
+                                  ),
+                                ),
+                              );
+                            },
+                            label: "Check Out",
                           ),
-                        );
-                      },
-                      label: "Customer Visit",
-                    ),
-                  ),
-                ],
-              );
-            },
+                        ),
+                        const SizedBox(height: 16),
+            
+                        SizedBox(
+                          width: double.infinity,
+                          child: BasePrimaryButton(
+                            onPressed: () {
+                              if (!isCheckedIn) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text("Anda belum check-in hari ini")),
+                                );
+                                return;
+                              }
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => SalesActivityFormScreen(
+                                    sales: widget.sales,
+                                  ),
+                                ),
+                              );
+                            },
+                            label: "Customer Visit",
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              )
+            ),
           ),
-        )
+        ],
+      ),
+    );
+  }
+
+  Padding buildCheckCard({
+    required String? time,
+    required bool isCheckin,
+  }) {
+    DateTime? parsedTime;
+    if (time != null) {
+      try {
+        parsedTime = DateFormat("HH:mm:ss dd-MM-yyyy").parse(time);
+      } catch (_) {
+        parsedTime = null;
+      }
+    }
+
+    String formattedTime =
+        parsedTime != null ? DateFormat("HH:mm").format(parsedTime) : "-";
+    String formattedDate =
+        parsedTime != null ? DateFormat("dd-MM-yyyy").format(parsedTime) : "-";
+
+    final Color mainColor = isCheckin
+        ? Colors.green.shade400.withOpacity(0.8)
+        : Colors.red.shade400.withOpacity(0.8);
+
+    final String label = isCheckin ? "Last Checkin" : "Last Checkout";
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+      child: Card(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        elevation: 4,
+        child: Row(
+          children: [
+            Container(
+              width: 6,
+              height: 80,
+              decoration: BoxDecoration(
+                color: mainColor,
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(12),
+                  bottomLeft: Radius.circular(12),
+                ),
+              ),
+            ),
+
+            Expanded(
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "$formattedTime o'clock",
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey.shade600,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          formattedDate,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    Container(
+                      padding:
+                          const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: mainColor,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        label,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

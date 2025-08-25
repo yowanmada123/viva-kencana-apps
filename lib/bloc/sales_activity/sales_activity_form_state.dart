@@ -2,9 +2,7 @@ part of 'sales_activity_form_bloc.dart';
 
 class SalesActivityFormState extends Equatable {
   final Set<String> selectedActivities;
-  final List<ImageWithFile> images;
-  final String officeOption;
-  final String userOption;
+  final List<ImageItem> images;
   final String odometer;
   final Position? position;
   final Position? currentPosition;
@@ -14,8 +12,6 @@ class SalesActivityFormState extends Equatable {
   const SalesActivityFormState({
     this.selectedActivities = const {},
     this.images = const [],
-    this.officeOption = '',
-    this.userOption = '',
     this.odometer = '',
     this.position,
     this.currentPosition,
@@ -25,9 +21,7 @@ class SalesActivityFormState extends Equatable {
 
   SalesActivityFormState copyWith({
     Set<String>? selectedActivities,
-    List<ImageWithFile>? images,
-    String? officeOption,
-    String? userOption,
+    List<ImageItem>? images,
     String? odometer,
     Position? position,
     Position? currentPosition,
@@ -37,8 +31,6 @@ class SalesActivityFormState extends Equatable {
     return SalesActivityFormState(
       selectedActivities: selectedActivities ?? this.selectedActivities,
       images: images ?? this.images,
-      officeOption: officeOption ?? this.officeOption,
-      userOption: userOption ?? this.userOption,
       odometer: odometer ?? this.odometer,
       position: position ?? this.position,
       currentPosition: currentPosition ?? this.currentPosition,
@@ -51,37 +43,12 @@ class SalesActivityFormState extends Equatable {
   List<Object?> get props => [
     selectedActivities,
     images,
-    officeOption,
-    userOption,
     odometer,
     position,
     address,
     isLoadingLocation,
     currentPosition,
   ];
-}
-
-class ImageWithFile {
-  final File file;
-  final String? uploadedUrl;
-  final String remark;
-  final String price;
-
-  ImageWithFile({
-    required this.file,
-    this.uploadedUrl,
-    this.remark = '',
-    this.price = '',
-  });
-
-  ImageWithFile copyWith({String? uploadedUrl, String? remark, String? price}) {
-    return ImageWithFile(
-      file: file,
-      uploadedUrl: uploadedUrl ?? this.uploadedUrl,
-      remark: remark ?? this.remark,
-      price: price ?? this.price,
-    );
-  }
 }
 
 class SalesActivityInitial extends SalesActivityFormState {}

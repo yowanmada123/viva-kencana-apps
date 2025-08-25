@@ -12,6 +12,7 @@ import '../../data/repository/auth_repository.dart';
 import '../../data/repository/authorization_repository.dart';
 import '../../models/errors/custom_exception.dart';
 import '../../models/menu.dart';
+import '../../utils/strict_location.dart';
 import '../qr_code/qr_code_screen.dart';
 import '../sales_activity/sales_activity_dashboard_screen.dart';
 import '../widgets/base_pop_up.dart';
@@ -61,65 +62,40 @@ class MyGridLayout extends StatelessWidget {
       case 'mnuSalesActivity':
         routeAction = () async {
         final bloc = context.read<SalesActivityFormCheckInBloc>();
+        final position = await StrictLocation.getCurrentPosition();
 
         bloc.add(const LoadSalesData());
         await Future.delayed(const Duration(milliseconds: 500));
 
         final salesState = bloc.state;
         if (salesState is SalesDataSuccess) {
-          final salesId = salesState.salesId;
-          final officeId = salesState.officeId;
+          final salesId = salesState.sales.salesId;
+
+          if (salesId.isEmpty) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text("ID Sales belum terdaftarkan")),
+            );
+            return;
+          }
+
+          if(position.isMocked){
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text("Perangkat terdeteksi menggunakan lokasi palsu"), backgroundColor: Colors.red),
+            );
+            return;
+          }
 
           Navigator.push(
             context,
             MaterialPageRoute(
               builder: (_) => SalesActivityDashboardScreen(
-                salesId: salesId,
-                officeId: officeId,
+                sales: salesState.sales,
               ),
             ),
           );
-
-          // bloc.add(LoadCheckinStatus());
-          // await Future.delayed(const Duration(milliseconds: 500));
-
-          // final state = bloc.state;
-          // if (state is CheckinLoaded) {
-          //   if (state.checkinInfo.stat == 'Y') {
-          //     Navigator.push(
-          //       context,
-          //       MaterialPageRoute(
-          //         builder: (_) => SalesActivityFormScreen(
-          //           salesId: salesId,
-          //           officeId: officeId,
-          //         ),
-          //       ),
-          //     );
-          //   } else {
-          //     Navigator.push(
-          //       context,
-          //       MaterialPageRoute(
-          //         builder: (_) => SalesActivityFormCheckInScreen(
-          //           salesId: salesId,
-          //           officeId: officeId,
-          //         ),
-          //       ),
-          //     );
-          //   }
-          // } else if (state is CheckinError) {
-          //   ScaffoldMessenger.of(context).showSnackBar(
-          //     SnackBar(
-          //       content: Text("Gagal memuat status check-in. Mohon coba lagi!"),
-          //     ),
-          //   );
-          // } else {
-          //   ScaffoldMessenger.of(context).showSnackBar(
-          //     const SnackBar(content: Text("Sedang memuat status check-in...")),
-          //   );
-          // }
         } else if (salesState is SalesDataError) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Gagal memuat data sales: ${salesState.message}")),
+            SnackBar(content: Text("ID Sales belum terdaftarkan")),
           );
         }
       };
