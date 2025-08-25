@@ -38,6 +38,7 @@ class SalesActivityFormData {
   final String? checkpoint;
   final String? salesid;
   final String? officeid;
+  final bool? setAddress;
   SalesActivityFormData({
     this.customerId = '',
     this.customerName = '',
@@ -74,6 +75,7 @@ class SalesActivityFormData {
     this.checkpoint = '',
     this.salesid = '',
     this.officeid = '',
+    this.setAddress = false,
   });
 
   SalesActivityFormData copyWith({
@@ -113,6 +115,7 @@ class SalesActivityFormData {
     String? checkpoint,
     String? salesid,
     String? officeid,
+    bool? setAddress,
   }) {
     return SalesActivityFormData(
       customerId: customerId ?? this.customerId,
@@ -150,6 +153,7 @@ class SalesActivityFormData {
       checkpoint: checkpoint ?? this.checkpoint,
       salesid: salesid ?? this.salesid,
       officeid: officeid ?? this.officeid,
+      setAddress: setAddress ?? this.setAddress,
     );
   }
 
@@ -186,6 +190,7 @@ class SalesActivityFormData {
       'images': images?.map((x) => x.toMap()).toList(),
       'vehicle_odometer': speedoKmModel,
       'checkpoint': checkpoint,
+      'set_address': setAddress,
     };
   }
 
@@ -225,6 +230,7 @@ class SalesActivityFormData {
       speedoKmModel: map['speedoKmModel'] ?? '',
       checkpoint: map['checkpoint'] ?? '',
       officeid: map['officeid'] ?? '',
+      setAddress: map['set_address'] ?? '',
     );
   }
 
@@ -235,7 +241,7 @@ class SalesActivityFormData {
 
   @override
   String toString() {
-    return 'SalesActivityFormData(customerId: $customerId, customerName: $customerName, customerKtpNpwp: $customerKtpNpwp, customerPhone: $customerPhone, customerEmail: $customerEmail, customerAddress: $customerAddress, customerProvince: $customerProvince, customerCity: $customerCity, customerDistrict: $customerDistrict, customerVillage: $customerVillage, customerBussiness: $customerBussiness, customerBussinessStatus: $customerBussinessStatus, customerBussinessType: $customerBussinessType, customerTaxType: $customerTaxType, customerOfficeType: $customerOfficeType, customerOfficeOwnership: $customerOfficeOwnership, customerType: $customerType, checkboxCar: $checkboxCar, chkProductOffer: $chkProductOffer, chkTakeOrder: $chkTakeOrder, chkInfoPromo: $chkInfoPromo, chkTakeBilling: $chkTakeBilling, chkCustomerVisit: $chkCustomerVisit, chkNewCustRequest: $chkNewCustRequest, latitude: $latitude, longitude: $longitude, currentLocation: $currentLocation, remark: $remark, image: $image, images: $images, new_: $new_, speedoKmModel: $speedoKmModel, checkpoint: $checkpoint, salesid: $salesid, officeid: $officeid)';
+    return 'SalesActivityFormData(customerId: $customerId, customerName: $customerName, customerKtpNpwp: $customerKtpNpwp, customerPhone: $customerPhone, customerEmail: $customerEmail, customerAddress: $customerAddress, customerProvince: $customerProvince, customerCity: $customerCity, customerDistrict: $customerDistrict, customerVillage: $customerVillage, customerBussiness: $customerBussiness, customerBussinessStatus: $customerBussinessStatus, customerBussinessType: $customerBussinessType, customerTaxType: $customerTaxType, customerOfficeType: $customerOfficeType, customerOfficeOwnership: $customerOfficeOwnership, customerType: $customerType, checkboxCar: $checkboxCar, chkProductOffer: $chkProductOffer, chkTakeOrder: $chkTakeOrder, chkInfoPromo: $chkInfoPromo, chkTakeBilling: $chkTakeBilling, chkCustomerVisit: $chkCustomerVisit, chkNewCustRequest: $chkNewCustRequest, latitude: $latitude, longitude: $longitude, currentLocation: $currentLocation, remark: $remark, image: $image, images: $images, new_: $new_, speedoKmModel: $speedoKmModel, checkpoint: $checkpoint, salesid: $salesid, officeid: $officeid, setAddress: $setAddress)';
   }
 
   @override
@@ -277,7 +283,8 @@ class SalesActivityFormData {
         other.speedoKmModel == speedoKmModel &&
         other.checkpoint == checkpoint &&
         other.salesid == salesid &&
-        other.officeid == officeid;
+        other.officeid == officeid &&
+        other.setAddress == setAddress;
   }
 
   @override
@@ -316,7 +323,8 @@ class SalesActivityFormData {
         speedoKmModel.hashCode ^
         checkpoint.hashCode ^
         salesid.hashCode ^
-        officeid.hashCode;
+        officeid.hashCode ^
+        setAddress.hashCode;
   }
 }
 
