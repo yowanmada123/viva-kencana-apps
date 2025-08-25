@@ -1,54 +1,39 @@
 part of 'sales_activity_form_checkin_bloc.dart';
 
 class SalesActivityFormCheckInState extends Equatable {
-  final File? imageCheckIn;
-  final File? imageCheckOut;
+  final List<ImageItem> images;
   final String odometer;
   final Position? position;
   final String? address;
-  final bool isCheckedIn;
-  final bool isCheckedOut;
 
   const SalesActivityFormCheckInState({
-    this.imageCheckIn,
-    this.imageCheckOut,
+    this.images = const [],
     this.odometer = '',
     this.position,
     this.address = '',
-    this.isCheckedIn = false,
-    this.isCheckedOut = false,
   });
 
   SalesActivityFormCheckInState copyWith({
-    File? imageCheckIn,
-    File? imageCheckOut,
+    List<ImageItem>? images,
     String? odometer,
     Position? position,
     String? address,
-    bool? isCheckedIn,
-    bool? isCheckedOut,
   }) {
     return SalesActivityFormCheckInState(
-      imageCheckIn: imageCheckIn ?? this.imageCheckIn,
-      imageCheckOut: imageCheckOut ?? this.imageCheckOut,
+      images: images ?? this.images,
       odometer: odometer ?? this.odometer,
       position: position ?? this.position,
       address: address ?? this.address,
-      isCheckedIn: isCheckedIn ?? this.isCheckedIn,
-      isCheckedOut: isCheckedOut ?? this.isCheckedOut,
     );
   }
 
   @override
   List<Object?> get props => [
-        imageCheckIn,
-        imageCheckOut,
-        odometer,
-        position,
-        address,
-        isCheckedIn,
-        isCheckedOut,
-      ];
+    images,
+    odometer,
+    position,
+    address,
+  ];
 }
 
 class SalesActivityFormCheckInInitial extends SalesActivityFormCheckInState {}
@@ -66,64 +51,6 @@ class SalesActivityFormCheckInError extends SalesActivityFormCheckInState {
   List<Object?> get props => [message];
 }
 
-class CheckinInitial extends SalesActivityFormCheckInState {}
-
-class CheckinLoading extends SalesActivityFormCheckInState {}
-
-class CheckinLoaded extends SalesActivityFormCheckInState {
-  final CheckinInfo checkinInfo;
-
-  const CheckinLoaded(this.checkinInfo, {
-    File? imageCheckIn,
-    File? imageCheckOut,
-    String odometer = '',
-    Position? position,
-    String? address = '',
-    bool isCheckedIn = false,
-    bool isCheckedOut = false,
-  }) : super(
-    imageCheckIn: imageCheckIn,
-    imageCheckOut: imageCheckOut,
-    odometer: odometer,
-    position: position,
-    address: address,
-    isCheckedIn: isCheckedIn,
-    isCheckedOut: isCheckedOut,
-  );
-
-  @override
-  bool get isCheckedIn => checkinInfo.stat == 'Y';
-
-  @override
-  CheckinLoaded copyWith({
-    File? imageCheckIn,
-    File? imageCheckOut,
-    String? odometer,
-    Position? position,
-    String? address,
-    bool? isCheckedIn,
-    bool? isCheckedOut,
-    CheckinInfo? checkinInfo,
-  }) {
-    return CheckinLoaded(
-      checkinInfo ?? this.checkinInfo,
-      imageCheckIn: imageCheckIn ?? this.imageCheckIn,
-      imageCheckOut: imageCheckOut ?? this.imageCheckOut,
-      odometer: odometer ?? this.odometer,
-      position: position ?? this.position,
-      address: address ?? this.address,
-      isCheckedIn: isCheckedIn ?? this.isCheckedIn,
-      isCheckedOut: isCheckedOut ?? this.isCheckedOut,
-    );
-  }
-}
-
-class CheckinError extends SalesActivityFormCheckInState {
-  final String message;
-
-  const CheckinError(this.message);
-}
-
 class CurrentLocationLoading extends SalesActivityFormCheckInState {}
 
 class CurrentLocationSuccess extends SalesActivityFormCheckInState {
@@ -134,16 +61,14 @@ class CurrentLocationSuccess extends SalesActivityFormCheckInState {
 class SalesDataLoading extends SalesActivityFormCheckInState {}
 
 class SalesDataSuccess extends SalesActivityFormCheckInState {
-  final String salesId;
-  final String officeId;
+  final SalesInfo sales;
 
   const SalesDataSuccess({
-    required this.salesId,
-    required this.officeId,
+    required this.sales,
   });
 
   @override
-  List<Object?> get props => [salesId, officeId];
+  List<Object?> get props => [sales];
 }
 
 class SalesDataError extends SalesActivityFormCheckInState {

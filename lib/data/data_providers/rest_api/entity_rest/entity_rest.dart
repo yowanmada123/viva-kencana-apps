@@ -20,7 +20,6 @@ class EntityRest {
       final response = await dio.post("api/mobile/getEntity");
 
       if (response.statusCode == 200) {
-        log('Response body: ${response.data}');
         final body = response.data;
         final entities = List<Entity>.from(
           body['data'].map((e) {

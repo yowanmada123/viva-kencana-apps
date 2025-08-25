@@ -1,7 +1,6 @@
 import 'package:dartz/dartz.dart';
 
 import '../../models/errors/custom_exception.dart';
-import '../../models/sales_activity/checkin_info.dart';
 import '../../models/sales_activity/customer_detail.dart';
 import '../../models/sales_activity/customer_info.dart';
 import '../../models/sales_activity/sales_info.dart';
@@ -42,9 +41,10 @@ class SalesActivityRepository {
   }
 
   Future<Either<CustomException, List<CustomerInfo>>> getCustomers({
-    required String searchQuery,
+    required String entityId,
+    required String keyword,
   }) async {
-    return salesActivityRest.getCustomer(searchQuery: searchQuery);
+    return salesActivityRest.getCustomer(entityId: entityId, keyword: keyword);
   }
 
   Future<Either<CustomException, String>> submitSalesCheckIn({
@@ -60,12 +60,9 @@ class SalesActivityRepository {
   }
 
   Future<Either<CustomException, CustomerDetail>> getCustomerDetail({
+    required String entityId,
     required String customerId,
   }) async {
-    return salesActivityRest.getCustomerDetail(customerId: customerId);
-  }
-
-  Future<Either<CustomException, CheckinInfo>> getCheckinInfo() async {
-    return salesActivityRest.getCheckinInfo();
+    return salesActivityRest.getCustomerDetail(entityId: entityId, customerId: customerId);
   }
 }

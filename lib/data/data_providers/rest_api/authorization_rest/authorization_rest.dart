@@ -24,15 +24,12 @@ class AuthorizationRest {
       final response = await dio.post("api/mobile/getMenu", data: data);
 
       if (response.statusCode == 200) {
-        log('Response body: ${response.data}');
         final body = response.data;
         final menu = List<Menu>.from(
           body['data'].map((e) {
             return Menu.fromMap(e);
           }),
         );
-
-        log("menu: $menu");
         return Right(menu);
       } else {
         return Left(NetUtils.parseErrorResponse(response: response.data));
@@ -60,7 +57,6 @@ class AuthorizationRest {
       final response = await dio.post("api/mobile/getEnvConf", data: data);
 
       if (response.statusCode == 200) {
-        log('Response body: ${response.data}');
         final body = response.data;
 
         Map<String, String> result = {};
@@ -68,8 +64,6 @@ class AuthorizationRest {
         for (var item in body['data']) {
           result[item['var_id']] = item['var_value'];
         }
-
-        print("result: $result");
 
         return Right(result);
       } else {

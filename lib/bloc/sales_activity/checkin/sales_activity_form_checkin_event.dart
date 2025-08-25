@@ -16,6 +16,25 @@ class SetImageEvent extends SalesActivityFormCheckInEvent {
   List<Object?> get props => [image];
 }
 
+class AddImageEvent extends SalesActivityFormCheckInEvent {
+  final ImageItem image;
+  const AddImageEvent(this.image);
+
+  @override
+  List<Object?> get props => [image];
+}
+
+class UpdateRemarkEvent extends SalesActivityFormCheckInEvent {
+  final int index;
+  final String remark;
+
+  const UpdateRemarkEvent(this.index, this.remark);
+
+  @override
+  List<Object?> get props => [index, remark];
+}
+
+
 class SetOdometerEvent extends SalesActivityFormCheckInEvent {
   final String odometer;
   const SetOdometerEvent(this.odometer);

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
@@ -15,22 +16,20 @@ import '../../bloc/sales_activity/sales_activity_form_bloc.dart';
 import '../../data/repository/auth_repository.dart';
 import '../../models/errors/custom_exception.dart';
 import '../../models/sales_activity/customer_info.dart';
+import '../../models/sales_activity/sales_info.dart';
 import '../../models/sales_activity/submit_data.dart' as model;
 import '../../utils/image_to_base_64_converter.dart';
+import '../../utils/strict_location.dart';
 import '../entity/entity_screen.dart';
+import '../widgets/base_danger_button.dart';
 import '../widgets/base_dropdown_button.dart';
 import '../widgets/base_dropdown_search.dart';
 import '../widgets/base_pop_up.dart';
 import '../widgets/base_primary_button.dart';
 
 class SalesActivityFormScreen extends StatefulWidget {
-  final String salesId;
-  final String officeId;
-  const SalesActivityFormScreen({
-    super.key,
-    required this.salesId,
-    required this.officeId,
-  });
+  final SalesInfo sales;
+  const SalesActivityFormScreen({super.key, required this.sales});
 
   @override
   State<SalesActivityFormScreen> createState() =>
@@ -77,11 +76,11 @@ class _SalesActivityFormScreenState extends State<SalesActivityFormScreen> {
   List<String> custOfficeType = ["GEDUNG", "RUKO", "RUMAH", "PABRIK/GUDANG"];
   List<String> custOfficeOwnership = ["SENDIRI", "SEWA", "KONTRAK", "LAINNYA"];
   List<String> custType = ["RETAIL", "PROJECT", "OTHER"];
-  dynamic salesmanVehicle = {
-    "Y": "Company Car",
-    "N": "Private Car",
-    "M": "Private Motorcycle",
-    "L": "Online Transport",
+  dynamic salesVehicle = {
+    "Company Car": "Company Car",
+    "Private Car": "Private Car",
+    "Private Motorcycle": "Private Motorcycle",
+    "Online Transport": "Online Transport",
   };
 
   dynamic newOrExisting = {"Y": "New Customer", "N": "Existing Customer"};
@@ -100,12 +99,13 @@ class _SalesActivityFormScreenState extends State<SalesActivityFormScreen> {
   String? selectedOfficeType;
   String? selectedOwnership;
   String? selectedCustomerType;
-  String? selectedSalesmanVehicle;
+  String? selectedSalesVehicle;
   String? selectedNewOrExist;
 
   int currentStep = 0;
   double progress = 1;
 
+  final custIdController = TextEditingController();
   final nameController = TextEditingController();
   final ktpController = TextEditingController();
   final phoneController = TextEditingController();
@@ -119,6 +119,7 @@ class _SalesActivityFormScreenState extends State<SalesActivityFormScreen> {
   final pageController = PageController(initialPage: 0);
 
   void resetCustomerForm() {
+    custIdController.clear();
     nameController.clear();
     ktpController.clear();
     phoneController.clear();
@@ -136,6 +137,7 @@ class _SalesActivityFormScreenState extends State<SalesActivityFormScreen> {
 
   @override
   void dispose() {
+    custIdController.dispose();
     nameController.dispose();
     ktpController.dispose();
     phoneController.dispose();
@@ -152,38 +154,12 @@ class _SalesActivityFormScreenState extends State<SalesActivityFormScreen> {
   void initState() {
     super.initState();
 
-    // WidgetsBinding.instance.addPostFrameCallback((_) {
-    //   showDialog(
-    //     context: context,
-    //     barrierDismissible: false,
-    //     builder:
-    //         (_) => BasePopUpDialog(
-    //           noText: "Kembali",
-    //           yesText: "Lanjutkan",
-    //           autoPopOnPressed: false,
-    //           onNoPressed: () {
-    //             Navigator.of(context).pushReplacement(
-    //               MaterialPageRoute(
-    //                 builder:
-    //                     (_) => SalesActivityFormCheckInScreen(
-    //                       salesId: widget.salesId,
-    //                       officeId: widget.officeId,
-    //                     ),
-    //               ),
-    //             );
-    //           },
-    //           onYesPressed: () {},
-    //           question: "Ingin Sudahi Trip?",
-    //         ),
-    //   );
-    // });
-
     context.read<SalesActivityFormBloc>().add(FetchProvinces());
   }
 
   @override
   Widget build(BuildContext context) {
-    final isExisting = customerType == 'Existing Customer';
+    bool isExisting = selectedNewOrExist == "N";
 
     final authRepository = context.read<AuthRepository>();
 
@@ -304,7 +280,7 @@ class _SalesActivityFormScreenState extends State<SalesActivityFormScreen> {
                       duration: Duration(seconds: 3),
                       behavior: SnackBarBehavior.floating,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(10.r),
                       ),
                       backgroundColor: Color.fromARGB(255, 243, 78, 78),
                     ),
@@ -339,32 +315,6 @@ class _SalesActivityFormScreenState extends State<SalesActivityFormScreen> {
                                   });
                                 },
                               ),
-                              // DropdownButtonFormField<String>(
-                              //   value: customerType,
-                              //   padding: EdgeInsets.fromLTRB(0, 0, 16, 0),
-                              //   decoration: const InputDecoration(
-                              //     labelText: 'New/Existing',
-                              //   ),
-                              //   items:
-                              //       ['Existing Customer', 'New Customer']
-                              //           .map(
-                              //             (type) => DropdownMenuItem(
-                              //               value: type,
-                              //               child: Text(type),
-                              //             ),
-                              //           )
-                              //           .toList(),
-                              //   onChanged: (value) {
-                              //     setState(() {
-                              //       customerType = value!;
-                              //       selectedCustomer = null;
-
-                              //       if (customerType == 'New Customer') {
-                              //         resetCustomerForm();
-                              //       }
-                              //     });
-                              //   },
-                              // ),
                               const SizedBox(height: 6),
 
                               if (isExisting) ...[
@@ -380,6 +330,8 @@ class _SalesActivityFormScreenState extends State<SalesActivityFormScreen> {
                                       final detail = state.customerDetail;
 
                                       setState(() {
+                                        custIdController.text =
+                                            detail.customerId;
                                         nameController.text =
                                             detail.namaCustomer;
                                         ktpController.text = detail.npwp;
@@ -425,6 +377,7 @@ class _SalesActivityFormScreenState extends State<SalesActivityFormScreen> {
                                               .read<SalesActivityFormBloc>()
                                               .add(
                                                 FetchCustomerDetail(
+                                                  widget.sales.companyId,
                                                   val.customerId,
                                                 ),
                                               );
@@ -434,7 +387,12 @@ class _SalesActivityFormScreenState extends State<SalesActivityFormScreen> {
                                         if (query.isNotEmpty) {
                                           context
                                               .read<SalesActivityFormBloc>()
-                                              .add(SearchCustomerData(query));
+                                              .add(
+                                                SearchCustomerData(
+                                                  widget.sales.companyId,
+                                                  query,
+                                                ),
+                                              );
                                         }
                                       },
                                     ),
@@ -673,12 +631,12 @@ class _SalesActivityFormScreenState extends State<SalesActivityFormScreen> {
                               ],
 
                               BaseDropdownButton(
-                                label: "Salesman Vehicle",
-                                items: salesmanVehicle,
-                                value: selectedSalesmanVehicle,
+                                label: "Sales Vehicle",
+                                items: salesVehicle,
+                                value: selectedSalesVehicle,
                                 onChanged: (val) {
                                   setState(() {
-                                    selectedSalesmanVehicle = val;
+                                    selectedSalesVehicle = val;
                                   });
                                 },
                               ),
@@ -698,7 +656,7 @@ class _SalesActivityFormScreenState extends State<SalesActivityFormScreen> {
                                           ),
                                           shape: RoundedRectangleBorder(
                                             borderRadius: BorderRadius.circular(
-                                              4,
+                                              4.r,
                                             ),
                                           ),
                                         ),
@@ -711,6 +669,19 @@ class _SalesActivityFormScreenState extends State<SalesActivityFormScreen> {
                                               const SnackBar(
                                                 content: Text(
                                                   "Nama Customer wajib diisi",
+                                                ),
+                                                backgroundColor: Colors.red,
+                                              ),
+                                            );
+                                            return;
+                                          } else if (selectedSalesVehicle ==
+                                              null) {
+                                            ScaffoldMessenger.of(
+                                              context,
+                                            ).showSnackBar(
+                                              const SnackBar(
+                                                content: Text(
+                                                  "Sales Vehicle wajib dipilih",
                                                 ),
                                                 backgroundColor: Colors.red,
                                               ),
@@ -743,6 +714,7 @@ class _SalesActivityFormScreenState extends State<SalesActivityFormScreen> {
                           curve: Curves.linear,
                         );
                       },
+                      custId: custIdController.text,
                       custName: nameController.text,
                       ktpNpwp: ktpController.text,
                       phone: phoneController.text,
@@ -759,9 +731,9 @@ class _SalesActivityFormScreenState extends State<SalesActivityFormScreen> {
                       custOfficeType: selectedOfficeType,
                       custOwnership: selectedOwnership,
                       custType: selectedCustomerType,
-                      salesVehicle: selectedSalesmanVehicle,
+                      salesVehicle: selectedSalesVehicle,
                       newOrExist: selectedNewOrExist,
-                      salesId: widget.salesId,
+                      salesId: widget.sales.salesId,
                     ),
                   ],
                 );
@@ -788,6 +760,7 @@ class _SalesActivityFormScreenState extends State<SalesActivityFormScreen> {
 
 class _SalesActivityFormSecondStep extends StatefulWidget {
   final Function onBackFunction;
+  final String custId;
   final String custName;
   final String ktpNpwp;
   final String phone;
@@ -810,6 +783,7 @@ class _SalesActivityFormSecondStep extends StatefulWidget {
 
   const _SalesActivityFormSecondStep({
     required this.onBackFunction,
+    required this.custId,
     required this.custName,
     required this.ktpNpwp,
     required this.phone,
@@ -842,9 +816,22 @@ class _SalesActivityFormSecondStepState
   String? selectedUserPoint;
   String imagePath = '';
 
+  bool setAsCustomerAddress = false;
+
   final ImagePicker _picker = ImagePicker();
+
   final MapController _mapController = MapController();
   final odometerController = TextEditingController();
+  final remarkController = TextEditingController();
+
+  final List<String> activities = [
+    'Registrasi Customer Baru',
+    'Penawaran Produk',
+    'Taking Order',
+    'Info Program/Hadiah',
+    'Penagihan',
+    'Customer Visit/Assistensi',
+  ];
 
   String? _extractOdometerFromText(String text) {
     final regex = RegExp(r'\b\d{4,7}\b');
@@ -872,7 +859,9 @@ class _SalesActivityFormSecondStepState
         );
 
         textRecognizer.close();
-        context.read<SalesActivityFormBloc>().add(AddImageEvent(imageFile));
+        context.read<SalesActivityFormBloc>().add(
+          AddImageEvent(model.ImageItem(file: imageFile.path)),
+        );
 
         if (odometerValue != null) {
           context.read<SalesActivityFormBloc>().add(
@@ -902,13 +891,29 @@ class _SalesActivityFormSecondStepState
     }
   }
 
-  Future<List<model.Image>> prepareImagesForSubmission(
-    List<ImageWithFile> images,
+  Future<File?> compressImage(File file) async {
+    final targetPath =
+        "${file.parent.path}/compressed_${DateTime.now().millisecondsSinceEpoch}.jpg";
+
+    final result = await FlutterImageCompress.compressAndGetFile(
+      file.absolute.path,
+      targetPath,
+      quality: 60,
+    );
+
+    return result != null ? File(result.path) : null;
+  }
+
+  Future<List<model.ImageItem>> prepareImagesForSubmission(
+    List<model.ImageItem> images,
   ) async {
     return await Future.wait(
       images.map((img) async {
-        final url = await imageToDataUri(img.file);
-        return model.Image(src: url, remark: img.remark);
+        File originalFile = File(img.file);
+        File? compressed = await compressImage(originalFile);
+        final fileToEncode = compressed ?? originalFile;
+        final url = await imageToDataUri(fileToEncode);
+        return model.ImageItem(file: url, remark: img.remark);
       }),
     );
   }
@@ -937,15 +942,6 @@ class _SalesActivityFormSecondStepState
                 padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.w),
                 child: LayoutBuilder(
                   builder: (context, constraints) {
-                    final activities = [
-                      'Registrasi Customer Baru',
-                      'Penawaran Produk',
-                      'Taking Order',
-                      'Info Program/Hadiah',
-                      'Penagihan',
-                      'Customer Visit/Assistensi',
-                    ];
-
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -991,21 +987,21 @@ class _SalesActivityFormSecondStepState
                     const Text("Images"),
                     SizedBox(height: 8.w),
                     SizedBox(
-                      height: 150,
+                      height: 180.w,
                       child: ListView.separated(
                         scrollDirection: Axis.horizontal,
                         itemCount: state.images.length + 1,
-                        separatorBuilder: (_, __) => SizedBox(width: 8),
+                        separatorBuilder: (_, __) => SizedBox(width: 8.w),
                         itemBuilder: (context, index) {
                           if (index == state.images.length) {
                             return GestureDetector(
                               onTap: _getImageFromCamera,
                               child: Container(
-                                width: 150,
+                                width: 150.w,
                                 decoration: BoxDecoration(
                                   color: Colors.grey[200],
                                   border: Border.all(color: Colors.grey),
-                                  borderRadius: BorderRadius.circular(8),
+                                  borderRadius: BorderRadius.circular(8.r),
                                 ),
                                 child: const Center(
                                   child: Icon(
@@ -1017,14 +1013,44 @@ class _SalesActivityFormSecondStepState
                               ),
                             );
                           } else {
-                            return ClipRRect(
-                              borderRadius: BorderRadius.circular(8),
-                              child: Image.file(
-                                state.images[index].file,
-                                width: 150,
-                                height: 150,
-                                fit: BoxFit.cover,
-                              ),
+                            final img = state.images[index];
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(8.r),
+                                  child: Image.file(
+                                    File(img.file),
+                                    width: 150.w,
+                                    height: 140.w,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                SizedBox(
+                                  width: 150,
+                                  child: TextField(
+                                    onChanged: (value) {
+                                      context.read<SalesActivityFormBloc>().add(
+                                        UpdateRemarkEvent(index, value),
+                                      );
+                                    },
+                                    decoration: InputDecoration(
+                                      hintText: "Photo Remark",
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(
+                                          6.r,
+                                        ),
+                                      ),
+                                      isDense: true,
+                                      contentPadding: EdgeInsets.symmetric(
+                                        horizontal: 8.w,
+                                        vertical: 4.w,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             );
                           }
                         },
@@ -1135,140 +1161,57 @@ class _SalesActivityFormSecondStepState
                 child: SizedBox(
                   width: double.infinity,
                   child: BasePrimaryButton(
-                    onPressed:
-                        () => context.read<SalesActivityFormBloc>().add(
-                          SetLocationEvent(),
-                        ),
+                    onPressed: () async {
+                      final position = await StrictLocation.getCurrentPosition();
+                      if(position.isMocked){
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text("Perangkat terdeteksi menggunakan lokasi palsu"), backgroundColor: Colors.red),
+                        );
+                        return;
+                      }
+                      context.read<SalesActivityFormBloc>().add(
+                        SetLocationEvent(),
+                      );
+                    },
                     label: 'Get Location',
                     icon: Icons.location_on,
                   ),
-                )
+                ),
               ),
-              // Padding(
-              //   padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.w),
-              //   child: Column(
-              //     crossAxisAlignment: CrossAxisAlignment.start,
-              //     children: [
-              //       Row(
-              //         children: const [
-              //           Text(
-              //             "Office",
-              //             style: TextStyle(fontWeight: FontWeight.bold),
-              //           ),
-              //           SizedBox(width: 4),
-              //           Text(
-              //             "(Office location as default point)",
-              //             style: TextStyle(
-              //               color: Colors.red,
-              //               fontSize: 12,
-              //               fontStyle: FontStyle.italic,
-              //             ),
-              //           ),
-              //         ],
-              //       ),
-              //       SizedBox(height: 8.w),
-              //       RadioListTile<String>(
-              //         value: 'start',
-              //         groupValue: state.officeOption,
-              //         title: const Text('Start Point From Office'),
-              //         onChanged: (value) {
-              //           context.read<SalesActivityFormBloc>().add(
-              //             SetOfficeOption(value!),
-              //           );
-              //         },
-              //       ),
-              //       RadioListTile<String>(
-              //         value: 'end',
-              //         groupValue: state.officeOption,
-              //         title: const Text('End Point in Office'),
-              //         onChanged: (value) {
-              //           context.read<SalesActivityFormBloc>().add(
-              //             SetOfficeOption(value!),
-              //           );
-              //         },
-              //       ),
-              //     ],
-              //   ),
-              // ),
-              // Padding(
-              //   padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.w),
-              //   child: Column(
-              //     crossAxisAlignment: CrossAxisAlignment.start,
-              //     children: [
-              //       Row(
-              //         children: const [
-              //           Text(
-              //             "User",
-              //             style: TextStyle(fontWeight: FontWeight.bold),
-              //           ),
-              //           SizedBox(width: 4),
-              //           Text(
-              //             "(Custom location by user)",
-              //             style: TextStyle(
-              //               color: Colors.red,
-              //               fontSize: 12,
-              //               fontStyle: FontStyle.italic,
-              //             ),
-              //           ),
-              //         ],
-              //       ),
-              //       SizedBox(height: 8.w),
-
-              //       RadioListTile<String>(
-              //         value: 'custom_start',
-              //         groupValue: state.userOption,
-              //         title: const Text('Start Point Custom'),
-              //         onChanged: (value) {
-              //           context.read<SalesActivityFormBloc>().add(
-              //             SetUserOption(value!),
-              //           );
-              //         },
-              //       ),
-              //       RadioListTile<String>(
-              //         value: 'custom_end',
-              //         groupValue: state.userOption,
-              //         title: const Text('End Point Custom'),
-              //         onChanged: (value) {
-              //           context.read<SalesActivityFormBloc>().add(
-              //             SetUserOption(value!),
-              //           );
-              //         },
-              //       ),
-              //     ],
-              //   ),
-              // ),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.w),
+                child: TextFormField(
+                  controller: remarkController,
+                  decoration: const InputDecoration(labelText: 'Remark'),
+                  keyboardType: TextInputType.text,
+                ),
+              ),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.w),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
-                      child: FilledButton(
-                        style: FilledButton.styleFrom(
-                          backgroundColor: Color(0xffff0000),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                        ),
-                        onPressed: () {
-                          widget.onBackFunction();
+                      child: BlocBuilder<SalesActivityFormBloc, SalesActivityFormState>(
+                        builder: (context, state) {
+                          final isLoading = state is SalesActivityFormLoading;
+                          return BaseDangerButton(
+                            label: 'Back',
+                            onPressed: isLoading ? null : () {
+                              widget.onBackFunction();
+                            },
+                          );
                         },
-                        child: Text("Back"),
                       ),
                     ),
                     SizedBox(width: 24.w),
                     Expanded(
-                      child: BlocListener<
-                        SalesActivityFormBloc,
-                        SalesActivityFormState
-                      >(
+                      child: BlocConsumer<SalesActivityFormBloc, SalesActivityFormState>(
                         listener: (context, state) {
                           if (state is SalesActivityFormSuccess) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
-                                content: Text(
-                                  'Form customer berhasil disubmit!',
-                                ),
+                                content: Text('Form customer berhasil disubmit!'),
                                 backgroundColor: Colors.green,
                               ),
                             );
@@ -1284,76 +1227,65 @@ class _SalesActivityFormSecondStepState
                             );
                           }
                         },
-                        child: BasePrimaryButton(
-                          onPressed: () async {
-                            if (state.address == '' || odometerController.text.isEmpty) {
-                              ScaffoldMessenger.of(
-                                context,
-                              ).showSnackBar(
-                                const SnackBar(
-                                  content: Text(
-                                    "Mohon isi odometer dan pastikan alamat tersedia.",
+                        builder: (context, state) {
+                          final isLoading = state is SalesActivityFormLoading;
+                          return BasePrimaryButton(
+                            label: "Submit",
+                            isLoading: isLoading,
+                            onPressed: () async {
+                              if (state.address == '' || odometerController.text.isEmpty) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                      "Mohon isi odometer dan pastikan alamat tersedia.",
+                                    ),
+                                    backgroundColor: Colors.orange,
                                   ),
-                                  backgroundColor: Colors.orange,
-                                ),
+                                );
+                                return;
+                              }
+                              final selected = state.selectedActivities;
+                              final List<model.ImageItem> modelImages = await prepareImagesForSubmission(state.images);
+                              final formData = model.SalesActivityFormData(
+                                customerId: widget.custId,
+                                customerName: widget.custName,
+                                customerKtpNpwp: widget.ktpNpwp,
+                                customerPhone: widget.phone,
+                                customerEmail: widget.email,
+                                customerAddress: widget.address,
+                                customerProvince: widget.province,
+                                customerCity: widget.city,
+                                customerDistrict: widget.district,
+                                customerVillage: widget.village,
+                                customerBussiness: widget.custBusiness ?? '',
+                                customerBussinessStatus: widget.custBusinessStatus ?? '',
+                                customerBussinessType: widget.custBusinessType ?? '',
+                                customerTaxType: widget.custTaxType ?? '',
+                                customerOfficeType: widget.custOfficeType ?? '',
+                                customerOfficeOwnership: widget.custOwnership ?? '',
+                                customerType: widget.custType ?? '',
+                                checkboxCar: widget.salesVehicle,
+                                chkNewCustRequest: selected.contains(activities[0]),
+                                chkProductOffer: selected.contains(activities[1]),
+                                chkTakeOrder: selected.contains(activities[2]),
+                                chkInfoPromo: selected.contains(activities[3]),
+                                chkTakeBilling: selected.contains(activities[4]),
+                                chkCustomerVisit: selected.contains(activities[5]),
+                                currentLocation: state.address,
+                                latitude: state.position!.latitude,
+                                longitude: state.position!.longitude,
+                                remark: remarkController.text,
+                                images: modelImages,
+                                salesid: widget.salesId,
+                                speedoKmModel: odometerController.text,
                               );
-                              return;
-                            }
-                            final activities = [
-                              'Penawaran Produk',
-                              'Taking Order',
-                              'Info Program/Hadiah',
-                              'Penagihan',
-                              'Customer Visit/Assistensi',
-                              'Registrasi Customer Baru',
-                            ];
-                            final selected = state.selectedActivities;
-                            final List<model.Image> modelImages =
-                                await prepareImagesForSubmission(state.images);
-                            final formData = model.SalesActivityFormData(
-                              customerId: '',
-                              customerName: widget.custName,
-                              customerKtpNpwp: widget.ktpNpwp,
-                              customerPhone: widget.phone,
-                              customerEmail: widget.email,
-                              customerAddress: widget.address,
-                              customerProvince: widget.province,
-                              customerCity: widget.city,
-                              customerDistrict: widget.district,
-                              customerVillage: widget.village,
-                              customerBussiness: widget.custBusiness ?? '',
-                              customerBussinessStatus:
-                                  widget.custBusinessStatus ?? '',
-                              customerBussinessType: widget.custBusinessType ?? '',
-                              customerTaxType: widget.custTaxType ?? '',
-                              customerOfficeType: widget.custOfficeType ?? '',
-                              customerOfficeOwnership: widget.custOwnership ?? '',
-                              customerType: widget.custType ?? '',
-                              checkboxCar: widget.salesVehicle,
-                              chkProductOffer: selected.contains(activities[0]),
-                              chkTakeOrder: selected.contains(activities[1]),
-                              chkInfoPromo: selected.contains(activities[2]),
-                              chkTakeBilling: selected.contains(activities[3]),
-                              chkCustomerVisit: selected.contains(activities[4]),
-                              chkNewCustRequest: selected.contains(activities[5]),
-                              currentLocation: state.address,
-                              latitude: state.position!.latitude,
-                              longitude: state.position!.longitude,
-                              remark: "",
-                              image: "",
-                              images: modelImages,
-                              new_: widget.newOrExist,
-                              checkpoint: "",
-                              salesid: widget.salesId,
-                              speedoKmModel: odometerController.text,
-                            );
 
-                            context.read<SalesActivityFormBloc>().add(
-                              SubmitSalesActivityForm(formData),
-                            );
-                          },
-                          label: "Submit",
-                        ),
+                              context.read<SalesActivityFormBloc>().add(
+                                SubmitSalesActivityForm(formData),
+                              );
+                            },
+                          );
+                        },
                       ),
                     ),
                   ],

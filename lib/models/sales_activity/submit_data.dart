@@ -32,7 +32,7 @@ class SalesActivityFormData {
   final String? currentLocation;
   final String? remark;
   final String? image;
-  final List<Image>? images;
+  final List<ImageItem>? images;
   final String? new_;
   final String? speedoKmModel;
   final String? checkpoint;
@@ -106,7 +106,8 @@ class SalesActivityFormData {
     String? currentLocation,
     String? remark,
     String? image,
-    List<Image>? images,
+    List<ImageItem>? images,
+    List<ImageItem>? imagesCheckpoint,
     String? new_,
     String? speedoKmModel,
     String? checkpoint,
@@ -219,7 +220,7 @@ class SalesActivityFormData {
       currentLocation: map['currentLocation'] ?? '',
       remark: map['remark'] ?? '',
       image: map['image'] ?? '',
-      images: List<Image>.from(map['images']?.map((x) => Image.fromMap(x))),
+      images: List<ImageItem>.from(map['images']?.map((x) => ImageItem.fromMap(x))),
       new_: map['new'] ?? '',
       speedoKmModel: map['speedoKmModel'] ?? '',
       checkpoint: map['checkpoint'] ?? '',
@@ -319,45 +320,37 @@ class SalesActivityFormData {
   }
 }
 
-class Image {
-  final String src;
+class ImageItem {
+  final String file;
   final String remark;
-  Image({required this.src, required this.remark});
 
-  Image copyWith({String? src, String? remark}) {
-    return Image(
-      src: src ?? this.src,
+  ImageItem({required this.file, this.remark = ""});
+
+  ImageItem copyWith({String? file, String? remark}) {
+    return ImageItem(
+      file: file ?? this.file,
       remark: remark ?? this.remark,
     );
   }
 
   Map<String, dynamic> toMap() {
-    return {'src': src, 'remark': remark};
+    return {'src': file, 'remark': remark};
   }
 
-  factory Image.fromMap(Map<String, dynamic> map) {
-    return Image(
-      src: map['src'] ?? '',
+  factory ImageItem.fromMap(Map<String, dynamic> map) {
+    return ImageItem(
+      file: map['src'] ?? '',
       remark: map['remark'] ?? '',
     );
   }
 
-  String toJson() => json.encode(toMap());
-
-  factory Image.fromJson(String source) => Image.fromMap(json.decode(source));
-
-  @override
-  String toString() => 'Image(src: $src, remark: $remark)';
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-
-    return other is Image &&
-        other.src == src &&
-        other.remark == remark;
+  Map<String, dynamic> toJson() {
+    return {
+      "src": file,
+      "remark": remark,
+    };
   }
 
   @override
-  int get hashCode => src.hashCode ^ remark.hashCode;
+  String toString() => "ImageItem(file: $file, remark: $remark)";
 }

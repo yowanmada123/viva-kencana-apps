@@ -1,21 +1,17 @@
 import 'package:flutter/material.dart';
 
 class BasePrimaryButton extends StatelessWidget {
-  final VoidCallback? onPressed;
   final String label;
+  final VoidCallback? onPressed;
   final IconData? icon;
   final bool isLoading;
-  final double? width;
-  final double? height;
 
   const BasePrimaryButton({
     Key? key,
-    required this.onPressed,
     required this.label,
+    required this.onPressed,
     this.icon,
     this.isLoading = false,
-    this.width,
-    this.height
   }) : super(key: key);
 
   @override

@@ -4,7 +4,6 @@ import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 
 import '../../../../models/errors/custom_exception.dart';
-import '../../../../models/sales_activity/checkin_info.dart';
 import '../../../../models/sales_activity/customer_detail.dart';
 import '../../../../models/sales_activity/customer_info.dart';
 import '../../../../models/sales_activity/sales_info.dart';
@@ -186,26 +185,60 @@ class SalesActivityRest {
   }
 
   Future<Either<CustomException, List<CustomerInfo>>> getCustomer({
-    required String searchQuery,
+    required String entityId,
+    required String keyword,
   }) async {
     try {
       http.options.headers['requiresToken'] = true;
       log(
-        'Request to https://v2.kencana.org/api/kmb/sales/CustomerVisit/getCustomerById (GET)',
+        'Request to https://v2.kencana.org/api/viva/sales_activity/CustomerVisit/getCustomer (GET)',
       );
       final response = await http.post(
-        "api/kmb/sales/CustomerVisit/getCustomerById",
-        data: {"id": searchQuery},
+        "api/viva/sales_activity/CustomerVisit/getCustomer",
+        data: {"entity_id": entityId, "keyword": keyword},
       );
       if (response.statusCode == 200) {
         final body = response.data;
 
         final List<CustomerInfo> customers =
-            (body['result'] as List)
+            (body['data'] as List)
                 .map((item) => CustomerInfo.fromMap(item))
                 .toList();
 
         return Right(customers);
+      } else {
+        return Left(NetUtils.parseErrorResponse(response: response.data));
+      }
+    } on DioException catch (e) {
+      return Left(NetUtils.parseDioException(e));
+    } on Exception catch (e) {
+      if (e is DioException) {
+        return Left(NetUtils.parseDioException(e));
+      }
+      return Future.value(Left(CustomException(message: e.toString())));
+    } catch (e) {
+      return Left(CustomException(message: e.toString()));
+    }
+  }
+
+  Future<Either<CustomException, CustomerDetail>> getCustomerDetail({
+    required String entityId,
+    required String customerId,
+  }) async {
+    try {
+      http.options.headers['requiresToken'] = true;
+      log(
+        'Request to https://v2.kencana.org/api/viva/sales_activity/CustomerVisit/getCustomerById (POST)',
+      );
+
+      final response = await http.post(
+        "api/viva/sales_activity/CustomerVisit/getCustomerById",
+        data: {"entity_id": entityId, "customer_id": customerId},
+      );
+      if (response.statusCode == 200) {
+        final body = response.data;
+
+        return Right(CustomerDetail.fromMap(body['data']));
       } else {
         return Left(NetUtils.parseErrorResponse(response: response.data));
       }
@@ -227,11 +260,10 @@ class SalesActivityRest {
     try {
       http.options.headers['requiresToken'] = true;
       log(
-        'Request to https://v2.kencana.org/api/kmb/sales/CustomerVisit/getActivityData (POST)',
+        'Request to https://v2.kencana.org/api/viva/sales_activity/CustomerVisit/submitCheckpointActivity (POST)',
       );
-      log("formData: $formData");
       final response = await http.post(
-        "api/kmb/sales/CustomerVisit/storeActivityData",
+        "api/viva/sales_activity/CustomerVisit/submitCheckpointActivity",
         data: formData.toMap(),
       );
       if (response.statusCode == 200) {
@@ -259,78 +291,16 @@ class SalesActivityRest {
     try {
       http.options.headers['requiresToken'] = true;
       log(
-        'Request to https://v2.kencana.org/api/kmb/sales/CustomerVisit/submitData (POST)',
+        'Request to https://v2.kencana.org/api/viva/sales_activity/CustomerVisit/submitCustomerActivity (POST)',
       );
       final response = await http.post(
-        "api/kmb/sales/CustomerVisit/submitData",
+        "api/viva/sales_activity/CustomerVisit/submitCustomerActivity",
         data: formData.toMap(),
       );
       if (response.statusCode == 200) {
         final body = response.data;
 
         return Right(body['message']);
-      } else {
-        return Left(NetUtils.parseErrorResponse(response: response.data));
-      }
-    } on DioException catch (e) {
-      return Left(NetUtils.parseDioException(e));
-    } on Exception catch (e) {
-      if (e is DioException) {
-        return Left(NetUtils.parseDioException(e));
-      }
-      return Future.value(Left(CustomException(message: e.toString())));
-    } catch (e) {
-      return Left(CustomException(message: e.toString()));
-    }
-  }
-
-  Future<Either<CustomException, CustomerDetail>> getCustomerDetail({
-    required String customerId,
-  }) async {
-    try {
-      http.options.headers['requiresToken'] = true;
-      log(
-        'Request to https://v2.kencana.org/api/kmb/sales/CustomerVisit/getCustomer (POST)',
-      );
-      final response = await http.post(
-        "api/kmb/sales/CustomerVisit/getCustomer",
-        data: {"customer_id": customerId},
-      );
-      if (response.statusCode == 200) {
-        final body = response.data;
-
-        return Right(CustomerDetail.fromMap(body['customer']));
-      } else {
-        return Left(NetUtils.parseErrorResponse(response: response.data));
-      }
-    } on DioException catch (e) {
-      return Left(NetUtils.parseDioException(e));
-    } on Exception catch (e) {
-      if (e is DioException) {
-        return Left(NetUtils.parseDioException(e));
-      }
-      return Future.value(Left(CustomException(message: e.toString())));
-    } catch (e) {
-      return Left(CustomException(message: e.toString()));
-    }
-  }
-
-  Future<Either<CustomException, CheckinInfo>> getCheckinInfo() async {
-    try {
-      http.options.headers['requiresToken'] = true;
-
-      log(
-        'Request to https://v2.kencana.org/api/kmb/sales/CustomerVisit/checkTodayStartCheckpoint (GET)',
-      );
-
-      final response = await http.get(
-        "api/kmb/sales/CustomerVisit/checkTodayStartCheckpoint",
-      );
-
-      if (response.statusCode == 200) {
-        final body = response.data;
-
-        return Right(CheckinInfo.fromMap(body));
       } else {
         return Left(NetUtils.parseErrorResponse(response: response.data));
       }
