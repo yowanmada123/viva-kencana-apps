@@ -1180,6 +1180,35 @@ class _SalesActivityFormSecondStepState
               ),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.w),
+                child: InkWell(
+                  onTap: () {
+                    setState(() {
+                      setAsCustomerAddress = !setAsCustomerAddress;
+                    });
+                  },
+                  borderRadius: BorderRadius.circular(8.r),
+                  child: Row(
+                    children: [
+                      Checkbox(
+                        value: setAsCustomerAddress,
+                        onChanged: (value) {
+                          setState(() {
+                            setAsCustomerAddress = value ?? false;
+                          });
+                        },
+                      ),
+                      Expanded(
+                        child: Text(
+                          "Set This GPS Location as Customer Address",
+                          style: TextStyle(fontSize: 14.sp),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.w),
                 child: TextFormField(
                   controller: remarkController,
                   decoration: const InputDecoration(labelText: 'Remark'),
@@ -1277,6 +1306,7 @@ class _SalesActivityFormSecondStepState
                                 remark: remarkController.text,
                                 images: modelImages,
                                 salesid: widget.salesId,
+                                setAddress: setAsCustomerAddress,
                                 speedoKmModel: odometerController.text,
                               );
 
