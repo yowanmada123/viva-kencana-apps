@@ -26,6 +26,7 @@ class _SalesActivityDashboardScreenState extends State<SalesActivityDashboardScr
   @override
   void initState() {
     super.initState();
+    context.read<SalesActivityFormCheckInBloc>().add(LoadSalesData());
   }
 
   @override
@@ -47,13 +48,24 @@ class _SalesActivityDashboardScreenState extends State<SalesActivityDashboardScr
       ),
       body: Column(
         children: [
-          buildCheckCard(
-            time: widget.sales.todayCheckin,
-            isCheckin: true,
-          ),
-          buildCheckCard(
-            time: widget.sales.todayCheckout,
-            isCheckin: false,
+          BlocBuilder<SalesActivityFormCheckInBloc, SalesActivityFormCheckInState>(
+            builder: (context, state) {
+              if (state is SalesDataLoading) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (state is SalesDataSuccess) {
+                final sales = state.sales;
+                return Column(
+                  children: [
+                    buildCheckCard(time: sales.todayCheckin, isCheckin: true),
+                    buildCheckCard(time: sales.todayCheckout, isCheckin: false),
+                  ],
+                );
+              } else {
+                return Center(
+                  child: Text("Failed to load sales data"),
+                );
+              }
+            },
           ),
 
           Expanded(
@@ -90,6 +102,12 @@ class _SalesActivityDashboardScreenState extends State<SalesActivityDashboardScr
                           width: double.infinity,
                           child: BasePrimaryButton(
                             onPressed: () {
+                              if (!isCheckedIn) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text("Anda belum check-in hari ini")),
+                                );
+                                return;
+                              }
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(

@@ -1262,11 +1262,11 @@ class _SalesActivityFormSecondStepState
                             label: "Submit",
                             isLoading: isLoading,
                             onPressed: () async {
-                              if (state.address == '' || odometerController.text.isEmpty) {
+                              if (state.address == '') {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
                                     content: Text(
-                                      "Mohon isi odometer dan pastikan alamat tersedia.",
+                                      "Mohon pastikan alamat tersedia.",
                                     ),
                                     backgroundColor: Colors.orange,
                                   ),

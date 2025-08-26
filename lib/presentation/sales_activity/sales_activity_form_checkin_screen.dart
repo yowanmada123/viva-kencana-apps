@@ -15,10 +15,10 @@ import '../../models/sales_activity/sales_info.dart';
 import '../../models/sales_activity/submit_data.dart' as model;
 import '../../utils/image_to_base_64_converter.dart';
 import '../../utils/strict_location.dart';
-import '../entity/entity_screen.dart';
 import '../widgets/base_danger_button.dart';
 import '../widgets/base_dropdown_button.dart';
 import '../widgets/base_primary_button.dart';
+import 'sales_activity_dashboard_screen.dart';
 
 class SalesActivityFormCheckInScreen extends StatefulWidget {
   final SalesInfo sales;
@@ -384,7 +384,7 @@ class _SalesActivityFormCheckInScreenState
                                 () {
                                   Navigator.of(context).pushReplacement(
                                     MaterialPageRoute(
-                                      builder: (_) => EntityScreen(),
+                                      builder: (_) => SalesActivityDashboardScreen(sales: widget.sales),
                                     ),
                                   );
                                 },
@@ -418,16 +418,13 @@ class _SalesActivityFormCheckInScreenState
                                                   >()
                                                   .state;
           
-                                          if (blocState.address == '' ||
-                                              _odometerController
-                                                  .text
-                                                  .isEmpty) {
+                                          if (blocState.address == '') {
                                             ScaffoldMessenger.of(
                                               context,
                                             ).showSnackBar(
                                               const SnackBar(
                                                 content: Text(
-                                                  "Mohon isi odometer dan pastikan alamat tersedia.",
+                                                  "Mohon pastikan alamat tersedia.",
                                                 ),
                                                 backgroundColor: Colors.orange,
                                               ),
