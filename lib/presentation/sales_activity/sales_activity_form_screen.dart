@@ -20,12 +20,12 @@ import '../../models/sales_activity/sales_info.dart';
 import '../../models/sales_activity/submit_data.dart' as model;
 import '../../utils/image_to_base_64_converter.dart';
 import '../../utils/strict_location.dart';
-import '../entity/entity_screen.dart';
 import '../widgets/base_danger_button.dart';
 import '../widgets/base_dropdown_button.dart';
 import '../widgets/base_dropdown_search.dart';
 import '../widgets/base_pop_up.dart';
 import '../widgets/base_primary_button.dart';
+import 'sales_activity_dashboard_screen.dart';
 
 class SalesActivityFormScreen extends StatefulWidget {
   final SalesInfo sales;
@@ -734,6 +734,7 @@ class _SalesActivityFormScreenState extends State<SalesActivityFormScreen> {
                       salesVehicle: selectedSalesVehicle,
                       newOrExist: selectedNewOrExist,
                       salesId: widget.sales.salesId,
+                      sales: widget.sales,
                     ),
                   ],
                 );
@@ -780,6 +781,7 @@ class _SalesActivityFormSecondStep extends StatefulWidget {
   final String? salesVehicle;
   final String? newOrExist;
   final String salesId;
+  final SalesInfo sales;
 
   const _SalesActivityFormSecondStep({
     required this.onBackFunction,
@@ -803,6 +805,7 @@ class _SalesActivityFormSecondStep extends StatefulWidget {
     this.newOrExist,
     required this.salesVehicle,
     required this.salesId,
+    required this.sales,
   });
 
   @override
@@ -1247,7 +1250,7 @@ class _SalesActivityFormSecondStepState
 
                             Navigator.pushAndRemoveUntil(
                               context,
-                              MaterialPageRoute(builder: (_) => EntityScreen()),
+                              MaterialPageRoute(builder: (_) => SalesActivityDashboardScreen(sales: widget.sales)),
                               (route) => false,
                             );
                           } else if (state is SalesActivityError) {
@@ -1262,11 +1265,11 @@ class _SalesActivityFormSecondStepState
                             label: "Submit",
                             isLoading: isLoading,
                             onPressed: () async {
-                              if (state.address == '' || odometerController.text.isEmpty) {
+                              if (state.address == '') {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
                                     content: Text(
-                                      "Mohon isi odometer dan pastikan alamat tersedia.",
+                                      "Mohon pastikan alamat tersedia.",
                                     ),
                                     backgroundColor: Colors.orange,
                                   ),
