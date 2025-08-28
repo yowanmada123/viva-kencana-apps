@@ -74,78 +74,84 @@ class _SalesActivityDashboardScreenState extends State<SalesActivityDashboardScr
                 padding: EdgeInsetsGeometry.symmetric(horizontal: 32),
                 child: BlocBuilder<SalesActivityFormCheckInBloc, SalesActivityFormCheckInState>(
                   builder: (context, state) {
-                    bool isCheckedIn = widget.sales.todayCheckin.isNotEmpty;
-            
-                    return Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SizedBox(
-                          width: double.infinity,
-                          child: BasePrimaryButton(
-                            onPressed: () {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => SalesActivityFormCheckInScreen(
-                                    sales: widget.sales,
-                                    isCheckIn: true,
+
+                    if (state is SalesDataSuccess){
+                      bool isCheckedIn = state.sales.todayCheckin.isNotEmpty;
+                      return Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(
+                            width: double.infinity,
+                            child: BasePrimaryButton(
+                              onPressed: () {
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => SalesActivityFormCheckInScreen(
+                                      sales: widget.sales,
+                                      isCheckIn: true,
+                                    ),
                                   ),
-                                ),
-                              );
-                            },
-                            label: "Check In",
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-            
-                        SizedBox(
-                          width: double.infinity,
-                          child: BasePrimaryButton(
-                            onPressed: () {
-                              if (!isCheckedIn) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text("Anda belum check-in hari ini")),
                                 );
-                                return;
-                              }
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => SalesActivityFormCheckInScreen(
-                                    sales: widget.sales,
-                                  ),
-                                ),
-                              );
-                            },
-                            label: "Check Out",
+                              },
+                              label: "Check In",
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 16),
-            
-                        SizedBox(
-                          width: double.infinity,
-                          child: BasePrimaryButton(
-                            onPressed: () {
-                              if (!isCheckedIn) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text("Anda belum check-in hari ini")),
+                          const SizedBox(height: 16),
+              
+                          SizedBox(
+                            width: double.infinity,
+                            child: BasePrimaryButton(
+                              onPressed: () {
+                                if (!isCheckedIn) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text("Anda belum check-in hari ini")),
+                                  );
+                                  return;
+                                }
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => SalesActivityFormCheckInScreen(
+                                      sales: widget.sales,
+                                    ),
+                                  ),
                                 );
-                                return;
-                              }
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => SalesActivityFormScreen(
-                                    sales: widget.sales,
-                                  ),
-                                ),
-                              );
-                            },
-                            label: "Customer Visit",
+                              },
+                              label: "Check Out",
+                            ),
                           ),
-                        ),
-                      ],
-                    );
+                          const SizedBox(height: 16),
+              
+                          SizedBox(
+                            width: double.infinity,
+                            child: BasePrimaryButton(
+                              onPressed: () {
+                                if (!isCheckedIn) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text("Anda belum check-in hari ini")),
+                                  );
+                                  return;
+                                }
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => SalesActivityFormScreen(
+                                      sales: widget.sales,
+                                    ),
+                                  ),
+                                );
+                              },
+                              label: "Customer Visit",
+                            ),
+                          ),
+                        ],
+                      );
+                    } else if (state is SalesDataLoading) {
+                      return Center(child: const CircularProgressIndicator());
+                    } else {
+                      return Center(child: const Text("Failed to load sales data"));
+                    }
                   },
                 ),
               )

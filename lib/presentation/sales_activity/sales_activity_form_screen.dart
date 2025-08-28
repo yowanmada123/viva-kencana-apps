@@ -674,19 +674,6 @@ class _SalesActivityFormScreenState extends State<SalesActivityFormScreen> {
                                               ),
                                             );
                                             return;
-                                          } else if (selectedSalesVehicle ==
-                                              null) {
-                                            ScaffoldMessenger.of(
-                                              context,
-                                            ).showSnackBar(
-                                              const SnackBar(
-                                                content: Text(
-                                                  "Sales Vehicle wajib dipilih",
-                                                ),
-                                                backgroundColor: Colors.red,
-                                              ),
-                                            );
-                                            return;
                                           }
 
                                           pageController.nextPage(
@@ -924,6 +911,8 @@ class _SalesActivityFormSecondStepState
   @override
   void initState() {
     super.initState();
+    odometerController.text =
+        context.read<SalesActivityFormBloc>().state.odometer;
     context.read<SalesActivityFormBloc>().add(LoadCurrentLocation());
   }
 
@@ -1062,12 +1051,21 @@ class _SalesActivityFormSecondStepState
                   ],
                 ),
               ),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.w),
-                child: TextFormField(
-                  controller: odometerController..text = state.odometer,
-                  decoration: const InputDecoration(labelText: 'Odometer'),
-                  keyboardType: TextInputType.number,
+              BlocListener<SalesActivityFormBloc, SalesActivityFormState>(
+                listenWhen: (previous, current) => previous.odometer != current.odometer,
+                listener: (context, state) {
+                  odometerController.text = state.odometer;
+                },
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 16.w,
+                    vertical: 4.w,
+                  ),
+                  child: TextFormField(
+                    controller: odometerController,
+                    decoration: const InputDecoration(labelText: 'Odometer'),
+                    keyboardType: TextInputType.number,
+                  ),
                 ),
               ),
               Padding(
@@ -1165,10 +1163,16 @@ class _SalesActivityFormSecondStepState
                   width: double.infinity,
                   child: BasePrimaryButton(
                     onPressed: () async {
-                      final position = await StrictLocation.getCurrentPosition();
-                      if(position.isMocked){
+                      final position =
+                          await StrictLocation.getCurrentPosition();
+                      if (position.isMocked) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text("Perangkat terdeteksi menggunakan lokasi palsu"), backgroundColor: Colors.red),
+                          SnackBar(
+                            content: Text(
+                              "Perangkat terdeteksi menggunakan lokasi palsu",
+                            ),
+                            backgroundColor: Colors.red,
+                          ),
                         );
                         return;
                       }
@@ -1224,34 +1228,49 @@ class _SalesActivityFormSecondStepState
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
-                      child: BlocBuilder<SalesActivityFormBloc, SalesActivityFormState>(
+                      child: BlocBuilder<
+                        SalesActivityFormBloc,
+                        SalesActivityFormState
+                      >(
                         builder: (context, state) {
                           final isLoading = state is SalesActivityFormLoading;
                           return BaseDangerButton(
                             label: 'Back',
-                            onPressed: isLoading ? null : () {
-                              widget.onBackFunction();
-                            },
+                            onPressed:
+                                isLoading
+                                    ? null
+                                    : () {
+                                      widget.onBackFunction();
+                                    },
                           );
                         },
                       ),
                     ),
                     SizedBox(width: 24.w),
                     Expanded(
-                      child: BlocConsumer<SalesActivityFormBloc, SalesActivityFormState>(
+                      child: BlocConsumer<
+                        SalesActivityFormBloc,
+                        SalesActivityFormState
+                      >(
                         listener: (context, state) {
                           if (state is SalesActivityFormSuccess) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
-                                content: Text('Form customer berhasil disubmit!'),
+                                content: Text(
+                                  'Form customer berhasil disubmit!',
+                                ),
                                 backgroundColor: Colors.green,
                               ),
                             );
 
-                            Navigator.pushAndRemoveUntil(
+                            Navigator.pushReplacement(
                               context,
-                              MaterialPageRoute(builder: (_) => SalesActivityDashboardScreen(sales: widget.sales)),
-                              (route) => false,
+                              MaterialPageRoute(
+                                builder:
+                                    (_) => SalesActivityDashboardScreen(
+                                      sales: widget.sales,
+                                    ),
+                              ),
                             );
                           } else if (state is SalesActivityError) {
                             ScaffoldMessenger.of(context).showSnackBar(
@@ -1277,7 +1296,10 @@ class _SalesActivityFormSecondStepState
                                 return;
                               }
                               final selected = state.selectedActivities;
-                              final List<model.ImageItem> modelImages = await prepareImagesForSubmission(state.images);
+                              final List<model.ImageItem> modelImages =
+                                  await prepareImagesForSubmission(
+                                    state.images,
+                                  );
                               final formData = model.SalesActivityFormData(
                                 customerId: widget.custId,
                                 customerName: widget.custName,
@@ -1290,19 +1312,30 @@ class _SalesActivityFormSecondStepState
                                 customerDistrict: widget.district,
                                 customerVillage: widget.village,
                                 customerBussiness: widget.custBusiness ?? '',
-                                customerBussinessStatus: widget.custBusinessStatus ?? '',
-                                customerBussinessType: widget.custBusinessType ?? '',
+                                customerBussinessStatus:
+                                    widget.custBusinessStatus ?? '',
+                                customerBussinessType:
+                                    widget.custBusinessType ?? '',
                                 customerTaxType: widget.custTaxType ?? '',
                                 customerOfficeType: widget.custOfficeType ?? '',
-                                customerOfficeOwnership: widget.custOwnership ?? '',
+                                customerOfficeOwnership:
+                                    widget.custOwnership ?? '',
                                 customerType: widget.custType ?? '',
                                 checkboxCar: widget.salesVehicle,
-                                chkNewCustRequest: selected.contains(activities[0]),
-                                chkProductOffer: selected.contains(activities[1]),
+                                chkNewCustRequest: selected.contains(
+                                  activities[0],
+                                ),
+                                chkProductOffer: selected.contains(
+                                  activities[1],
+                                ),
                                 chkTakeOrder: selected.contains(activities[2]),
                                 chkInfoPromo: selected.contains(activities[3]),
-                                chkTakeBilling: selected.contains(activities[4]),
-                                chkCustomerVisit: selected.contains(activities[5]),
+                                chkTakeBilling: selected.contains(
+                                  activities[4],
+                                ),
+                                chkCustomerVisit: selected.contains(
+                                  activities[5],
+                                ),
                                 currentLocation: state.address,
                                 latitude: state.position!.latitude,
                                 longitude: state.position!.longitude,

@@ -138,9 +138,10 @@ class _SalesActivityFormCheckInScreenState
 
   @override
   void initState() {
+    super.initState();
     StrictLocation.checkLocationRequirements();
     context.read<SalesActivityFormCheckInBloc>().add(LoadCurrentLocation());
-    super.initState();
+    _odometerController.text = context.read<SalesActivityFormCheckInBloc>().state.odometer;
   }
 
   @override
@@ -317,10 +318,16 @@ class _SalesActivityFormCheckInScreenState
                         },
                       ),
                     ),
-                    TextFormField(
-                      controller: _odometerController..text = state.odometer,
-                      decoration: const InputDecoration(labelText: 'Odometer'),
-                      keyboardType: TextInputType.number,
+                    BlocListener<SalesActivityFormCheckInBloc, SalesActivityFormCheckInState>(
+                      listenWhen: (previous, current) => previous.odometer != current.odometer,
+                      listener: (context, state) {
+                        _odometerController.text = state.odometer;
+                      },
+                      child: TextFormField(
+                        controller: _odometerController,
+                        decoration: const InputDecoration(labelText: 'Odometer'),
+                        keyboardType: TextInputType.number,
+                      ),
                     ),
                     TextFormField(
                       controller: remarkController,
@@ -378,6 +385,8 @@ class _SalesActivityFormCheckInScreenState
                                   backgroundColor: Colors.green,
                                 ),
                               );
+
+                              context.read<SalesActivityFormCheckInBloc>().add(LoadSalesData());
             
                               Future.delayed(
                                 const Duration(milliseconds: 200),
@@ -425,19 +434,6 @@ class _SalesActivityFormCheckInScreenState
                                               const SnackBar(
                                                 content: Text(
                                                   "Mohon pastikan alamat tersedia.",
-                                                ),
-                                                backgroundColor: Colors.orange,
-                                              ),
-                                            );
-                                            return;
-                                          }
-                                          if (selectedSalesVehicle == null) {
-                                            ScaffoldMessenger.of(
-                                              context,
-                                            ).showSnackBar(
-                                              const SnackBar(
-                                                content: Text(
-                                                  "Mohon pilih jenis transportasi anda.",
                                                 ),
                                                 backgroundColor: Colors.orange,
                                               ),
