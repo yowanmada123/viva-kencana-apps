@@ -5,12 +5,14 @@ class SalesActivityFormCheckInState extends Equatable {
   final String odometer;
   final Position? position;
   final String? address;
+  final bool isLoadingLocation;
 
   const SalesActivityFormCheckInState({
     this.images = const [],
     this.odometer = '',
     this.position,
     this.address = '',
+    this.isLoadingLocation = false,
   });
 
   SalesActivityFormCheckInState copyWith({
@@ -18,12 +20,14 @@ class SalesActivityFormCheckInState extends Equatable {
     String? odometer,
     Position? position,
     String? address,
+    bool? isLoadingLocation,
   }) {
     return SalesActivityFormCheckInState(
       images: images ?? this.images,
       odometer: odometer ?? this.odometer,
       position: position ?? this.position,
       address: address ?? this.address,
+      isLoadingLocation: isLoadingLocation ?? this.isLoadingLocation,
     );
   }
 
@@ -33,6 +37,7 @@ class SalesActivityFormCheckInState extends Equatable {
     odometer,
     position,
     address,
+    isLoadingLocation,
   ];
 }
 

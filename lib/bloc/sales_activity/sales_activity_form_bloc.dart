@@ -161,6 +161,7 @@ class SalesActivityFormBloc
     Emitter<SalesActivityFormState> emit,
   ) async {
     try {
+      emit(state.copyWith(isLoadingLocation: true));
       StrictLocation.checkLocationRequirements();
 
       final position = await StrictLocation.getCurrentPosition();
@@ -175,9 +176,10 @@ class SalesActivityFormBloc
               ? "${placemarks.first.street}, ${placemarks.first.locality}, ${placemarks.first.administrativeArea}"
               : "Address not found";
 
-      emit(state.copyWith(position: position, address: address));
+      emit(state.copyWith(position: position, address: address, isLoadingLocation: false));
     } catch (e) {
       print("Failed to get location: $e");
+      emit(state.copyWith(isLoadingLocation: false));
     }
   }
 
