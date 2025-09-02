@@ -62,7 +62,9 @@ class _SalesActivityFormCheckInScreenState
     final status = await Permission.camera.status;
 
     if (status.isGranted || await Permission.camera.request().isGranted) {
-      final pickedFile = await _picker.pickImage(source: image.ImageSource.camera);
+      final pickedFile = await _picker.pickImage(
+        source: image.ImageSource.camera,
+      );
       if (pickedFile != null) {
         imagePath = pickedFile.path.toString();
         final imageFile = File(pickedFile.path.toString());
@@ -111,7 +113,8 @@ class _SalesActivityFormCheckInScreenState
   }
 
   Future<File?> compressImage(File file) async {
-    final targetPath = "${file.parent.path}/compressed_${DateTime.now().millisecondsSinceEpoch}.jpg";
+    final targetPath =
+        "${file.parent.path}/compressed_${DateTime.now().millisecondsSinceEpoch}.jpg";
 
     final result = await FlutterImageCompress.compressAndGetFile(
       file.absolute.path,
@@ -141,7 +144,8 @@ class _SalesActivityFormCheckInScreenState
     super.initState();
     StrictLocation.checkLocationRequirements();
     context.read<SalesActivityFormCheckInBloc>().add(LoadCurrentLocation());
-    _odometerController.text = context.read<SalesActivityFormCheckInBloc>().state.odometer;
+    _odometerController.text =
+        context.read<SalesActivityFormCheckInBloc>().state.odometer;
   }
 
   @override
@@ -238,21 +242,32 @@ class _SalesActivityFormCheckInScreenState
                     Text(state.address!),
                     SizedBox(
                       width: double.infinity,
-                      child: BasePrimaryButton(
-                        onPressed: () async {
-                          final position = await StrictLocation.getCurrentPosition();
-                          if(position.isMocked){
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text("Perangkat terdeteksi menggunakan lokasi palsu"), backgroundColor: Colors.red),
-                            );
-                            return;
-                          }
-                          context.read<SalesActivityFormCheckInBloc>().add(
-                            SetLocationEvent(),
+                      child: BlocBuilder<SalesActivityFormCheckInBloc, SalesActivityFormCheckInState>(
+                        builder: (context, state) {
+                          return BasePrimaryButton(
+                            onPressed: () async {
+                              final position =
+                                  await StrictLocation.getCurrentPosition();
+                              if (position.isMocked) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      "Perangkat terdeteksi menggunakan lokasi palsu",
+                                    ),
+                                    backgroundColor: Colors.red,
+                                  ),
+                                );
+                                return;
+                              }
+                              context.read<SalesActivityFormCheckInBloc>().add(
+                                SetLocationEvent(),
+                              );
+                            },
+                            isLoading: state.isLoadingLocation,
+                            label: "Get Location",
+                            icon: Icons.location_on,
                           );
                         },
-                        label: "Get Location",
-                        icon: Icons.location_on,
                       ),
                     ),
                     const Text("Image"),
@@ -275,7 +290,11 @@ class _SalesActivityFormCheckInScreenState
                                   borderRadius: BorderRadius.circular(8.w),
                                 ),
                                 child: Center(
-                                  child: Icon(Icons.add_a_photo, size: 40.w, color: Colors.grey),
+                                  child: Icon(
+                                    Icons.add_a_photo,
+                                    size: 40.w,
+                                    color: Colors.grey,
+                                  ),
                                 ),
                               ),
                             );
@@ -298,34 +317,46 @@ class _SalesActivityFormCheckInScreenState
                                   width: 150.w,
                                   child: TextField(
                                     onChanged: (value) {
-                                      context.read<SalesActivityFormCheckInBloc>().add(
-                                            UpdateRemarkEvent(index, value),
-                                          );
+                                      context
+                                          .read<SalesActivityFormCheckInBloc>()
+                                          .add(UpdateRemarkEvent(index, value));
                                     },
                                     decoration: InputDecoration(
                                       hintText: "Photo Remark",
                                       border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(6.w),
+                                        borderRadius: BorderRadius.circular(
+                                          6.w,
+                                        ),
                                       ),
                                       isDense: true,
-                                      contentPadding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.w),
+                                      contentPadding: EdgeInsets.symmetric(
+                                        horizontal: 8.w,
+                                        vertical: 4.w,
+                                      ),
                                     ),
                                   ),
-                                )
+                                ),
                               ],
                             );
                           }
                         },
                       ),
                     ),
-                    BlocListener<SalesActivityFormCheckInBloc, SalesActivityFormCheckInState>(
-                      listenWhen: (previous, current) => previous.odometer != current.odometer,
+                    BlocListener<
+                      SalesActivityFormCheckInBloc,
+                      SalesActivityFormCheckInState
+                    >(
+                      listenWhen:
+                          (previous, current) =>
+                              previous.odometer != current.odometer,
                       listener: (context, state) {
                         _odometerController.text = state.odometer;
                       },
                       child: TextFormField(
                         controller: _odometerController,
-                        decoration: const InputDecoration(labelText: 'Odometer'),
+                        decoration: const InputDecoration(
+                          labelText: 'Odometer',
+                        ),
                         keyboardType: TextInputType.number,
                       ),
                     ),
@@ -348,23 +379,30 @@ class _SalesActivityFormCheckInScreenState
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        BlocBuilder<SalesActivityFormCheckInBloc, SalesActivityFormCheckInState>(
+                        BlocBuilder<
+                          SalesActivityFormCheckInBloc,
+                          SalesActivityFormCheckInState
+                        >(
                           builder: (context, state) {
-                            final isLoading = state is SalesActivityFormCheckInLoading;
+                            final isLoading =
+                                state is SalesActivityFormCheckInLoading;
                             return Expanded(
                               child: SizedBox(
                                 width: double.infinity,
                                 child: BaseDangerButton(
-                                  onPressed: isLoading ? null : () => Navigator.pop(context),
+                                  onPressed:
+                                      isLoading
+                                          ? null
+                                          : () => Navigator.pop(context),
                                   label: 'Back',
                                 ),
                               ),
                             );
                           },
                         ),
-            
+
                         SizedBox(width: 16),
-            
+
                         BlocConsumer<
                           SalesActivityFormCheckInBloc,
                           SalesActivityFormCheckInState
@@ -376,9 +414,10 @@ class _SalesActivityFormCheckInScreenState
                           listener: (context, state) {
                             if (state is SalesActivityFormCheckInSuccess) {
                               final bool isCheckIn = widget.isCheckIn;
-                              final String message = isCheckIn
-                                  ? "Berhasil melakukan checkin!"
-                                  : "Berhasil melakukan checkout!";
+                              final String message =
+                                  isCheckIn
+                                      ? "Berhasil melakukan checkin!"
+                                      : "Berhasil melakukan checkout!";
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
                                   content: Text(message),
@@ -386,14 +425,19 @@ class _SalesActivityFormCheckInScreenState
                                 ),
                               );
 
-                              context.read<SalesActivityFormCheckInBloc>().add(LoadSalesData());
-            
+                              context.read<SalesActivityFormCheckInBloc>().add(
+                                LoadSalesData(),
+                              );
+
                               Future.delayed(
                                 const Duration(milliseconds: 200),
                                 () {
                                   Navigator.of(context).pushReplacement(
                                     MaterialPageRoute(
-                                      builder: (_) => SalesActivityDashboardScreen(sales: widget.sales),
+                                      builder:
+                                          (_) => SalesActivityDashboardScreen(
+                                            sales: widget.sales,
+                                          ),
                                     ),
                                   );
                                 },
@@ -410,12 +454,14 @@ class _SalesActivityFormCheckInScreenState
                             }
                           },
                           builder: (context, state) {
-                            final isLoading = state is SalesActivityFormCheckInLoading;
-          
+                            final isLoading =
+                                state is SalesActivityFormCheckInLoading;
+
                             return Expanded(
                               child: BasePrimaryButton(
                                 isLoading: isLoading,
-                                label: widget.isCheckIn ? "Checkin" : "Checkout",
+                                label:
+                                    widget.isCheckIn ? "Checkin" : "Checkout",
                                 onPressed:
                                     isLoading
                                         ? null
@@ -426,7 +472,7 @@ class _SalesActivityFormCheckInScreenState
                                                     SalesActivityFormCheckInBloc
                                                   >()
                                                   .state;
-          
+
                                           if (blocState.address == '') {
                                             ScaffoldMessenger.of(
                                               context,
@@ -440,7 +486,11 @@ class _SalesActivityFormCheckInScreenState
                                             );
                                             return;
                                           }
-                                          final List<model.ImageItem> modelImages = await prepareImagesForSubmission(blocState.images);
+                                          final List<model.ImageItem>
+                                          modelImages =
+                                              await prepareImagesForSubmission(
+                                                blocState.images,
+                                              );
                                           final formData =
                                               model.SalesActivityFormData(
                                                 checkboxCar:
@@ -465,7 +515,15 @@ class _SalesActivityFormCheckInScreenState
                                                 officeid: widget.sales.officeId,
                                               );
 
-                                          context.read<SalesActivityFormCheckInBloc>().add(SubmitSalesActivityCheckInForm(formData));
+                                          context
+                                              .read<
+                                                SalesActivityFormCheckInBloc
+                                              >()
+                                              .add(
+                                                SubmitSalesActivityCheckInForm(
+                                                  formData,
+                                                ),
+                                              );
                                         },
                               ),
                             );

@@ -28,6 +28,7 @@ class SalesActivityFormCheckInBloc extends Bloc<SalesActivityFormCheckInEvent, S
 
     on<SetLocationEvent>((event, emit) async {
       try {
+        emit(state.copyWith(isLoadingLocation: true));
         StrictLocation.checkLocationRequirements();
         final LocationSettings locationSettings = LocationSettings(
           accuracy: LocationAccuracy.high,
@@ -47,9 +48,11 @@ class SalesActivityFormCheckInBloc extends Bloc<SalesActivityFormCheckInEvent, S
         emit(state.copyWith(
           position: position,
           address: address,
+          isLoadingLocation: false,
         ));
       } catch (e) {
         print("Failed to get location: $e");
+        emit(state.copyWith(isLoadingLocation: false));
       }
     });
   }

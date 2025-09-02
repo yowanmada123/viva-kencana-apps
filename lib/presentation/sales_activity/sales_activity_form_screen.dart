@@ -1052,7 +1052,9 @@ class _SalesActivityFormSecondStepState
                 ),
               ),
               BlocListener<SalesActivityFormBloc, SalesActivityFormState>(
-                listenWhen: (previous, current) => previous.odometer != current.odometer,
+                listenWhen:
+                    (previous, current) =>
+                        previous.odometer != current.odometer,
                 listener: (context, state) {
                   odometerController.text = state.odometer;
                 },
@@ -1161,27 +1163,32 @@ class _SalesActivityFormSecondStepState
                 padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.w),
                 child: SizedBox(
                   width: double.infinity,
-                  child: BasePrimaryButton(
-                    onPressed: () async {
-                      final position =
-                          await StrictLocation.getCurrentPosition();
-                      if (position.isMocked) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              "Perangkat terdeteksi menggunakan lokasi palsu",
-                            ),
-                            backgroundColor: Colors.red,
-                          ),
-                        );
-                        return;
-                      }
-                      context.read<SalesActivityFormBloc>().add(
-                        SetLocationEvent(),
+                  child: BlocBuilder<SalesActivityFormBloc, SalesActivityFormState>(
+                    builder: (context, state) {
+                      return BasePrimaryButton(
+                        onPressed: () async {
+                          final position =
+                              await StrictLocation.getCurrentPosition();
+                          if (position.isMocked) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  "Perangkat terdeteksi menggunakan lokasi palsu",
+                                ),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                            return;
+                          }
+                          context.read<SalesActivityFormBloc>().add(
+                            SetLocationEvent(),
+                          );
+                        },
+                        isLoading: state.isLoadingLocation,
+                        label: 'Get Location',
+                        icon: Icons.location_on,
                       );
                     },
-                    label: 'Get Location',
-                    icon: Icons.location_on,
                   ),
                 ),
               ),
