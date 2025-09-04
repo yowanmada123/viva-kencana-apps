@@ -71,7 +71,7 @@ class _SalesActivityDashboardScreenState extends State<SalesActivityDashboardScr
           Expanded(
             child: Center(
               child: Padding(
-                padding: EdgeInsetsGeometry.symmetric(horizontal: 32),
+                padding: EdgeInsetsGeometry.symmetric(horizontal: 32.w),
                 child: BlocBuilder<SalesActivityFormCheckInBloc, SalesActivityFormCheckInState>(
                   builder: (context, state) {
 
@@ -97,7 +97,7 @@ class _SalesActivityDashboardScreenState extends State<SalesActivityDashboardScr
                               label: "Check In",
                             ),
                           ),
-                          const SizedBox(height: 16),
+                          SizedBox(height: 4.w),
               
                           SizedBox(
                             width: double.infinity,
@@ -121,7 +121,7 @@ class _SalesActivityDashboardScreenState extends State<SalesActivityDashboardScr
                               label: "Check Out",
                             ),
                           ),
-                          const SizedBox(height: 16),
+                          SizedBox(height: 4.w),
               
                           SizedBox(
                             width: double.infinity,
@@ -187,30 +187,29 @@ class _SalesActivityDashboardScreenState extends State<SalesActivityDashboardScr
     final String label = isCheckin ? "Last Checkin" : "Last Checkout";
 
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+      padding: EdgeInsets.symmetric(vertical: 8.0.w, horizontal: 16.0.w),
       child: Card(
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(12.r),
         ),
         elevation: 4,
         child: Row(
           children: [
             Container(
-              width: 6,
-              height: 80,
+              width: 6.w,
+              height: 80.w,
               decoration: BoxDecoration(
                 color: mainColor,
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(12),
-                  bottomLeft: Radius.circular(12),
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(12.r),
+                  bottomLeft: Radius.circular(12.r),
                 ),
               ),
             ),
 
             Expanded(
               child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+                padding: EdgeInsets.symmetric(horizontal: 12.0.w, vertical: 8.0.w),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -220,15 +219,15 @@ class _SalesActivityDashboardScreenState extends State<SalesActivityDashboardScr
                         Text(
                           "$formattedTime o'clock",
                           style: TextStyle(
-                            fontSize: 14,
+                            fontSize: 14.sp,
                             color: Colors.grey.shade600,
                           ),
                         ),
-                        const SizedBox(height: 4),
+                        SizedBox(height: 4.w),
                         Text(
                           formattedDate,
-                          style: const TextStyle(
-                            fontSize: 16,
+                          style: TextStyle(
+                            fontSize: 16.sp,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -236,11 +235,10 @@ class _SalesActivityDashboardScreenState extends State<SalesActivityDashboardScr
                     ),
 
                     Container(
-                      padding:
-                          const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.w),
                       decoration: BoxDecoration(
                         color: mainColor,
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(20.r),
                       ),
                       child: Text(
                         label,
