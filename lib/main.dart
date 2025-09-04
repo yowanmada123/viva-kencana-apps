@@ -13,6 +13,8 @@ import 'package:permission_handler/permission_handler.dart';
 
 import 'bloc/auth/authentication/authentication_bloc.dart';
 import 'bloc/sales_activity/checkin/sales_activity_form_checkin_bloc.dart';
+import 'bloc/sales_activity/history_visit/history_visit_detail/sales_activity_history_visit_detail_bloc.dart';
+import 'bloc/sales_activity/history_visit/sales_activity_history_visit_bloc.dart';
 import 'bloc/sales_activity/sales_activity_form_bloc.dart';
 import 'bloc/update/update_bloc.dart';
 import 'data/data_providers/rest_api/auth_rest.dart';
@@ -71,6 +73,7 @@ void main() async {
         RepositoryProvider.value(value: batchRepository),
         RepositoryProvider.value(value: entityRepository),
         RepositoryProvider.value(value: authorizationRepository),
+        RepositoryProvider.value(value: salesActivityRepository),
       ],
       child: MultiBlocProvider(
         providers: [
@@ -78,6 +81,8 @@ void main() async {
           BlocProvider(lazy: false, create: (context) => UpdateBloc()..add(CheckForUpdate())),
           BlocProvider(lazy: false, create: (context) => SalesActivityFormBloc(salesActivityRepository: salesActivityRepository)),
           BlocProvider(lazy: false, create: (context) => SalesActivityFormCheckInBloc(salesActivityRepository: salesActivityRepository)),
+          BlocProvider(lazy: false, create: (context) => SalesActivityHistoryVisitBloc(salesActivityRepository: salesActivityRepository)),
+          BlocProvider(lazy: false, create: (context) => SalesActivityHistoryVisitDetailBloc(salesActivityRepository: salesActivityRepository)),
         ],
         child: const MyApp(),
       ),

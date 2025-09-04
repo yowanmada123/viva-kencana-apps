@@ -8,6 +8,7 @@ import '../../models/sales_activity/sales_info.dart';
 import '../widgets/base_primary_button.dart';
 import 'sales_activity_form_checkin_screen.dart';
 import 'sales_activity_form_screen.dart';
+import 'sales_activity_history_visit_screen.dart';
 
 class SalesActivityDashboardScreen extends StatefulWidget {
   final SalesInfo sales;
@@ -143,6 +144,30 @@ class _SalesActivityDashboardScreenState extends State<SalesActivityDashboardScr
                                 );
                               },
                               label: "Customer Visit",
+                            ),
+                          ),
+                          SizedBox(height: 4.w),
+
+                          SizedBox(
+                            width: double.infinity,
+                            child: BasePrimaryButton(
+                              onPressed: () {
+                                if (!isCheckedIn) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text("Anda belum check-in hari ini")),
+                                  );
+                                  return;
+                                }
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => SalesActivityHistoryVisitScreen(
+                                      sales: widget.sales,
+                                    ),
+                                  ),
+                                );
+                              },
+                              label: "History Visit",
                             ),
                           ),
                         ],

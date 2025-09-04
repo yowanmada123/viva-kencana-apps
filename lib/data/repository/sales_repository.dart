@@ -3,6 +3,8 @@ import 'package:dartz/dartz.dart';
 import '../../models/errors/custom_exception.dart';
 import '../../models/sales_activity/customer_detail.dart';
 import '../../models/sales_activity/customer_info.dart';
+import '../../models/sales_activity/history_detail.dart';
+import '../../models/sales_activity/history_visit.dart';
 import '../../models/sales_activity/sales_info.dart';
 import '../../models/sales_activity/submit_data.dart';
 import '../data_providers/rest_api/sales_activity_rest/sales_activity_rest.dart';
@@ -64,5 +66,18 @@ class SalesActivityRepository {
     required String customerId,
   }) async {
     return salesActivityRest.getCustomerDetail(entityId: entityId, customerId: customerId);
+  }
+
+  Future<Either<CustomException, List<HistoryVisit>>> getHistoryVisit({
+    required String startDate,
+    required String endDate,
+  }) async {
+    return salesActivityRest.getHistoryVisit(startDate: startDate, endDate: endDate);
+  }
+
+  Future<Either<CustomException, List<HistoryDetail>>> getHistoryDetail({
+    required String activityId,
+  }) async {
+    return salesActivityRest.getHistoryDetail(activityId: activityId);
   }
 }

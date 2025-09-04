@@ -6,6 +6,8 @@ import 'package:dio/dio.dart';
 import '../../../../models/errors/custom_exception.dart';
 import '../../../../models/sales_activity/customer_detail.dart';
 import '../../../../models/sales_activity/customer_info.dart';
+import '../../../../models/sales_activity/history_detail.dart';
+import '../../../../models/sales_activity/history_visit.dart';
 import '../../../../models/sales_activity/sales_info.dart';
 import '../../../../models/sales_activity/submit_data.dart';
 import '../../../../utils/net_utils.dart';
@@ -301,6 +303,85 @@ class SalesActivityRest {
         final body = response.data;
 
         return Right(body['message']);
+      } else {
+        return Left(NetUtils.parseErrorResponse(response: response.data));
+      }
+    } on DioException catch (e) {
+      return Left(NetUtils.parseDioException(e));
+    } on Exception catch (e) {
+      if (e is DioException) {
+        return Left(NetUtils.parseDioException(e));
+      }
+      return Future.value(Left(CustomException(message: e.toString())));
+    } catch (e) {
+      return Left(CustomException(message: e.toString()));
+    }
+  }
+
+  Future<Either<CustomException, List<HistoryVisit>>> getHistoryVisit({
+    String? startDate,
+    String? endDate,
+  }) async {
+    try {
+      http.options.headers['requiresToken'] = true;
+      log(
+        'Request to https://v2.kencana.org/api/viva/sales_activity/CustomerVisit/getActivityData (POST)',
+      );
+      final body = {
+        'start_date': startDate ?? '',
+        'end_date': endDate ?? '',
+      };
+      final response = await http.post(
+        "api/viva/sales_activity/CustomerVisit/getActivityData",
+        data: body,
+      );
+      if (response.statusCode == 200) {
+        final body = response.data;
+
+        final List<HistoryVisit> histories =
+            (body['data'] as List)
+                .map((item) => HistoryVisit.fromMap(item))
+                .toList();
+
+        return Right(histories);
+      } else {
+        return Left(NetUtils.parseErrorResponse(response: response.data));
+      }
+    } on DioException catch (e) {
+      return Left(NetUtils.parseDioException(e));
+    } on Exception catch (e) {
+      if (e is DioException) {
+        return Left(NetUtils.parseDioException(e));
+      }
+      return Future.value(Left(CustomException(message: e.toString())));
+    } catch (e) {
+      return Left(CustomException(message: e.toString()));
+    }
+  }
+
+  Future<Either<CustomException, List<HistoryDetail>>> getHistoryDetail({
+    required String activityId,
+  }) async {
+    try {
+      http.options.headers['requiresToken'] = true;
+      log(
+        'Request to https://v2.kencana.org/api/viva/sales_activity/CustomerVisit/getActivityDetail (POST)',
+      );
+      final body = {
+        'id': activityId,
+      };
+      final response = await http.post(
+        "api/viva/sales_activity/CustomerVisit/getActivityDetail",
+        data: body,
+      );
+      if (response.statusCode == 200) {
+        final body = response.data;
+        final List<HistoryDetail> detail =
+            (body['data'] as List)
+                .map((item) => HistoryDetail.fromMap(item))
+                .toList();
+
+        return Right(detail);
       } else {
         return Left(NetUtils.parseErrorResponse(response: response.data));
       }
