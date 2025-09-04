@@ -45,8 +45,8 @@ class _SalesActivityHistoryVisitScreenState extends State<SalesActivityHistoryVi
     final picked = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
-      firstDate: DateTime(2020),
-      lastDate: DateTime(2100),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(DateTime.now().year, 12, 31),
     );
     if (picked != null) {
       controller.text = _formatDate(picked);
@@ -122,46 +122,34 @@ class _SalesActivityHistoryVisitScreenState extends State<SalesActivityHistoryVi
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12.w),
                           ),
-                          child: Padding(
-                            padding: EdgeInsets.all(12.w),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      "${visit.entityId} - ${DateFormat('dd/MM/yyyy').format(DateTime.parse(visit.trDate))}",
-                                      style: TextStyle(
-                                        fontSize: 16.w,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    PopupMenuButton(
-                                      itemBuilder: (context) => [
-                                        const PopupMenuItem(
-                                          value: "detail",
-                                          child: Text("Detail"),
-                                        ),
-                                      ],
-                                      onSelected: (value) {
-                                        if (value == "detail") {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) => SalesActivityHistoryDetailScreen(visit: visit),
-                                            ),
-                                          );
-                                        }
-                                      },
-                                    )
-                                  ],
+                          child: InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => SalesActivityHistoryDetailScreen(visit: visit),
                                 ),
-                                SizedBox(height: 8.w),
-                                Text("Tr ID: ${visit.trId}"),
-                                Text("Sales ID: ${visit.salesId}"),
-                                Text("User ID: ${visit.userId2}"),
-                              ],
+                              );
+                            },
+                            borderRadius: BorderRadius.circular(12.w),
+                            child: Padding(
+                              padding: EdgeInsets.all(12.w),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "${visit.entityId} - ${DateFormat('dd/MM/yyyy').format(DateTime.parse(visit.trDate))}",
+                                    style: TextStyle(
+                                      fontSize: 16.w,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  SizedBox(height: 8.w),
+                                  Text("Tr ID: ${visit.trId}"),
+                                  Text("Sales ID: ${visit.salesId}"),
+                                  Text("User ID: ${visit.userId2}"),
+                                ],
+                              ),
                             ),
                           ),
                         );
