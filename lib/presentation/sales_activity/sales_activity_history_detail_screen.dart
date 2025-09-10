@@ -100,42 +100,48 @@ class _SalesActivityHistoryDetailScreenState extends State<SalesActivityHistoryD
                                   ),
                                 ),
                               ),
-                              Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 12.w),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          "${DateFormat('hh:mm a').format(DateTime.parse(d.trDate))} - ${d.customerName} - ${d.customerCity}",
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 16.sp,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
+                              Expanded(
+                                child: Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: 12.w),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        DateFormat('hh:mm a').format(DateTime.parse(d.trDate)),
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16.sp,
+                                          overflow: TextOverflow.ellipsis,
                                         ),
-                                      ],
-                                    ),
-                                    Text(
-                                      d.gpsAddress,
-                                      style: TextStyle(fontSize: 13.sp, color: Colors.grey),
-                                      maxLines: 3,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    SizedBox(height: 4.w),
-                                    Text(
-                                      "Customer ID: ${d.customerId == "" ? "-" : d.customerId}",
-                                      style: TextStyle(fontSize: 14.sp, color: Colors.black87),
-                                    ),
-                                    SizedBox(height: 4.w),
-                                    Text(
-                                      "Vehicle: ${d.salesVehicle}",
-                                      style: TextStyle(fontSize: 14.sp, color: Colors.black87),
-                                    ),
-                                    SizedBox(height: 4.w),
-                                  ],
+                                        maxLines: 1,
+                                      ),
+                                      Text(
+                                        "${d.customerName} - ${d.customerCity}",
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 1,
+                                        style: TextStyle(
+                                          fontSize: 16.sp,
+                                        ),
+                                      ),
+                                      Text(
+                                        d.gpsAddress,
+                                        style: TextStyle(fontSize: 13.sp, color: Colors.grey),
+                                        maxLines: 3,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      SizedBox(height: 4.w),
+                                      Text(
+                                        "Customer ID: ${d.customerId == "" ? "-" : d.customerId}",
+                                        style: TextStyle(fontSize: 14.sp, color: Colors.black87),
+                                      ),
+                                      SizedBox(height: 4.w),
+                                      Text(
+                                        "Vehicle: ${d.salesVehicle}",
+                                        style: TextStyle(fontSize: 14.sp, color: Colors.black87),
+                                      ),
+                                      SizedBox(height: 4.w),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ],
