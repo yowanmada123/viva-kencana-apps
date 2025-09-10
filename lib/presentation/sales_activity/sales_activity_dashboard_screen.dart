@@ -152,12 +152,6 @@ class _SalesActivityDashboardScreenState extends State<SalesActivityDashboardScr
                             width: double.infinity,
                             child: BasePrimaryButton(
                               onPressed: () {
-                                if (!isCheckedIn) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text("Anda belum check-in hari ini")),
-                                  );
-                                  return;
-                                }
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
@@ -206,8 +200,8 @@ class _SalesActivityDashboardScreenState extends State<SalesActivityDashboardScr
         parsedTime != null ? DateFormat("dd-MM-yyyy").format(parsedTime) : "-";
 
     final Color mainColor = isCheckin
-        ? Colors.green.shade400.withOpacity(0.8)
-        : Colors.red.shade400.withOpacity(0.8);
+        ? Colors.green.shade400.withValues(alpha: 0.8)
+        : Colors.red.shade400.withValues(alpha: 0.8);
 
     final String label = isCheckin ? "Last Checkin" : "Last Checkout";
 
