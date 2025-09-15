@@ -190,6 +190,8 @@ class SalesActivityFormData {
       'images': images?.map((x) => x.toMap()).toList(),
       'vehicle_odometer': speedoKmModel,
       'checkpoint': checkpoint,
+      'sales_id': salesid,
+      'office_id': officeid,
       'set_address': setAddress,
     };
   }
@@ -229,7 +231,8 @@ class SalesActivityFormData {
       new_: map['new'] ?? '',
       speedoKmModel: map['speedoKmModel'] ?? '',
       checkpoint: map['checkpoint'] ?? '',
-      officeid: map['officeid'] ?? '',
+      officeid: map['office_id'] ?? '',
+      salesid: map['sales_id'] ?? '',
       setAddress: map['set_address'] ?? '',
     );
   }
