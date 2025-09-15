@@ -85,7 +85,7 @@ class _SalesActivityDashboardScreenState extends State<SalesActivityDashboardScr
                             width: double.infinity,
                             child: BasePrimaryButton(
                               onPressed: () {
-                                Navigator.pushReplacement(
+                                Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                     builder: (_) => SalesActivityFormCheckInScreen(
@@ -110,7 +110,7 @@ class _SalesActivityDashboardScreenState extends State<SalesActivityDashboardScr
                                   );
                                   return;
                                 }
-                                Navigator.pushReplacement(
+                                Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                     builder: (_) => SalesActivityFormCheckInScreen(
@@ -134,7 +134,7 @@ class _SalesActivityDashboardScreenState extends State<SalesActivityDashboardScr
                                   );
                                   return;
                                 }
-                                Navigator.pushReplacement(
+                                Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                     builder: (_) => SalesActivityFormScreen(
