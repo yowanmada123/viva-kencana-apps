@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 import '../../bloc/auth/authentication/authentication_bloc.dart';
 import '../../bloc/auth/login-form/login_form_bloc.dart';
@@ -36,6 +37,7 @@ class _LoginFormViewState extends State<LoginFormView> {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController shifController = TextEditingController();
+
 
   bool rememberMe = true;
   bool _obscurePassword = true;
@@ -233,6 +235,40 @@ class _LoginFormViewState extends State<LoginFormView> {
                       ),
                     );
                   },
+                ),
+                const Spacer(),
+
+                FutureBuilder(
+                  future: PackageInfo.fromPlatform(), 
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData) {
+                      return const Text("Loading...");
+                    }
+
+                    final info = snapshot.data!;
+
+                    return Column(
+                      children: [
+                        Text(
+                          "${info.appName} (All rights reserved)",
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          "Version ${info.version} (kencana.org)",
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                      ],
+                    );
+                  }
                 ),
               ],
             ),
