@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -5,6 +7,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../bloc/auth/authentication/authentication_bloc.dart';
 import '../../bloc/auth/logout/logout_bloc.dart';
 import '../../bloc/entity/entity_bloc.dart';
+import '../../data/data_providers/shared-preferences/shared_preferences_manager.dart';
 import '../../data/repository/auth_repository.dart';
 import '../../data/repository/entity_repository.dart';
 import '../../models/errors/custom_exception.dart';
@@ -29,12 +32,36 @@ class EntityScreen extends StatelessWidget {
                     ..add(LoadEntity()),
         ),
       ],
-      child: MyGridLayout(),
+      child: GridLayout(),
     );
   }
 }
 
-class MyGridLayout extends StatelessWidget {
+class GridLayout extends StatefulWidget {
+  const GridLayout({super.key});
+
+  @override
+  State<GridLayout> createState() => _GridLayoutState();
+}
+
+class _GridLayoutState extends State<GridLayout> {
+  String? name;
+  String? dept;
+
+  Future<void> loadUserData() async {
+    final SharedPreferencesManager authSharedPref = SharedPreferencesManager(key: 'auth');
+    final dataString = await authSharedPref.read();
+
+    if (dataString != null) {
+      final Map<String, dynamic> data = json.decode(dataString);
+      final user = data['user'];
+      setState(() {
+        name = user['name1'] ?? '-';
+        dept = user['dept_id'] ?? '-';
+      });
+    }
+  }
+
   Color hexToColor(String hex) {
     hex = hex.replaceAll('#', '');
     if (hex.length == 6) {
@@ -43,104 +70,209 @@ class MyGridLayout extends StatelessWidget {
     return Color(int.parse(hex, radix: 16));
   }
 
+  @override
+  void initState() {    
+    loadUserData();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Color(0xff1E4694),
-        iconTheme: const IconThemeData(color: Colors.white),
-        title: Text(
-          'VIVA KENCANA',
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontFamily: "Poppins",
-            color: Colors.white,
-            fontWeight: FontWeight.w600,
-            fontSize: 18.w,
-          ),
-        ),
-        actions: [
-          Padding(
-            padding: EdgeInsets.only(right: 16.w),
-            child: BlocConsumer<LogoutBloc, LogoutState>(
-              listener: (context, state) {
-                if (state is LogoutSuccess || state is LogoutFailure) {
-                  context.read<AuthenticationBloc>().add(
-                      SetAuthenticationStatus(isAuthenticated: false));
-                }
-              },
-              builder: (context, state) {
-                return GestureDetector(
-                  onTap: () {
-                    showDialog<bool>(
-                      context: context,
-                      builder: (BuildContext childContext) {
-                        return BasePopUpDialog(
-                          noText: "Tidak",
-                          yesText: "Ya",
-                          onNoPressed: () {},
-                          onYesPressed: () {
-                            if (state is! LogoutLoading) {
-                              context.read<LogoutBloc>().add(LogoutPressed());
-                            }
-                          },
-                          question: "Apakah Anda yakin ingin keluar dari aplikasi?",
-                        );
-                      },
-                    );
-                  },
-                  child: Icon(Icons.logout, color: Colors.white),
-                );
-              },
-            ),
-          )
-        ]
-      ),
-      body: Container(
-        margin: EdgeInsets.fromLTRB(8.0, 8.0, 0.0, 0.0),
-        child: BlocConsumer<EntityBloc, EntityState>(
-          listener: (context, state) {
-            if (state is EntityFailure) {
-              if (state.exception is UnauthorizedException) {
-                context.read<AuthenticationBloc>().add(
-                  SetAuthenticationStatus(isAuthenticated: false),
-                );
-                Navigator.of(context).popUntil((route) => route.isFirst);
-              }
-            }
-          },
-          builder: (context, state) {
-            if (state is EntityLoaded) {
-              final entities = state.entities;
-              if (entities.isEmpty) {
-                return const Center(
-                  child: Text(
-                    "Entitas tidak ditemukan",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(100.w),
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            AppBar(
+              backgroundColor: Theme.of(context).primaryColor,
+              iconTheme: const IconThemeData(color: Colors.white),
+              title: Text(
+                'Viva Kencana',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontFamily: "Poppins",
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 16.w,
+                ),
+              ),
+              actions: [
+                Padding(
+                  padding: EdgeInsets.only(right: 8.w),
+                  child: BlocConsumer<LogoutBloc, LogoutState>(
+                    listener: (context, state) {
+                      if (state is LogoutSuccess || state is LogoutFailure) {
+                        context.read<AuthenticationBloc>().add(
+                            SetAuthenticationStatus(isAuthenticated: false));
+                      }
+                    },
+                    builder: (context, state) {
+                      return GestureDetector(
+                        onTap: () {
+                          showDialog<bool>(
+                            context: context,
+                            builder: (BuildContext childContext) {
+                              return BasePopUpDialog(
+                                noText: "Tidak",
+                                yesText: "Ya",
+                                onNoPressed: () {},
+                                onYesPressed: () {
+                                  if (state is! LogoutLoading) {
+                                    context.read<LogoutBloc>().add(LogoutPressed());
+                                  }
+                                },
+                                question: "Apakah Anda yakin ingin keluar dari aplikasi?",
+                              );
+                            },
+                          );
+                        },
+                        child: Icon(Icons.settings, color: Colors.white),
+                      );
+                    },
                   ),
-                );
-              }
-              return GridView.count(
-                crossAxisCount: 4,
-                children: List.generate(entities.length, (index) {
-                  final entity = entities[index];
-                  return Container(
-                    padding: EdgeInsets.all(4.w),
-                    child: Center(
-                      child: SizedBox(
-                        width: 50.w,
-                        height: 50.w,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: hexToColor(entity.color),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8.w), 
+                ),
+                Padding(
+                  padding: EdgeInsetsGeometry.only(right: 16.w),
+                  child: Icon(Icons.category_sharp),
+                )
+              ]
+            ),
+            Positioned(
+              bottom: -30,
+              left: 16,
+              right: 16,
+              child: Card(
+                elevation: 4,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.w),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Color(0xffD2F801),
+                              borderRadius: BorderRadius.circular(15.w)
                             ),
-                            padding: EdgeInsets.zero, 
-                            elevation: 2,
+                            padding: EdgeInsets.all(4..w),
+                            child: Icon(Icons.person, color: Color(0xff595959), size: 28.w,),
                           ),
-                          onPressed: () {
+                          SizedBox(width: 8.w),
+                          SizedBox(
+                            width: 140.w,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "👋 Good Morning",
+                                  style: TextStyle(
+                                    fontSize: 10.w,
+                                    fontWeight: FontWeight.w500
+                                  ),
+                                ),
+                                Text(
+                                  name!,
+                                  style: TextStyle(
+                                    fontSize: 16.w,
+                                    fontWeight: FontWeight.w600
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Icon(Icons.local_fire_department, size: 12.w, color: Theme.of(context).primaryColor),
+                          SizedBox(
+                            width: 90.w,
+                            child: Text(
+                              "$dept department",
+                              style: TextStyle(
+                                fontSize: 10.w
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+      body: Padding(
+        padding: EdgeInsets.only(top: 32.w),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 24.w),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "Let’s see your entity",
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w500
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      
+                    },
+                    child: Text(
+                      "see all",
+                      style: TextStyle(
+                        fontSize: 12.sp,
+                        fontWeight: FontWeight.w500,
+                        color: Theme.of(context).primaryColor,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: BlocConsumer<EntityBloc, EntityState>(
+                listener: (context, state) {
+                  if (state is EntityFailure) {
+                    if (state.exception is UnauthorizedException) {
+                      context.read<AuthenticationBloc>().add(
+                        SetAuthenticationStatus(isAuthenticated: false),
+                      );
+                      Navigator.of(context).popUntil((route) => route.isFirst);
+                    }
+                  }
+                },
+                builder: (context, state) {
+                  if (state is EntityLoaded) {
+                    final entities = state.entities;
+                    if (entities.isEmpty) {
+                      return const Center(
+                        child: Text(
+                          "Entitas tidak ditemukan",
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
+                      );
+                    }
+                    return GridView.count(
+                      crossAxisCount: 2,
+                      children: List.generate(entities.length, (index) {
+                        final entity = entities[index];
+                        return GestureDetector(
+                          onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -148,31 +280,107 @@ class MyGridLayout extends StatelessWidget {
                               ),
                             );
                           },
-                          child: Center(
-                            child: Text(
-                              entity.entityId,
-                              textAlign: TextAlign.center,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                fontSize: 12.sp,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 16.w),
+                            child: Card(
+                              elevation: 4,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
                               ),
+                              clipBehavior: Clip.antiAlias,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  SizedBox(
+                                    height: 110.w,
+                                    width: double.infinity,
+                                    child: entity.urlImage != "" && entity.urlImage.isNotEmpty
+                                      ? Image.network(
+                                          entity.urlImage,
+                                          fit: BoxFit.cover,
+                                          errorBuilder: (context, error, stackTrace) {
+                                            return Center(child: Icon(Icons.broken_image, size: 40.w, color: Theme.of(context).disabledColor));
+                                          },
+                                        )
+                                      : Center(child: Icon(Icons.image, size: 40.w, color: Theme.of(context).disabledColor)),
+                                  ),
+                          
+                                  Padding(
+                                    padding: EdgeInsets.fromLTRB(8.w, 8.w, 8.w, 8.w),
+                                    child: Text(
+                                      entity.description,
+                                      style: TextStyle(
+                                        fontSize: 12.w,
+                                        fontWeight: FontWeight.w500
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.symmetric(horizontal: 8.w),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            CircleAvatar(
+                                              backgroundColor: hexToColor(entity.color),
+                                              radius: 10.w,
+                                            ),
+                                            SizedBox(width: 4.w),
+                                            Text(
+                                              entity.entityId,
+                                              style: TextStyle(
+                                                fontSize: 10.w,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                          
+                                        TextButton(
+                                          style: TextButton.styleFrom(
+                                            padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 0), 
+                                            minimumSize: Size(0, 20.w),
+                                            backgroundColor: Theme.of(context).primaryColor,
+                                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                          ),
+                                          onPressed: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) => DriverDashboardScreen(entityId: entity.entityId),
+                                              ),
+                                            );
+                                          },
+                                          child: Text(
+                                            "See more",
+                                            style: TextStyle(
+                                              fontSize: 10.w,
+                                              color: Theme.of(context).hintColor,
+                                              fontWeight: FontWeight.w500
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              )
                             ),
                           ),
-                        ),
-                      ),
-                    ),
-                  );
-                }),
-              );
-            } else if (state is EntityLoading) {
-              return const Center(child: CircularProgressIndicator());
-            } else {
-              return const Text("Entitas tidak ditemukan");
-            }
-          },
+                        );
+                      }),
+                    );
+                  } else if (state is EntityLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else {
+                    return const Text("Entitas tidak ditemukan");
+                  }
+                },
+              ),
+            ),
+          ],
         ),
       ),
     );
