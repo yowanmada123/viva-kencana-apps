@@ -12,7 +12,7 @@ import '../../data/repository/auth_repository.dart';
 import '../../data/repository/entity_repository.dart';
 import '../../models/errors/custom_exception.dart';
 import '../driver/driver_dashboard_screen.dart';
-import '../widgets/base_pop_up.dart';
+import '../setting/setting_screen.dart';
 
 class EntityScreen extends StatelessWidget {
   const EntityScreen({super.key});
@@ -45,7 +45,7 @@ class GridLayout extends StatefulWidget {
 }
 
 class _GridLayoutState extends State<GridLayout> {
-  String? name;
+  String name = '-';
   String? dept;
 
   Future<void> loadUserData() async {
@@ -57,7 +57,7 @@ class _GridLayoutState extends State<GridLayout> {
       final user = data['user'];
       setState(() {
         name = user['name1'] ?? '-';
-        dept = user['dept_id'] ?? '-';
+        dept = user['dept_id'].trim() ?? '-';
       });
     }
   }
@@ -110,21 +110,10 @@ class _GridLayoutState extends State<GridLayout> {
                     builder: (context, state) {
                       return GestureDetector(
                         onTap: () {
-                          showDialog<bool>(
-                            context: context,
-                            builder: (BuildContext childContext) {
-                              return BasePopUpDialog(
-                                noText: "Tidak",
-                                yesText: "Ya",
-                                onNoPressed: () {},
-                                onYesPressed: () {
-                                  if (state is! LogoutLoading) {
-                                    context.read<LogoutBloc>().add(LogoutPressed());
-                                  }
-                                },
-                                question: "Apakah Anda yakin ingin keluar dari aplikasi?",
-                              );
-                            },
+                          Navigator.push(
+                            context, MaterialPageRoute(
+                            builder: (context) => SettingScreen(),
+                            )
                           );
                         },
                         child: Icon(Icons.settings, color: Colors.white),
@@ -176,7 +165,7 @@ class _GridLayoutState extends State<GridLayout> {
                                   ),
                                 ),
                                 Text(
-                                  name!,
+                                  name,
                                   style: TextStyle(
                                     fontSize: 16.w,
                                     fontWeight: FontWeight.w600
@@ -269,6 +258,7 @@ class _GridLayoutState extends State<GridLayout> {
                     }
                     return GridView.count(
                       crossAxisCount: 2,
+                      padding: EdgeInsets.symmetric(horizontal: 4.w),
                       children: List.generate(entities.length, (index) {
                         final entity = entities[index];
                         return GestureDetector(
@@ -280,94 +270,91 @@ class _GridLayoutState extends State<GridLayout> {
                               ),
                             );
                           },
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 16.w),
-                            child: Card(
-                              elevation: 4,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              clipBehavior: Clip.antiAlias,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  SizedBox(
-                                    height: 110.w,
-                                    width: double.infinity,
-                                    child: entity.urlImage != "" && entity.urlImage.isNotEmpty
-                                      ? Image.network(
-                                          entity.urlImage,
-                                          fit: BoxFit.cover,
-                                          errorBuilder: (context, error, stackTrace) {
-                                            return Center(child: Icon(Icons.broken_image, size: 40.w, color: Theme.of(context).disabledColor));
-                                          },
-                                        )
-                                      : Center(child: Icon(Icons.image, size: 40.w, color: Theme.of(context).disabledColor)),
-                                  ),
-                          
-                                  Padding(
-                                    padding: EdgeInsets.fromLTRB(8.w, 8.w, 8.w, 8.w),
-                                    child: Text(
-                                      entity.description,
-                                      style: TextStyle(
-                                        fontSize: 12.w,
-                                        fontWeight: FontWeight.w500
-                                      ),
-                                      overflow: TextOverflow.ellipsis,
+                          child: Card(
+                            elevation: 4,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            clipBehavior: Clip.antiAlias,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                SizedBox(
+                                  height: 100.w,
+                                  width: double.infinity,
+                                  child: entity.urlImage != "" && entity.urlImage.isNotEmpty
+                                    ? Image.network(
+                                        entity.urlImage,
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (context, error, stackTrace) {
+                                          return Center(child: Icon(Icons.broken_image, size: 40.w, color: Theme.of(context).disabledColor));
+                                        },
+                                      )
+                                    : Center(child: Icon(Icons.image, size: 40.w, color: Theme.of(context).disabledColor)),
+                                ),
+                                                    
+                                Padding(
+                                  padding: EdgeInsets.fromLTRB(8.w, 8.w, 8.w, 8.w),
+                                  child: Text(
+                                    entity.description,
+                                    style: TextStyle(
+                                      fontSize: 12.w,
+                                      fontWeight: FontWeight.w500
                                     ),
+                                    overflow: TextOverflow.ellipsis,
                                   ),
-                                  Padding(
-                                    padding: EdgeInsets.symmetric(horizontal: 8.w),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            CircleAvatar(
-                                              backgroundColor: hexToColor(entity.color),
-                                              radius: 10.w,
-                                            ),
-                                            SizedBox(width: 4.w),
-                                            Text(
-                                              entity.entityId,
-                                              style: TextStyle(
-                                                fontSize: 10.w,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                          
-                                        TextButton(
-                                          style: TextButton.styleFrom(
-                                            padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 0), 
-                                            minimumSize: Size(0, 20.w),
-                                            backgroundColor: Theme.of(context).primaryColor,
-                                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: 8.w),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          CircleAvatar(
+                                            backgroundColor: hexToColor(entity.color),
+                                            radius: 10.w,
                                           ),
-                                          onPressed: () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) => DriverDashboardScreen(entityId: entity.entityId),
-                                              ),
-                                            );
-                                          },
-                                          child: Text(
-                                            "See more",
+                                          SizedBox(width: 4.w),
+                                          Text(
+                                            entity.entityId,
                                             style: TextStyle(
                                               fontSize: 10.w,
-                                              color: Theme.of(context).hintColor,
-                                              fontWeight: FontWeight.w500
                                             ),
                                           ),
+                                        ],
+                                      ),
+                                                    
+                                      TextButton(
+                                        style: TextButton.styleFrom(
+                                          padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 0), 
+                                          minimumSize: Size(0, 20.w),
+                                          backgroundColor: Theme.of(context).primaryColor,
+                                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                                         ),
-                                      ],
-                                    ),
+                                        onPressed: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => DriverDashboardScreen(entityId: entity.entityId),
+                                            ),
+                                          );
+                                        },
+                                        child: Text(
+                                          "See more",
+                                          style: TextStyle(
+                                            fontSize: 10.w,
+                                            color: Theme.of(context).hintColor,
+                                            fontWeight: FontWeight.w500
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ],
-                              )
-                            ),
+                                ),
+                              ],
+                            )
                           ),
                         );
                       }),
