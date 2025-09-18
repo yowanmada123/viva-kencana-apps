@@ -104,7 +104,7 @@ class MyApp extends StatelessWidget {
             title: 'Viva Kencana Ekspedisi',
             theme: ThemeData(
               colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-              primaryColor: Color(0xff1E4694),
+              primaryColor: Color(0xff570DE6),
               hintColor: Color(0xffF1F1F1),
               disabledColor: Color(0xff808186),
               secondaryHeaderColor: Color(0xff575353),
