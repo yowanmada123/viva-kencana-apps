@@ -70,6 +70,20 @@ class _GridLayoutState extends State<GridLayout> {
     return Color(int.parse(hex, radix: 16));
   }
 
+  String getGreeting() {
+    final nowUtc = DateTime.now().toUtc();
+    final wibTime = nowUtc.add(const Duration(hours: 7));
+    final hour = wibTime.hour;
+
+    if (hour >= 5 && hour < 12) {
+      return "Good Morning";
+    } else if (hour >= 12 && hour < 17) {
+      return "Good Afternoon";
+    } else {
+      return "Good Evening";
+    }
+  }
+
   @override
   void initState() {    
     loadUserData();
@@ -158,7 +172,7 @@ class _GridLayoutState extends State<GridLayout> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  "👋 Good Morning",
+                                  "👋 ${getGreeting()}",
                                   style: TextStyle(
                                     fontSize: 10.w,
                                     fontWeight: FontWeight.w500
