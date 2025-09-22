@@ -1,9 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../bloc/auth/authentication/authentication_bloc.dart';
 import '../../bloc/auth/logout/logout_bloc.dart';
+import '../../data/data_providers/shared-preferences/shared_preferences_manager.dart';
 import '../../data/repository/auth_repository.dart';
 import '../widgets/base_pop_up.dart';
 
@@ -15,6 +18,29 @@ class SettingScreen extends StatefulWidget {
 }
 
 class _SettingScreenState extends State<SettingScreen> {
+  String name = '-';
+  String? username;
+
+  Future<void> loadUserData() async {
+    final SharedPreferencesManager authSharedPref = SharedPreferencesManager(key: 'auth');
+    final dataString = await authSharedPref.read();
+
+    if (dataString != null) {
+      final Map<String, dynamic> data = json.decode(dataString);
+      final user = data['user'];
+      setState(() {
+        name = user['name1'] ?? '-';
+        username = user['username'].trim() ?? '-';
+      });
+    }
+  }
+
+  @override
+  void initState() {    
+    loadUserData();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     final authRepository = context.read<AuthRepository>();
@@ -58,7 +84,7 @@ class _SettingScreenState extends State<SettingScreen> {
                   ),
                   SizedBox(height: 8.w),
                   Text(
-                    "Ridwan Soleh",
+                    name,
                     style: TextStyle(
                       fontSize: 18.w,
                       color: Theme.of(context).hintColor,
@@ -66,7 +92,7 @@ class _SettingScreenState extends State<SettingScreen> {
                     ),
                   ),
                   Text(
-                    "@Ridwan Soleh",
+                    "@$username",
                     style: TextStyle(fontSize: 12.w, color: Colors.grey),
                   ),
                 ],

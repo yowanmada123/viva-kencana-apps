@@ -331,10 +331,14 @@ class _GridLayoutState extends State<GridLayout> {
                                             radius: 10.w,
                                           ),
                                           SizedBox(width: 4.w),
-                                          Text(
-                                            entity.entityId,
-                                            style: TextStyle(
-                                              fontSize: 10.w,
+                                          SizedBox(
+                                            width: 60.w,
+                                            child: Text(
+                                              entity.entityId,
+                                              style: TextStyle(
+                                                fontSize: 10.w,
+                                              ),
+                                              overflow: TextOverflow.ellipsis,
                                             ),
                                           ),
                                         ],
