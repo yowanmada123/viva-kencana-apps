@@ -135,6 +135,12 @@ class MyApp extends StatelessWidget {
               listener: (context, state) {
                 if (state is UpdateAvailable) {
                   _showUpdateDialog(context, state);
+                } else if (state is UpdateDownloaded) {
+                  Navigator.pop(context);
+                  OpenFile.open(state.filePath);
+                } else if (state is UpdateError) {
+                  Navigator.pop(context);
+                  _showErrorDialog(context, state.message);
                 }
               },
               child: BlocBuilder<AuthenticationBloc, AuthenticationState>(
@@ -158,17 +164,20 @@ class MyApp extends StatelessWidget {
       context: context,
       barrierDismissible: false,
       builder:
-          (_) => AlertDialog(
-            title: const Text('Update Tersedia'),
-            content: Text(
-              'Versi ${state.latestVersion} tersedia:\n\n${state.updateNotes}',
-            ),
-            actions: [
-              ElevatedButton(
-                onPressed: () => _handleUpdate(context, state),
-                child: const Text('Update'),
+          (_) => PopScope(
+            canPop: false,
+            child: AlertDialog(
+              title: const Text('Update Tersedia'),
+              content: Text(
+                'Versi ${state.latestVersion} tersedia:\n\n${state.updateNotes}',
               ),
-            ],
+              actions: [
+                ElevatedButton(
+                  onPressed: () => _handleUpdate(context, state),
+                  child: const Text('Update'),
+                ),
+              ],
+            ),
           ),
     );
   }
@@ -183,7 +192,37 @@ class MyApp extends StatelessWidget {
 
     if (!await _checkInstallPermission(context)) return;
 
-    await _downloadAndInstallUpdate(context, state);
+    context.read<UpdateBloc>().add(DownloadUpdate(state.apkUrl));
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => PopScope(
+        canPop: false,
+        child: AlertDialog(
+          title: Text("Sedang Memperbarui…", style: TextStyle(
+            fontSize: 16.w
+          )),
+          content: BlocBuilder<UpdateBloc, UpdateState>(
+            buildWhen: (prev, curr) => curr is UpdateDownloading,
+            builder: (context, state) {
+              double progress = 0.0;
+              if (state is UpdateDownloading) {
+                progress = state.progress;
+              }
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  LinearProgressIndicator(value: progress),
+                  const SizedBox(height: 12),
+                  Text("${(progress * 100).toStringAsFixed(0)}%"),
+                ],
+              );
+            },
+          ),
+        ),
+      ),
+    );
   }
 
   Future<bool> _checkStoragePermission(BuildContext context) async {
@@ -224,26 +263,6 @@ class MyApp extends StatelessWidget {
     }
 
     return true;
-  }
-
-  Future<void> _downloadAndInstallUpdate(
-    BuildContext context,
-    UpdateAvailable state,
-  ) async {
-    try {
-      final tempDir = await getExternalStorageDirectory();
-      final filePath = '${tempDir!.path}/update.apk';
-
-      await Dio().download(
-        state.apkUrl,
-        filePath,
-        options: Options(receiveTimeout: const Duration(seconds: 300)),
-      );
-
-      await OpenFile.open(filePath);
-    } catch (e) {
-      _showErrorDialog(context, 'Gagal mengunduh update: ${e.toString()}');
-    }
   }
 
   void _showErrorDialog(BuildContext context, String message) {

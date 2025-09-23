@@ -2,6 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:dio/dio.dart';
 import 'package:equatable/equatable.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 part 'update_event.dart';
@@ -10,6 +11,7 @@ part 'update_state.dart';
 class UpdateBloc extends Bloc<UpdateEvent, UpdateState> {
   UpdateBloc() : super(UpdateInitial()) {
     on<CheckForUpdate>(_onCheckForUpdate);
+    on<DownloadUpdate>(_onDownloadUpdate);
   }
 
   Future<void> _onCheckForUpdate(CheckForUpdate event, Emitter<UpdateState> emit) async {
@@ -39,6 +41,30 @@ class UpdateBloc extends Bloc<UpdateEvent, UpdateState> {
       }
     } catch (e) {
       emit(UpdateError("Gagal memeriksa versi: ${e.toString()}"));
+    }
+  }
+
+  Future<void> _onDownloadUpdate(
+    DownloadUpdate event,
+    Emitter<UpdateState> emit) async {
+    try {
+      final tempDir = await getExternalStorageDirectory();
+      final filePath = '${tempDir!.path}/update.apk';
+
+      await Dio().download(
+        event.apkUrl,
+        filePath,
+        onReceiveProgress: (received, total) {
+          if (total != -1) {
+            final progress = received / total;
+            emit(UpdateDownloading(progress));
+          }
+        },
+      );
+
+      emit(UpdateDownloaded(filePath));
+    } catch (e) {
+      emit(UpdateError("Gagal mengunduh update: ${e.toString()}"));
     }
   }
 }
