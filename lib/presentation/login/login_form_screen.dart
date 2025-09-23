@@ -78,6 +78,7 @@ class _LoginFormViewState extends State<LoginFormView> {
     final deviceSize = MediaQuery.of(context).size;
     return KeyboardDismissOnTap(
       child: Scaffold(
+        resizeToAvoidBottomInset: false,
         body: SafeArea(
           child: Padding(
             padding: EdgeInsets.all(20.w),
@@ -236,39 +237,43 @@ class _LoginFormViewState extends State<LoginFormView> {
                     );
                   },
                 ),
-                const Spacer(),
 
-                FutureBuilder(
-                  future: PackageInfo.fromPlatform(), 
-                  builder: (context, snapshot) {
-                    if (!snapshot.hasData) {
-                      return const Text("Loading...");
+                Expanded(child: SizedBox()),
+
+                Align(
+                  alignment: Alignment.bottomCenter,
+                  child: FutureBuilder(
+                    future: PackageInfo.fromPlatform(), 
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData) {
+                        return const Text("Loading...");
+                      }
+                  
+                      final info = snapshot.data!;
+                  
+                      return Column(
+                        children: [
+                          Text(
+                            "${info.appName} (All rights reserved)",
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            "Version ${info.version} (kencana.org)",
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                        ],
+                      );
                     }
-
-                    final info = snapshot.data!;
-
-                    return Column(
-                      children: [
-                        Text(
-                          "${info.appName} (All rights reserved)",
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          "Version ${info.version} (kencana.org)",
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                      ],
-                    );
-                  }
+                  ),
                 ),
               ],
             ),

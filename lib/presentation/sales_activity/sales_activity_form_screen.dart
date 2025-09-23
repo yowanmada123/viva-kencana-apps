@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -105,6 +106,8 @@ class _SalesActivityFormScreenState extends State<SalesActivityFormScreen> {
   int currentStep = 0;
   double progress = 1;
 
+  Timer? _debounce;
+
   final custIdController = TextEditingController();
   final nameController = TextEditingController();
   final ktpController = TextEditingController();
@@ -153,7 +156,7 @@ class _SalesActivityFormScreenState extends State<SalesActivityFormScreen> {
   @override
   void initState() {
     super.initState();
-
+    _debounce?.cancel();
     context.read<SalesActivityFormBloc>().add(FetchProvinces());
   }
 
@@ -223,11 +226,13 @@ class _SalesActivityFormScreenState extends State<SalesActivityFormScreen> {
                         BlocProvider.of<AuthenticationBloc>(
                           context,
                         ).add(SetAuthenticationStatus(isAuthenticated: false));
+                        Navigator.of(context).popUntil((route) => route.isFirst);
                       } else if (state is LogoutFailure) {
                         if (state.exception is UnauthorizedException) {
                           context.read<AuthenticationBloc>().add(
                             SetAuthenticationStatus(isAuthenticated: false),
                           );
+                          Navigator.of(context).popUntil((route) => route.isFirst);
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
@@ -384,16 +389,17 @@ class _SalesActivityFormScreenState extends State<SalesActivityFormScreen> {
                                         }
                                       },
                                       onSearchChanged: (query) {
-                                        if (query.isNotEmpty) {
-                                          context
-                                              .read<SalesActivityFormBloc>()
-                                              .add(
-                                                SearchCustomerData(
-                                                  widget.sales.companyId,
-                                                  query,
-                                                ),
-                                              );
-                                        }
+                                        if (_debounce?.isActive ?? false) _debounce?.cancel();
+                                        _debounce = Timer(const Duration(milliseconds: 500), () {
+                                          if (query.isNotEmpty) {
+                                            context.read<SalesActivityFormBloc>().add(
+                                              SearchCustomerData(
+                                                widget.sales.companyId,
+                                                query,
+                                              ),
+                                            );
+                                          }
+                                        });
                                       },
                                     ),
                                   ),
