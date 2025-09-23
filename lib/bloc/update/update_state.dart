@@ -28,6 +28,24 @@ class UpdateAvailable extends UpdateState {
 
 class UpdateNotAvailable extends UpdateState {}
 
+class UpdateDownloading extends UpdateState {
+  final double progress;
+
+  const UpdateDownloading(this.progress);
+
+  @override
+  List<Object?> get props => [progress];
+}
+
+class UpdateDownloaded extends UpdateState {
+  final String filePath;
+
+  const UpdateDownloaded(this.filePath);
+
+  @override
+  List<Object?> get props => [filePath];
+}
+
 class UpdateError extends UpdateState {
   final String message;
 
