@@ -193,11 +193,11 @@ class SalesActivityRest {
     try {
       http.options.headers['requiresToken'] = true;
       log(
-        'Request to https://v2.kencana.org/api/viva/sales_activity/CustomerVisit/getCustomer (GET)',
+        'Request to https://v2.kencana.org/api/viva/sales_activity/CustomerVisit/getCustomerById (GET)',
       );
       final response = await http.post(
-        "api/viva/sales_activity/CustomerVisit/getCustomer",
-        data: {"entity_id": entityId, "keyword": keyword},
+        "api/viva/sales_activity/CustomerVisit/getCustomerById",
+        data: {"entity_id": entityId, "customer_id": keyword},
       );
       if (response.statusCode == 200) {
         final body = response.data;
@@ -230,11 +230,11 @@ class SalesActivityRest {
     try {
       http.options.headers['requiresToken'] = true;
       log(
-        'Request to https://v2.kencana.org/api/viva/sales_activity/CustomerVisit/getCustomerById (POST)',
+        'Request to https://v2.kencana.org/api/viva/sales_activity/CustomerVisit/getCustomer (POST)',
       );
 
       final response = await http.post(
-        "api/viva/sales_activity/CustomerVisit/getCustomerById",
+        "api/viva/sales_activity/CustomerVisit/getCustomer",
         data: {"entity_id": entityId, "customer_id": customerId},
       );
       if (response.statusCode == 200) {

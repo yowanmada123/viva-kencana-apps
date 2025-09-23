@@ -10,6 +10,7 @@ import '../../bloc/authorization/access_menu/access_menu_bloc.dart';
 import '../../bloc/sales_activity/checkin/sales_activity_form_checkin_bloc.dart';
 import '../../data/repository/auth_repository.dart';
 import '../../data/repository/authorization_repository.dart';
+import '../../data/repository/sales_repository.dart';
 import '../../models/errors/custom_exception.dart';
 import '../../models/menu.dart';
 import '../../utils/strict_location.dart';
@@ -42,7 +43,14 @@ class DriverDashboardScreen extends StatelessWidget {
   }
 }
 
-class MyGridLayout extends StatelessWidget {
+class MyGridLayout extends StatefulWidget {
+  @override
+  _MyGridLayoutState createState() => _MyGridLayoutState();
+}
+
+class _MyGridLayoutState extends State<MyGridLayout> {
+  String? _loadingMenuId;
+
   Map<String, dynamic>? getButton(SubMenu submenu, BuildContext context) {
     final menuId = submenu.menuId;
     final caption = submenu.menuCaption;
@@ -61,50 +69,76 @@ class MyGridLayout extends StatelessWidget {
         break;
       case 'mnuSalesActivity':
         routeAction = () async {
-        final bloc = context.read<SalesActivityFormCheckInBloc>();
-        final position = await StrictLocation.getCurrentPosition();
+          final bloc = context.read<SalesActivityFormCheckInBloc>();
+          final salesRepository = context.read<SalesActivityRepository>();
+          final position = await StrictLocation.getCurrentPosition();
 
-        bloc.add(const LoadSalesData());
-        await Future.delayed(const Duration(milliseconds: 500));
+          bloc.add(const LoadSalesData());
+          bool isHandled = false;
+          Timer(const Duration(seconds: 3), () {
+            if (!isHandled) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text("Permintaan terlalu lama, coba lagi"),
+                ),
+              );
+            }
+          });
 
-        final salesState = bloc.state;
-        if (salesState is SalesDataSuccess) {
-          final salesId = salesState.sales.salesId;
+          final salesState = bloc.state;
+          if (salesState is SalesDataSuccess) {
+            final salesId = salesState.sales.salesId;
 
-          if (salesId.isEmpty) {
+            if (salesId.isEmpty) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text("ID Sales belum terdaftarkan")),
+              );
+              return;
+            }
+
+            if (position.isMocked) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    "Perangkat terdeteksi menggunakan lokasi palsu",
+                  ),
+                  backgroundColor: Colors.red,
+                ),
+              );
+              return;
+            }
+
+            isHandled = true;
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder:
+                    (_) => BlocProvider.value(
+                      value: SalesActivityFormCheckInBloc(salesActivityRepository: salesRepository),
+                      child: SalesActivityDashboardScreen(
+                        sales: salesState.sales,
+                      ),
+                    ),
+              ),
+            );
+          } else if (salesState is SalesDataError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text("ID Sales belum terdaftarkan")),
             );
-            return;
+            isHandled = true;
           }
-
-          if(position.isMocked){
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text("Perangkat terdeteksi menggunakan lokasi palsu"), backgroundColor: Colors.red),
-            );
-            return;
-          }
-
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => SalesActivityDashboardScreen(
-                sales: salesState.sales,
-              ),
-            ),
-          );
-        } else if (salesState is SalesDataError) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("ID Sales belum terdaftarkan")),
-          );
-        }
-      };
+        };
         break;
       default:
         routeAction = null;
     }
 
-    return {'icon': icon, 'text': caption, 'action': routeAction};
+    return {
+      'menuId': menuId,
+      'icon': icon,
+      'text': caption,
+      'action': routeAction,
+    };
   }
 
   IconData _getIconForMenuId(String? menuId) {
@@ -121,8 +155,10 @@ class MyGridLayout extends StatelessWidget {
   void _navigateToScreen(
     BuildContext context,
     Map<String, dynamic> button,
+    bool isLoading,
   ) async {
     final action = button['action'] as Future<void> Function()?;
+    final menuId = button['menuId'] as String?;
 
     if (action == null) {
       ScaffoldMessenger.of(
@@ -130,19 +166,26 @@ class MyGridLayout extends StatelessWidget {
       ).showSnackBar(const SnackBar(content: Text("Fitur belum tersedia")));
       return;
     }
+
+    if (isLoading) return null;
+
+    setState(() {
+      _loadingMenuId = menuId;
+    });
+
     await action();
+
+    setState(() {
+      _loadingMenuId = null;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color(0xff1E4694),
+        backgroundColor: Theme.of(context).primaryColor,
         iconTheme: const IconThemeData(color: Colors.white),
-        // leading: IconButton(
-        //   icon: Icon(Icons.menu, color: Color(0xffffffff)),
-        //   onPressed: () => print("Menu"),
-        // ),
         title: Text(
           'VIVA KENCANA',
           textAlign: TextAlign.center,
@@ -249,10 +292,11 @@ class MyGridLayout extends StatelessWidget {
   }
 
   Widget _buildMenuCard(BuildContext context, Map<String, dynamic> button) {
+    final isLoading = _loadingMenuId == button['menuId'];
     return Container(
       padding: EdgeInsets.all(4.w),
       child: GestureDetector(
-        onTap: () => _navigateToScreen(context, button),
+        onTap: () => _navigateToScreen(context, button, isLoading),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -261,15 +305,27 @@ class MyGridLayout extends StatelessWidget {
               width: 48.w,
               height: 48.w,
               decoration: BoxDecoration(
-                color: const Color(0xff1E4694),
+                color: Theme.of(context).primaryColor,
                 borderRadius: BorderRadius.circular(10.w),
               ),
-              child: Icon(button['icon'], size: 24.w, color: Colors.white),
+              child:
+                  isLoading
+                      ? const Center(
+                        child: SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        ),
+                      )
+                      : Icon(button['icon'], size: 24.w, color: Colors.white),
             ),
             SizedBox(height: 4.w),
             Expanded(
               child: Text(
-                button['text'],
+                isLoading ? 'Loading...' : button['text'],
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 textAlign: TextAlign.center,

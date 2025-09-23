@@ -142,13 +142,13 @@ class _GridLayoutState extends State<GridLayout> {
               ]
             ),
             Positioned(
-              bottom: -30,
-              left: 16,
-              right: 16,
+              bottom: -30.w,
+              left: 16.w,
+              right: 16.w,
               child: Card(
                 elevation: 4,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(12.r),
                 ),
                 child: Padding(
                   padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.w),
@@ -181,7 +181,7 @@ class _GridLayoutState extends State<GridLayout> {
                                 Text(
                                   name,
                                   style: TextStyle(
-                                    fontSize: 16.w,
+                                    fontSize: 14.w,
                                     fontWeight: FontWeight.w600
                                   ),
                                   overflow: TextOverflow.ellipsis,
@@ -270,112 +270,114 @@ class _GridLayoutState extends State<GridLayout> {
                         ),
                       );
                     }
-                    return GridView.count(
-                      crossAxisCount: 2,
-                      padding: EdgeInsets.symmetric(horizontal: 4.w),
-                      children: List.generate(entities.length, (index) {
-                        final entity = entities[index];
-                        return GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => DriverDashboardScreen(entityId: entity.entityId),
+                    return Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 16.w),
+                      child: GridView.count(
+                        crossAxisCount: 2,
+                        children: List.generate(entities.length, (index) {
+                          final entity = entities[index];
+                          return GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => DriverDashboardScreen(entityId: entity.entityId),
+                                ),
+                              );
+                            },
+                            child: Card(
+                              elevation: 4,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
                               ),
-                            );
-                          },
-                          child: Card(
-                            elevation: 4,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            clipBehavior: Clip.antiAlias,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                SizedBox(
-                                  height: 100.w,
-                                  width: double.infinity,
-                                  child: entity.urlImage != "" && entity.urlImage.isNotEmpty
-                                    ? Image.network(
-                                        entity.urlImage,
-                                        fit: BoxFit.cover,
-                                        errorBuilder: (context, error, stackTrace) {
-                                          return Center(child: Icon(Icons.broken_image, size: 40.w, color: Theme.of(context).disabledColor));
-                                        },
-                                      )
-                                    : Center(child: Icon(Icons.image, size: 40.w, color: Theme.of(context).disabledColor)),
-                                ),
-                                                    
-                                Padding(
-                                  padding: EdgeInsets.fromLTRB(8.w, 8.w, 8.w, 8.w),
-                                  child: Text(
-                                    entity.description,
-                                    style: TextStyle(
-                                      fontSize: 12.w,
-                                      fontWeight: FontWeight.w500
+                              clipBehavior: Clip.antiAlias,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  SizedBox(
+                                    height: 100.w,
+                                    width: double.infinity,
+                                    child: entity.urlImage != "" && entity.urlImage.isNotEmpty
+                                      ? Image.network(
+                                          entity.urlImage,
+                                          fit: BoxFit.cover,
+                                          errorBuilder: (context, error, stackTrace) {
+                                            return Center(child: Icon(Icons.broken_image, size: 40.w, color: Theme.of(context).disabledColor));
+                                          },
+                                        )
+                                      : Center(child: Icon(Icons.image, size: 40.w, color: Theme.of(context).disabledColor)),
+                                  ),
+                                                      
+                                  Padding(
+                                    padding: EdgeInsets.fromLTRB(8.w, 8.w, 8.w, 4.w),
+                                    child: Text(
+                                      entity.description,
+                                      style: TextStyle(
+                                        fontSize: 12.w,
+                                        fontWeight: FontWeight.w500
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
                                     ),
-                                    overflow: TextOverflow.ellipsis,
                                   ),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 8.w),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          CircleAvatar(
-                                            backgroundColor: hexToColor(entity.color),
-                                            radius: 10.w,
-                                          ),
-                                          SizedBox(width: 4.w),
-                                          SizedBox(
-                                            width: 60.w,
-                                            child: Text(
-                                              entity.entityId,
-                                              style: TextStyle(
-                                                fontSize: 10.w,
+                                  Padding(
+                                    padding: EdgeInsets.symmetric(horizontal: 8.w),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            CircleAvatar(
+                                              backgroundColor: hexToColor(entity.color),
+                                              radius: 10.w,
+                                            ),
+                                            SizedBox(width: 4.w),
+                                            SizedBox(
+                                              width: 50.w,
+                                              child: Text(
+                                                entity.entityId,
+                                                style: TextStyle(
+                                                  fontSize: 10.w,
+                                                ),
+                                                overflow: TextOverflow.ellipsis,
                                               ),
-                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ],
+                                        ),
+                                                      
+                                        TextButton(
+                                          style: TextButton.styleFrom(
+                                            padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 0), 
+                                            minimumSize: Size(0, 20.w),
+                                            backgroundColor: Theme.of(context).primaryColor,
+                                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                          ),
+                                          onPressed: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) => DriverDashboardScreen(entityId: entity.entityId),
+                                              ),
+                                            );
+                                          },
+                                          child: Text(
+                                            "See more",
+                                            style: TextStyle(
+                                              fontSize: 10.w,
+                                              color: Theme.of(context).hintColor,
+                                              fontWeight: FontWeight.w500
                                             ),
                                           ),
-                                        ],
-                                      ),
-                                                    
-                                      TextButton(
-                                        style: TextButton.styleFrom(
-                                          padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 0), 
-                                          minimumSize: Size(0, 20.w),
-                                          backgroundColor: Theme.of(context).primaryColor,
-                                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                                         ),
-                                        onPressed: () {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) => DriverDashboardScreen(entityId: entity.entityId),
-                                            ),
-                                          );
-                                        },
-                                        child: Text(
-                                          "See more",
-                                          style: TextStyle(
-                                            fontSize: 10.w,
-                                            color: Theme.of(context).hintColor,
-                                            fontWeight: FontWeight.w500
-                                          ),
-                                        ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
-                                ),
-                              ],
-                            )
-                          ),
-                        );
-                      }),
+                                ],
+                              )
+                            ),
+                          );
+                        }),
+                      ),
                     );
                   } else if (state is EntityLoading) {
                     return const Center(child: CircularProgressIndicator());

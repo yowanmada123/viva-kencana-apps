@@ -23,7 +23,6 @@ class SalesActivityDashboardScreen extends StatefulWidget {
 }
 
 class _SalesActivityDashboardScreenState extends State<SalesActivityDashboardScreen> {
-
   @override
   void initState() {
     super.initState();
@@ -63,7 +62,18 @@ class _SalesActivityDashboardScreenState extends State<SalesActivityDashboardScr
                 );
               } else {
                 return Center(
-                  child: Text("Failed to load sales data"),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text("Gagal memuat data sales, coba lagi"),
+                      BasePrimaryButton(
+                        onPressed: () {
+                          context.read<SalesActivityFormCheckInBloc>().add(LoadSalesData());
+                        },
+                        label: "COba lagi",
+                      ),
+                    ],
+                  ),
                 );
               }
             },
@@ -169,7 +179,7 @@ class _SalesActivityDashboardScreenState extends State<SalesActivityDashboardScr
                     } else if (state is SalesDataLoading) {
                       return Center(child: const CircularProgressIndicator());
                     } else {
-                      return Center(child: const Text("Failed to load sales data"));
+                      return Center(child: const Text("Gagal memuat data sales"));
                     }
                   },
                 ),
