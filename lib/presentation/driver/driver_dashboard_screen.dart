@@ -38,12 +38,16 @@ class DriverDashboardScreen extends StatelessWidget {
                     ..add(LoadAccessMenu(entityId: entityId)),
         ),
       ],
-      child: MyGridLayout(),
+      child: MyGridLayout(entityId: entityId),
     );
   }
 }
 
 class MyGridLayout extends StatefulWidget {
+  const MyGridLayout({super.key, required this.entityId});
+
+  final String entityId;
+
   @override
   _MyGridLayoutState createState() => _MyGridLayoutState();
 }
@@ -141,6 +145,85 @@ class _MyGridLayoutState extends State<MyGridLayout> {
     };
   }
 
+  SubMenu attachAction(BuildContext context, SubMenu submenu) {
+    switch (submenu.menuId) {
+      case 'confirmLoading':
+        return submenu.copyWith(
+          action: () async {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => QrCodeScreen()),
+            );
+          },
+        );
+
+      case 'mnuSalesActivity':
+        return submenu.copyWith(
+          action: () async {
+            final bloc = context.read<SalesActivityFormCheckInBloc>();
+            final salesRepository = context.read<SalesActivityRepository>();
+            final position = await StrictLocation.getCurrentPosition();
+
+            bloc.add(const LoadSalesData());
+            bool isHandled = false;
+
+            Timer(const Duration(seconds: 3), () {
+              if (!isHandled) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Permintaan terlalu lama, coba lagi")),
+                );
+              }
+            });
+
+            final salesState = bloc.state;
+            if (salesState is SalesDataSuccess) {
+              final salesId = salesState.sales.salesId;
+
+              if (salesId.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("ID Sales belum terdaftarkan")),
+                );
+                return;
+              }
+
+              if (position.isMocked) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text("Perangkat terdeteksi menggunakan lokasi palsu"),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+                return;
+              }
+
+              isHandled = true;
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => BlocProvider.value(
+                    value: SalesActivityFormCheckInBloc(
+                      salesActivityRepository: salesRepository,
+                    ),
+                    child: SalesActivityDashboardScreen(
+                      sales: salesState.sales,
+                    ),
+                  ),
+                ),
+              );
+            } else if (salesState is SalesDataError) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text("ID Sales belum terdaftarkan")),
+              );
+              isHandled = true;
+            }
+          },
+        );
+
+      default:
+        return submenu.copyWith(action: null);
+    }
+  }
+
   IconData _getIconForMenuId(String? menuId) {
     switch (menuId) {
       case 'confirmLoading':
@@ -154,26 +237,23 @@ class _MyGridLayoutState extends State<MyGridLayout> {
 
   void _navigateToScreen(
     BuildContext context,
-    Map<String, dynamic> button,
+    SubMenu submenu,
     bool isLoading,
   ) async {
-    final action = button['action'] as Future<void> Function()?;
-    final menuId = button['menuId'] as String?;
+    if (isLoading) return;
 
-    if (action == null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Fitur belum tersedia")));
+    if (submenu.action == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Fitur belum tersedia")),
+      );
       return;
     }
 
-    if (isLoading) return null;
-
     setState(() {
-      _loadingMenuId = menuId;
+      _loadingMenuId = submenu.menuId;
     });
 
-    await action();
+    await submenu.action!();
 
     setState(() {
       _loadingMenuId = null;
@@ -187,7 +267,7 @@ class _MyGridLayoutState extends State<MyGridLayout> {
         backgroundColor: Theme.of(context).primaryColor,
         iconTheme: const IconThemeData(color: Colors.white),
         title: Text(
-          'VIVA KENCANA',
+          widget.entityId,
           textAlign: TextAlign.center,
           style: TextStyle(
             fontFamily: "Poppins",
@@ -256,7 +336,7 @@ class _MyGridLayoutState extends State<MyGridLayout> {
           builder: (context, state) {
             if (state is AccessMenuLoadSuccess) {
               final menus = state.menus;
-              return _buildGroupMenu(context, menus);
+              return buildGroupMenu(context, menus);
             } else if (state is AccessMenuLoading) {
               return Center(child: CircularProgressIndicator());
             } else {
@@ -268,78 +348,122 @@ class _MyGridLayoutState extends State<MyGridLayout> {
     );
   }
 
-  Widget _buildGroupMenu(BuildContext context, List<dynamic> menus) {
-    final List<Map<String, dynamic>> submenus = [];
-
-    for (var menu in menus) {
-      if (menu.submenus != null) {
-        for (var submenu in menu.submenus) {
-          final button = getButton(submenu, context);
-          if (button != null) submenus.add(button);
-        }
-      }
-    }
-
-    return GridView.count(
-      crossAxisCount: 4,
+  Widget buildGroupMenu(BuildContext context, List<Menu> menus) {
+    return ListView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      children: List.generate(submenus.length, (index) {
-        final button = submenus[index];
-        return _buildMenuCard(context, button);
-      }),
-    );
-  }
+      itemCount: menus.length,
+      itemBuilder: (context, menuIndex) {
+        final menu = menus[menuIndex];
+        final submenus = menu.submenus;
 
-  Widget _buildMenuCard(BuildContext context, Map<String, dynamic> button) {
-    final isLoading = _loadingMenuId == button['menuId'];
-    return Container(
-      padding: EdgeInsets.all(4.w),
-      child: GestureDetector(
-        onTap: () => _navigateToScreen(context, button, isLoading),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            Container(
-              width: 48.w,
-              height: 48.w,
-              decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor,
-                borderRadius: BorderRadius.circular(10.w),
-              ),
-              child:
-                  isLoading
-                      ? const Center(
-                        child: SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
-                          ),
-                        ),
-                      )
-                      : Icon(button['icon'], size: 24.w, color: Colors.white),
-            ),
-            SizedBox(height: 4.w),
-            Expanded(
-              child: Text(
-                isLoading ? 'Loading...' : button['text'],
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 12.w,
-                  color: const Color(0xff1E4694),
-                  fontWeight: FontWeight.bold,
-                  height: 1.2,
+        return Padding(
+          padding: EdgeInsets.symmetric(vertical: 8.w,),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 4.w),
+                child: Text(
+                  "Pilihan menu operasional untuk ${menu.menuHeaderCaption}",
+                  style: TextStyle(
+                    fontSize: 12.w,
+                    color: Colors.black87,
+                  ),
                 ),
               ),
-            ),
-          ],
-        ),
-      ),
+
+              Column(
+                children: List.generate(submenus.length, (submenuIndex) {
+                  final submenu = attachAction(context, submenus[submenuIndex]);
+                  final iconCode = int.tryParse(submenu.icon) ?? Icons.help.codePoint;
+                  final isLoading = _loadingMenuId == submenu.menuId;
+
+                  return GestureDetector(
+                    onTap: () => _navigateToScreen(context, submenu, isLoading),
+                    child: Container(
+                      margin: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.w),
+                      padding: EdgeInsets.all(12.w),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12.w),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.1),
+                            blurRadius: 5,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Container(
+                            width: 40.w,
+                            height: 40.w,
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).primaryColor,
+                              borderRadius: BorderRadius.circular(8.w),
+                            ),
+                            child: isLoading
+                                ? const Center(
+                                    child: SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  )
+                                : Icon(
+                                  IconData(iconCode, fontFamily: 'MaterialIcons'),
+                                  color: Colors.white,
+                                  size: 20.w,
+                                ),
+                          ),
+                          SizedBox(width: 12.w),
+                    
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  isLoading ? 'Loading...' : submenu.menuCaption,
+                                  style: TextStyle(
+                                    fontSize: 14.w,
+                                    fontWeight: FontWeight.w600,
+                                    color: const Color(0xff1E4694),
+                                  ),
+                                ),
+                                SizedBox(height: 4.w),
+                                Text(
+                                  "Let's see ${submenu.menuCaption} process",
+                                  style: TextStyle(
+                                    fontSize: 12.w,
+                                    color: Colors.grey[600],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                    
+                          if (!isLoading)
+                            Icon(
+                              Icons.arrow_forward_ios,
+                              size: 16.w,
+                              color: Colors.grey,
+                            ),
+                        ],
+                      ),
+                    ),
+                  );
+                }),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
