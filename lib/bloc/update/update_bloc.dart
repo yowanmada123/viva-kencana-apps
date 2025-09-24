@@ -30,7 +30,7 @@ class UpdateBloc extends Bloc<UpdateEvent, UpdateState> {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('latest_version', latestVersion);
 
-      if (latestVersion != currentVersion) {
+      if (isLowerVersion(currentVersion, latestVersion)) {
         emit(UpdateAvailable(
           latestVersion: latestVersion,
           apkUrl: apkUrl,
@@ -66,5 +66,19 @@ class UpdateBloc extends Bloc<UpdateEvent, UpdateState> {
     } catch (e) {
       emit(UpdateError("Gagal mengunduh update: ${e.toString()}"));
     }
+  }
+
+  bool isLowerVersion(String current, String latest) {
+    final currentParts = current.split('.').map(int.parse).toList();
+    final latestParts = latest.split('.').map(int.parse).toList();
+
+    for (var i = 0; i < latestParts.length; i++) {
+      final curr = i < currentParts.length ? currentParts[i] : 0;
+      final lat = latestParts[i];
+
+      if (curr < lat) return true;
+      if (curr > lat) return false;
+    }
+    return false;
   }
 }

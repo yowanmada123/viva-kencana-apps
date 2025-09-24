@@ -15,7 +15,7 @@ class BaseDropdownSearch<T> extends StatefulWidget {
   final TextEditingController? controller;
 
   const BaseDropdownSearch({
-    Key? key,
+    super.key,
     required this.items,
     required this.getLabel,
     required this.selectedValue,
@@ -25,7 +25,7 @@ class BaseDropdownSearch<T> extends StatefulWidget {
     this.width,
     this.onSearchChanged,
     this.controller,
-  }) : super(key: key);
+  });
 
   @override
   State<BaseDropdownSearch<T>> createState() => _BaseDropdownSearchState<T>();

@@ -737,15 +737,6 @@ class _WareHouseContentListState extends State<WareHouseContentListView> {
                                     ),
                                     child: TextButton(
                                       onPressed: () async {
-                                        final result = await showDialog<bool>(
-                                          context: context,
-                                          builder: (BuildContext context) {
-                                            return ConfirmDialog(
-                                              message:
-                                                  'Apakah Anda ingin Cancel status ?',
-                                            );
-                                          },
-                                        );
                                         if (state is! CancelLoadLoading) {
                                           context.read<CancelLoadBloc>().add(
                                             CancelLoadSubmitted(
@@ -1055,9 +1046,6 @@ class BuildGridItem extends StatelessWidget {
 
           if (reload != null) {
             if (reload) {
-              // context.read<ListVehicleBloc>().add(
-              //   LoadListVehicle(userId: authState.user.userID),
-              // );
               ScaffoldMessenger.of(
                 context,
               ).showSnackBar(SnackBar(content: Text("Update Success")));

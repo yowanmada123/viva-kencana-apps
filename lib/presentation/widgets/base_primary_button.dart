@@ -7,12 +7,12 @@ class BasePrimaryButton extends StatelessWidget {
   final bool isLoading;
 
   const BasePrimaryButton({
-    Key? key,
+    super.key,
     required this.label,
     required this.onPressed,
     this.icon,
     this.isLoading = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

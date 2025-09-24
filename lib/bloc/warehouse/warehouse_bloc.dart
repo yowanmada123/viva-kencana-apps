@@ -7,7 +7,7 @@ part 'warehouse_state.dart';
 class WarehouseBloc extends Bloc<WarehouseEvent, WarehouseState> {
   WarehouseBloc() : super(WarehouseInitial()) {
     on<WarehouseEvent>((event, emit) {
-      // TODO: implement event handler
+      //
     });
   }
 }

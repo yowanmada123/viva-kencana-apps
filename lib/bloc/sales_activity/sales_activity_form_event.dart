@@ -77,7 +77,7 @@ class FetchCustomerDetail extends SalesActivityFormEvent {
 class SubmitSalesActivityForm extends SalesActivityFormEvent {
   final SalesActivityFormData formData;
 
-  SubmitSalesActivityForm(this.formData);
+  const SubmitSalesActivityForm(this.formData);
 }
 
 class LoadCurrentLocation extends SalesActivityFormEvent {}

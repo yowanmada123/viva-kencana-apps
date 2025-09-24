@@ -57,7 +57,7 @@ class _GridLayoutState extends State<GridLayout> {
       final user = data['user'];
       setState(() {
         name = user['name1'] ?? '-';
-        dept = user['dept_id'].trim() ?? '-';
+        dept = user['dept_id'].trim() == "" ? '-' : user['dept_id'].trim();
       });
     }
   }

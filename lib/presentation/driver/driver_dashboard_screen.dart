@@ -16,7 +16,6 @@ import '../../models/menu.dart';
 import '../../utils/strict_location.dart';
 import '../qr_code/qr_code_screen.dart';
 import '../sales_activity/sales_activity_dashboard_screen.dart';
-import '../widgets/base_pop_up.dart';
 
 class DriverDashboardScreen extends StatelessWidget {
   const DriverDashboardScreen({super.key, required this.entityId});
@@ -276,49 +275,6 @@ class _MyGridLayoutState extends State<MyGridLayout> {
             fontSize: 18.w,
           ),
         ),
-        actions: [
-          Padding(
-            padding: EdgeInsets.only(right: 16.w),
-            child: BlocConsumer<LogoutBloc, LogoutState>(
-              listener: (context, state) {
-                if (state is LogoutFailure) {
-                  BlocProvider.of<AuthenticationBloc>(
-                    context,
-                  ).add(SetAuthenticationStatus(isAuthenticated: false));
-                } else if (state is LogoutSuccess) {
-                  BlocProvider.of<AuthenticationBloc>(
-                    context,
-                  ).add(SetAuthenticationStatus(isAuthenticated: false));
-                  Navigator.of(context).popUntil((route) => route.isFirst);
-                }
-              },
-              builder: (context, state) {
-                return GestureDetector(
-                  onTap: () {
-                    showDialog<bool>(
-                      context: context,
-                      builder: (BuildContext childContext) {
-                        return BasePopUpDialog(
-                          noText: "Tidak",
-                          yesText: "Ya",
-                          onNoPressed: () {},
-                          onYesPressed: () {
-                            if (state is! LogoutLoading) {
-                              context.read<LogoutBloc>().add(LogoutPressed());
-                            }
-                          },
-                          question:
-                              "Apakah Anda yakin ingin keluar dari aplikasi?",
-                        );
-                      },
-                    );
-                  },
-                  child: Icon(Icons.logout, color: Colors.white),
-                );
-              },
-            ),
-          ),
-        ],
       ),
       body: Container(
         margin: EdgeInsets.fromLTRB(0.0, 8.0, 0.0, 0.0),
@@ -336,6 +292,9 @@ class _MyGridLayoutState extends State<MyGridLayout> {
           builder: (context, state) {
             if (state is AccessMenuLoadSuccess) {
               final menus = state.menus;
+              if (menus.isEmpty) {
+                return Center(child: Text("Tidak ada menu yang dapat diakses."));
+              }
               return buildGroupMenu(context, menus);
             } else if (state is AccessMenuLoading) {
               return Center(child: CircularProgressIndicator());

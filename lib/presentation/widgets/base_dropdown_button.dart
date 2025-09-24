@@ -9,13 +9,13 @@ class BaseDropdownButton extends StatelessWidget {
   final bool isDisabled;
 
   const BaseDropdownButton({
-    Key? key,
+    super.key,
     required this.label,
     required this.items,
     required this.value,
     required this.onChanged,
     this.isDisabled = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

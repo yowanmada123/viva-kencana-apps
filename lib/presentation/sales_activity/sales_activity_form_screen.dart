@@ -11,11 +11,9 @@ import 'package:image_picker/image_picker.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-import '../../bloc/auth/authentication/authentication_bloc.dart';
 import '../../bloc/auth/logout/logout_bloc.dart';
 import '../../bloc/sales_activity/sales_activity_form_bloc.dart';
 import '../../data/repository/auth_repository.dart';
-import '../../models/errors/custom_exception.dart';
 import '../../models/sales_activity/customer_info.dart';
 import '../../models/sales_activity/sales_info.dart';
 import '../../models/sales_activity/submit_data.dart' as model;
@@ -24,7 +22,6 @@ import '../../utils/strict_location.dart';
 import '../widgets/base_danger_button.dart';
 import '../widgets/base_dropdown_button.dart';
 import '../widgets/base_dropdown_search.dart';
-import '../widgets/base_pop_up.dart';
 import '../widgets/base_primary_button.dart';
 import 'sales_activity_dashboard_screen.dart';
 
@@ -186,10 +183,10 @@ class _SalesActivityFormScreenState extends State<SalesActivityFormScreen> {
           create: (context) => LogoutBloc(authRepository),
           child: Scaffold(
             appBar: AppBar(
-              backgroundColor: Color(0xff1E4694),
+              backgroundColor: Theme.of(context).primaryColor,
               iconTheme: const IconThemeData(color: Colors.white),
               title: Text(
-                'SALES ACTIVITY',
+                'Customer Visit',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontFamily: "Poppins",
@@ -216,63 +213,6 @@ class _SalesActivityFormScreenState extends State<SalesActivityFormScreen> {
                   child: const SizedBox(height: 5),
                 ),
               ),
-              actions: [
-                Padding(
-                  padding: EdgeInsets.only(right: 16.w),
-                  // child: Icon(Icons.logout, color: Colors.white),
-                  child: BlocConsumer<LogoutBloc, LogoutState>(
-                    listener: (context, state) {
-                      if (state is LogoutSuccess) {
-                        BlocProvider.of<AuthenticationBloc>(
-                          context,
-                        ).add(SetAuthenticationStatus(isAuthenticated: false));
-                        Navigator.of(context).popUntil((route) => route.isFirst);
-                      } else if (state is LogoutFailure) {
-                        if (state.exception is UnauthorizedException) {
-                          context.read<AuthenticationBloc>().add(
-                            SetAuthenticationStatus(isAuthenticated: false),
-                          );
-                          Navigator.of(context).popUntil((route) => route.isFirst);
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                "Unknown error, please contact admin",
-                              ),
-                            ),
-                          );
-                        }
-                      }
-                    },
-                    builder: (context, state) {
-                      return GestureDetector(
-                        onTap: () {
-                          showDialog<bool>(
-                            context: context,
-                            builder: (BuildContext childContext) {
-                              return BasePopUpDialog(
-                                noText: "Tidak",
-                                yesText: "Ya",
-                                onNoPressed: () {},
-                                onYesPressed: () {
-                                  if (state is! LogoutLoading) {
-                                    context.read<LogoutBloc>().add(
-                                      LogoutPressed(),
-                                    );
-                                  }
-                                },
-                                question:
-                                    "Apakah Anda yakin ingin keluar dari aplikasi?",
-                              );
-                            },
-                          );
-                        },
-                        child: Icon(Icons.logout, color: Colors.white),
-                      );
-                    },
-                  ),
-                ),
-              ],
             ),
             body: BlocConsumer<SalesActivityFormBloc, SalesActivityFormState>(
               listener: (context, state) {

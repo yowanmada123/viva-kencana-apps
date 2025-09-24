@@ -46,7 +46,7 @@ class SetOdometerEvent extends SalesActivityFormCheckInEvent {
 class GetLocationEvent extends SalesActivityFormCheckInEvent {
   final Position position;
   final String address;
-  GetLocationEvent(this.position, this.address);
+  const GetLocationEvent(this.position, this.address);
 }
 
 class SetLocationEvent extends SalesActivityFormCheckInEvent {}

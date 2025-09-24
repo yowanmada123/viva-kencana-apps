@@ -178,7 +178,6 @@ class SalesActivityFormBloc
 
       emit(state.copyWith(position: position, address: address, isLoadingLocation: false));
     } catch (e) {
-      print("Failed to get location: $e");
       emit(state.copyWith(isLoadingLocation: false));
     }
   }
@@ -202,11 +201,7 @@ class SalesActivityFormBloc
     Emitter<SalesActivityFormState> emit,
   ) async {
     emit(CurrentLocationLoading());
-    try {
-      final position = await StrictLocation.getCurrentPosition();
-      emit(state.copyWith(position: position));
-    } catch (e) {
-      print(e.toString());
-    }
+    final position = await StrictLocation.getCurrentPosition();
+    emit(state.copyWith(position: position));
   }
 }
