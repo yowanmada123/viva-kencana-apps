@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
+import 'package:latlong2/latlong.dart';
 
 import '../../bloc/sales_activity/history_visit/history_visit_detail/sales_activity_history_visit_detail_bloc.dart';
 import '../../models/sales_activity/history_visit.dart';
@@ -19,6 +21,8 @@ class SalesActivityHistoryDetailScreen extends StatefulWidget {
 }
 
 class _SalesActivityHistoryDetailScreenState extends State<SalesActivityHistoryDetailScreen> {
+  final MapController _mapController = MapController();
+
   @override
   void initState() {
     super.initState();
@@ -30,7 +34,7 @@ class _SalesActivityHistoryDetailScreenState extends State<SalesActivityHistoryD
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Detail - ${widget.visit.trId}',
+          'Detail History Visit',
           textAlign: TextAlign.center,
           style: TextStyle(
             fontFamily: "Poppins",
@@ -82,69 +86,140 @@ class _SalesActivityHistoryDetailScreenState extends State<SalesActivityHistoryD
                         final Color mainColor = d.startEndPoint == 'OS'
                           ? Colors.green.shade400.withValues(alpha: 0.8)
                           : Colors.red.shade400.withValues(alpha: 0.8);
+                        final latitude = double.tryParse(d.latitude) ?? 0.0;
+                        final longitude = double.tryParse(d.longitude) ?? 0.0;
+                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                          if (mounted) {
+                            _mapController.move(
+                              LatLng(
+                                latitude,
+                                longitude,
+                              ),
+                              17.0,
+                            );
+                          }
+                        });
                         return Card(
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12.r),
                           ),
                           elevation: 4,
-                          child: Row(
-                            children: [
-                              Container(
-                                width: 6.w,
-                                height: 110.w,
-                                decoration: BoxDecoration(
-                                  color: mainColor,
-                                  borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(12.r),
-                                    bottomLeft: Radius.circular(12.r),
+                          child: IntrinsicHeight(
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Container(
+                                  width: 6.w,
+                                  height: double.infinity,
+                                  decoration: BoxDecoration(
+                                    color: mainColor,
+                                    borderRadius: BorderRadius.only(
+                                      topLeft: Radius.circular(12.r),
+                                      bottomLeft: Radius.circular(12.r),
+                                    ),
                                   ),
                                 ),
-                              ),
-                              Expanded(
-                                child: Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 12.w),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        DateFormat('hh:mm a').format(DateTime.parse(d.trDate)),
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 16.sp,
+                                Expanded(
+                                  child: Padding(
+                                    padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.w),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          "${DateFormat('hh:mm a').format(DateTime.parse(d.trDate))} - ${d.trId}",
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16.sp,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 1,
+                                        ),
+                                        Text(
+                                          "${d.customerName} - ${d.customerCity}",
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 1,
+                                          style: TextStyle(
+                                            fontSize: 16.sp,
+                                          ),
+                                        ),
+                                        Text(
+                                          d.gpsAddress == "" ? '-' : d.gpsAddress,
+                                          style: TextStyle(fontSize: 13.sp, color: Colors.grey),
+                                          maxLines: 3,
                                           overflow: TextOverflow.ellipsis,
                                         ),
-                                        maxLines: 1,
-                                      ),
-                                      Text(
-                                        "${d.customerName} - ${d.customerCity}",
-                                        overflow: TextOverflow.ellipsis,
-                                        maxLines: 1,
-                                        style: TextStyle(
-                                          fontSize: 16.sp,
+                                        SizedBox(height: 4.w),
+                                        Text(
+                                          "Customer ID: ${d.customerId == "" ? "-" : d.customerId}",
+                                          style: TextStyle(fontSize: 14.sp, color: Colors.black87),
                                         ),
-                                      ),
-                                      Text(
-                                        d.gpsAddress,
-                                        style: TextStyle(fontSize: 13.sp, color: Colors.grey),
-                                        maxLines: 3,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                      SizedBox(height: 4.w),
-                                      Text(
-                                        "Customer ID: ${d.customerId == "" ? "-" : d.customerId}",
-                                        style: TextStyle(fontSize: 14.sp, color: Colors.black87),
-                                      ),
-                                      SizedBox(height: 4.w),
-                                      Text(
-                                        "Vehicle: ${d.salesVehicle}",
-                                        style: TextStyle(fontSize: 14.sp, color: Colors.black87),
-                                      ),
-                                      SizedBox(height: 4.w),
-                                    ],
+                                        Text(
+                                          "Customer Phone: ${d.customerPhone == "" ? "-" : d.customerPhone}",
+                                          style: TextStyle(fontSize: 14.sp, color: Colors.black87),
+                                        ),
+                                        Text(
+                                          "Customer KTP/NPWP: ${d.customerKtpNpwp == "" ? "-" : d.customerKtpNpwp}",
+                                          style: TextStyle(fontSize: 14.sp, color: Colors.black87),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        Text(
+                                          "Sales ID: ${d.salesId} - ${d.entityId}",
+                                          style: TextStyle(fontSize: 14.sp, color: Colors.black87),
+                                        ),
+                                        Text(
+                                          "Vehicle: ${d.salesVehicle}",
+                                          style: TextStyle(fontSize: 14.sp, color: Colors.black87),
+                                        ),
+                                        Text(
+                                          "Remark: ${d.remark == "" ? "-" : d.remark}",
+                                          style: TextStyle(fontSize: 14.sp, color: Colors.black87),
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 3,
+                                        ),
+                                        SizedBox(height: 4.w),
+                                        SizedBox(
+                                          height: 150.w,
+                                          width: 280.w,
+                                          child: FlutterMap(
+                                            mapController: _mapController,
+                                            options: MapOptions(
+                                              initialCenter: LatLng(latitude, longitude),
+                                              initialZoom: 12,
+                                            ),
+                                            children: [
+                                              TileLayer(
+                                                urlTemplate:
+                                                    'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                                                subdomains: const ['a', 'b', 'c'],
+                                                userAgentPackageName:
+                                                    'com.example.vivakencanaapp',
+                                              ),
+                                                MarkerLayer(
+                                                  markers: [
+                                                    Marker(
+                                                      point: LatLng(
+                                                        latitude,
+                                                        longitude,
+                                                      ),
+                                                      width: 40,
+                                                      height: 40,
+                                                      child: const Icon(
+                                                        Icons.location_pin,
+                                                        color: Colors.red,
+                                                        size: 40,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         );
                       },

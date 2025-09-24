@@ -114,6 +114,8 @@ class SubMenu {
   final String seqId;
   final String menuCaption;
   final String routePath;
+  final String icon;
+  final Future<void> Function()? action;
   SubMenu({
     required this.entityId,
     required this.applId,
@@ -121,6 +123,8 @@ class SubMenu {
     required this.seqId,
     required this.menuCaption,
     required this.routePath,
+    required this.icon,
+    this.action,
   });
 
   SubMenu copyWith({
@@ -130,6 +134,8 @@ class SubMenu {
     String? seqId,
     String? menuCaption,
     String? routePath,
+    String? icon,
+    Future<void> Function()? action,
   }) {
     return SubMenu(
       entityId: entityId ?? this.entityId,
@@ -138,6 +144,8 @@ class SubMenu {
       seqId: seqId ?? this.seqId,
       menuCaption: menuCaption ?? this.menuCaption,
       routePath: routePath ?? this.routePath,
+      icon: icon ?? this.icon,
+      action: action ?? this.action,
     );
   }
 
@@ -149,6 +157,7 @@ class SubMenu {
       'seq_id': seqId,
       'menu_caption': menuCaption,
       'route_path': routePath,
+      'icon': icon,
     };
   }
 
@@ -160,6 +169,7 @@ class SubMenu {
       seqId: map['seq_id'] ?? '',
       menuCaption: map['menu_caption'] ?? '',
       routePath: map['route_path'] ?? '',
+      icon: map['icon'] ?? '',
     );
   }
 
@@ -169,7 +179,7 @@ class SubMenu {
 
   @override
   String toString() {
-    return 'SubMenu(entityId: $entityId, applId: $applId, menuId: $menuId, seqId: $seqId, menuCaption: $menuCaption, routePath: $routePath)';
+    return 'SubMenu(entityId: $entityId, applId: $applId, menuId: $menuId, seqId: $seqId, menuCaption: $menuCaption, routePath: $routePath, icon: $icon)';
   }
 
   @override
@@ -182,7 +192,8 @@ class SubMenu {
       other.menuId == menuId &&
       other.seqId == seqId &&
       other.menuCaption == menuCaption &&
-      other.routePath == routePath;
+      other.routePath == routePath &&
+      other.icon == icon;
   }
 
   @override
@@ -192,6 +203,7 @@ class SubMenu {
       menuId.hashCode ^
       seqId.hashCode ^
       menuCaption.hashCode ^
-      routePath.hashCode;
+      routePath.hashCode ^
+      icon.hashCode;
   }
 }
