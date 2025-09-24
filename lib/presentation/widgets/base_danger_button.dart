@@ -5,11 +5,11 @@ class BaseDangerButton extends StatelessWidget {
   final VoidCallback? onPressed;
   final IconData? icon;
   const BaseDangerButton({
-    Key? key,
+    super.key,
     required this.label,
     required this.onPressed,
     this.icon,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

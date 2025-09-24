@@ -51,7 +51,6 @@ class SalesActivityFormCheckInBloc extends Bloc<SalesActivityFormCheckInEvent, S
           isLoadingLocation: false,
         ));
       } catch (e) {
-        print("Failed to get location: $e");
         emit(state.copyWith(isLoadingLocation: false));
       }
     });
@@ -79,13 +78,9 @@ class SalesActivityFormCheckInBloc extends Bloc<SalesActivityFormCheckInEvent, S
     Emitter<SalesActivityFormCheckInState> emit,
   ) async {
     emit(CurrentLocationLoading());
-    try {
-      final position = await StrictLocation.getCurrentPosition();
+    final position = await StrictLocation.getCurrentPosition();
 
-      emit(state.copyWith(position: position));
-    } catch (e) {
-      print(e.toString());
-    }
+    emit(state.copyWith(position: position));
   }
 
   Future<void> _onGetSalesData(

@@ -69,12 +69,13 @@ class _SalesActivityHistoryDetailScreenState extends State<SalesActivityHistoryD
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Padding(
-                    padding: EdgeInsets.only(bottom: 4.w, left: 4.w),
+                    padding: EdgeInsets.only(bottom: 8.w, left: 4.w),
                     child: Text(
                       DateFormat('dd/MM/yyyy').format(DateTime.parse(widget.visit.trDate)),
                       style: TextStyle(
-                        fontSize: 18.sp,
-                        fontWeight: FontWeight.bold,
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.black.withValues(alpha: 0.7)
                       ),
                     ),
                   ),
@@ -84,10 +85,18 @@ class _SalesActivityHistoryDetailScreenState extends State<SalesActivityHistoryD
                       itemBuilder: (context, index) {
                         final d = details[index];
                         final Color mainColor = d.startEndPoint == 'OS'
-                          ? Colors.green.shade400.withValues(alpha: 0.8)
-                          : Colors.red.shade400.withValues(alpha: 0.8);
+                          ? Colors.green.shade400
+                          : Colors.red.shade400;
                         final latitude = double.tryParse(d.latitude) ?? 0.0;
                         final longitude = double.tryParse(d.longitude) ?? 0.0;
+                        Map<String, dynamic> activities = {
+                          "product_offer": d.productOffer,
+                          "take_order": d.takeOrder,
+                          "promo_info": d.promoInfo,
+                          "penagihan": d.penagihan,
+                          "customer_visit": d.customerVisit,
+                          "customer_new": d.customerNew
+                        };
                         WidgetsBinding.instance.addPostFrameCallback((_) {
                           if (mounted) {
                             _mapController.move(
@@ -126,7 +135,7 @@ class _SalesActivityHistoryDetailScreenState extends State<SalesActivityHistoryD
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          "${DateFormat('hh:mm a').format(DateTime.parse(d.trDate))} - ${d.trId}",
+                                          d.trId,
                                           style: TextStyle(
                                             fontWeight: FontWeight.bold,
                                             fontSize: 16.sp,
@@ -134,6 +143,17 @@ class _SalesActivityHistoryDetailScreenState extends State<SalesActivityHistoryD
                                           overflow: TextOverflow.ellipsis,
                                           maxLines: 1,
                                         ),
+                                        Text(
+                                          DateFormat('hh:mm a').format(DateTime.parse(d.trDate)),
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 15.sp,
+                                            color: Theme.of(context).primaryColor
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 1,
+                                        ),
+                                        SizedBox(height: 8.w),
                                         Text(
                                           "${d.customerName} - ${d.customerCity}",
                                           overflow: TextOverflow.ellipsis,
@@ -150,36 +170,41 @@ class _SalesActivityHistoryDetailScreenState extends State<SalesActivityHistoryD
                                         ),
                                         SizedBox(height: 4.w),
                                         Text(
-                                          "Customer ID: ${d.customerId == "" ? "-" : d.customerId}",
+                                          "Cust. ID: ${d.customerId == "" ? "-" : d.customerId}",
                                           style: TextStyle(fontSize: 14.sp, color: Colors.black87),
                                         ),
+                                        SizedBox(height: 4.w),
                                         Text(
-                                          "Customer Phone: ${d.customerPhone == "" ? "-" : d.customerPhone}",
+                                          "Cust. Phone: ${d.customerPhone == "" ? "-" : d.customerPhone}",
                                           style: TextStyle(fontSize: 14.sp, color: Colors.black87),
                                         ),
+                                        SizedBox(height: 4.w),
                                         Text(
-                                          "Customer KTP/NPWP: ${d.customerKtpNpwp == "" ? "-" : d.customerKtpNpwp}",
+                                          "Cust. KTP/NPWP: ${d.customerKtpNpwp == "" ? "-" : d.customerKtpNpwp}",
                                           style: TextStyle(fontSize: 14.sp, color: Colors.black87),
                                           overflow: TextOverflow.ellipsis,
                                         ),
+                                        SizedBox(height: 4.w),
                                         Text(
                                           "Sales ID: ${d.salesId} - ${d.entityId}",
                                           style: TextStyle(fontSize: 14.sp, color: Colors.black87),
                                         ),
+                                        SizedBox(height: 4.w),
                                         Text(
                                           "Vehicle: ${d.salesVehicle}",
                                           style: TextStyle(fontSize: 14.sp, color: Colors.black87),
                                         ),
+                                        SizedBox(height: 4.w),
+                                        buildActivities(activities),
+                                        SizedBox(height: 4.w),
                                         Text(
                                           "Remark: ${d.remark == "" ? "-" : d.remark}",
                                           style: TextStyle(fontSize: 14.sp, color: Colors.black87),
-                                          overflow: TextOverflow.ellipsis,
-                                          maxLines: 3,
                                         ),
-                                        SizedBox(height: 4.w),
+                                        SizedBox(height: 12.w),
                                         SizedBox(
                                           height: 150.w,
-                                          width: 280.w,
+                                          width: 300.w,
                                           child: FlutterMap(
                                             mapController: _mapController,
                                             options: MapOptions(
@@ -214,6 +239,7 @@ class _SalesActivityHistoryDetailScreenState extends State<SalesActivityHistoryD
                                             ],
                                           ),
                                         ),
+                                        SizedBox(height: 12.w),
                                       ],
                                     ),
                                   ),
@@ -234,4 +260,28 @@ class _SalesActivityHistoryDetailScreenState extends State<SalesActivityHistoryD
       ),
     );
   }
+
+  Widget buildActivities(Map<String, dynamic> data) {
+    final activityLabels = {
+      "product_offer": "Penawaran Produk",
+      "take_order": "Taking Order",
+      "promo_info": "Info Program/Hadiah",
+      "penagihan": "Penagihan",
+      "customer_visit": "Customer Visit/Asistensi",
+      "customer_new": "Registrasi Customer Baru",
+    };
+
+    final activeActivities = activityLabels.entries
+        .where((entry) => data[entry.key] == "Y")
+        .map((entry) => entry.value)
+        .toList();
+
+    return Text(
+      activeActivities.isEmpty
+          ? "Activity: -"
+          : "Activity: ${activeActivities.join(', ')}",
+      style: TextStyle(fontSize: 14.sp, color: Colors.black87),
+    );
+  }
+
 }

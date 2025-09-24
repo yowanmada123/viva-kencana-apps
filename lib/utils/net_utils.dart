@@ -1,5 +1,5 @@
+import 'package:dio/dio.dart' as dio;
 import 'package:http/http.dart';
-import 'package:dio/dio.dart' as Dio;
 
 import '../models/errors/custom_exception.dart';
 
@@ -19,9 +19,9 @@ class NetUtils {
     }
   }
 
-  static CustomException parseDioException(Dio.DioException e) {
+  static CustomException parseDioException(dio.DioException e) {
     try {
-      Dio.Response response = e.response!;
+      dio.Response response = e.response!;
       String message =
           response.data['message'] ?? "Terjadi kesalahan! Silakan coba lagi.";
 

@@ -24,10 +24,10 @@ class SalesActivityFormCheckInScreen extends StatefulWidget {
   final SalesInfo sales;
   final bool isCheckIn;
   const SalesActivityFormCheckInScreen({
-    Key? key,
+    super.key,
     required this.sales,
     this.isCheckIn = false,
-  }) : super(key: key);
+  });
 
   @override
   State<SalesActivityFormCheckInScreen> createState() =>

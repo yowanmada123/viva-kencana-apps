@@ -210,8 +210,8 @@ class _SalesActivityDashboardScreenState extends State<SalesActivityDashboardScr
         parsedTime != null ? DateFormat("dd-MM-yyyy").format(parsedTime) : "-";
 
     final Color mainColor = isCheckin
-        ? Colors.green.shade400.withValues(alpha: 0.8)
-        : Colors.red.shade400.withValues(alpha: 0.8);
+        ? Colors.green.shade400
+        : Colors.red.shade400;
 
     final String label = isCheckin ? "Last Checkin" : "Last Checkout";
 
