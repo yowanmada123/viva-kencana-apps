@@ -1,11 +1,14 @@
 part of 'sales_activity_form_checkin_bloc.dart';
 
+enum FormStatus { initial, loading, success, error }
 class SalesActivityFormCheckInState extends Equatable {
   final List<ImageItem> images;
   final String odometer;
   final Position? position;
   final String? address;
   final bool isLoadingLocation;
+  final FormStatus status;
+  final String errorMessage;
 
   const SalesActivityFormCheckInState({
     this.images = const [],
@@ -13,6 +16,8 @@ class SalesActivityFormCheckInState extends Equatable {
     this.position,
     this.address = '',
     this.isLoadingLocation = false,
+    this.status = FormStatus.initial,
+    this.errorMessage = '',
   });
 
   SalesActivityFormCheckInState copyWith({
@@ -21,6 +26,8 @@ class SalesActivityFormCheckInState extends Equatable {
     Position? position,
     String? address,
     bool? isLoadingLocation,
+    FormStatus? status,
+    String? errorMessage,
   }) {
     return SalesActivityFormCheckInState(
       images: images ?? this.images,
@@ -28,6 +35,8 @@ class SalesActivityFormCheckInState extends Equatable {
       position: position ?? this.position,
       address: address ?? this.address,
       isLoadingLocation: isLoadingLocation ?? this.isLoadingLocation,
+      status: status ?? this.status,
+      errorMessage: errorMessage ?? this.errorMessage,
     );
   }
 
@@ -38,6 +47,8 @@ class SalesActivityFormCheckInState extends Equatable {
     position,
     address,
     isLoadingLocation,
+    status,
+    errorMessage,
   ];
 }
 
