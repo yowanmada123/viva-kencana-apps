@@ -138,12 +138,6 @@ class _SalesActivityDashboardScreenState extends State<SalesActivityDashboardScr
                             width: double.infinity,
                             child: BasePrimaryButton(
                               onPressed: () {
-                                if (!isCheckedIn) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text("Anda belum check-in hari ini")),
-                                  );
-                                  return;
-                                }
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
