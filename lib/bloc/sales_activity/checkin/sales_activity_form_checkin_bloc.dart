@@ -60,15 +60,18 @@ class SalesActivityFormCheckInBloc extends Bloc<SalesActivityFormCheckInEvent, S
     SubmitSalesActivityCheckInForm event,
     Emitter<SalesActivityFormCheckInState> emit,
   ) async {
-    emit(SalesActivityFormCheckInLoading());
+    emit(state.copyWith(status: FormStatus.loading));
     final result = await salesActivityRepository.submitSalesCheckIn(formData: event.formData);
 
     result.fold(
       (failure) {
-        emit(SalesActivityFormCheckInError(failure.message!));
+        emit(state.copyWith(
+        status: FormStatus.error,
+        errorMessage: failure.message!,
+      ));
       },
       (message) {
-        emit(SalesActivityFormCheckInSuccess());
+        emit(state.copyWith(status: FormStatus.success));
       },
     );
   }

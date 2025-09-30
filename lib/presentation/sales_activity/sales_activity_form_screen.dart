@@ -346,20 +346,62 @@ class _SalesActivityFormScreenState extends State<SalesActivityFormScreen> {
                                 ),
                               ],
 
-                              buildTextField(
-                                label: "Customer Name",
+                              TextFormField(
                                 controller: nameController,
-                                isReadOnly: isExisting,
+                                readOnly: isExisting,
+                                decoration: InputDecoration(
+                                  label: RichText(
+                                    text: TextSpan(
+                                      children: [
+                                        TextSpan(
+                                          text: 'Customer Name',
+                                            style: TextStyle(
+                                              color: Colors.black54,
+                                              fontSize: 16.w,
+                                            )
+                                        ),
+                                        TextSpan(
+                                          text: ' *',
+                                            style: TextStyle(
+                                              color: Colors.red,
+                                              fontSize: 14.w,
+                                            )
+                                        ),
+                                      ]
+                                    ),
+                                  ),
+                                ),
                               ),
                               buildTextField(
                                 label: "KTP/NPWP",
                                 controller: ktpController,
                                 isReadOnly: isExisting,
                               ),
-                              buildTextField(
-                                label: "Phone",
+                              TextFormField(
                                 controller: phoneController,
-                                isReadOnly: isExisting,
+                                readOnly: isExisting,
+                                decoration: InputDecoration(
+                                  label: RichText(
+                                    text: TextSpan(
+                                      children: [
+                                        TextSpan(
+                                          text: 'Customer Phone',
+                                            style: TextStyle(
+                                              color: Colors.black54,
+                                              fontSize: 16.w,
+                                            )
+                                        ),
+                                        TextSpan(
+                                          text: ' *',
+                                            style: TextStyle(
+                                              color: Colors.red,
+                                              fontSize: 14.w,
+                                            )
+                                        ),
+                                      ]
+                                    ),
+                                  ),
+                                ),
                               ),
                               buildTextField(
                                 label: "Email",
@@ -1011,7 +1053,28 @@ class _SalesActivityFormSecondStepState
                   ),
                   child: TextFormField(
                     controller: odometerController,
-                    decoration: const InputDecoration(labelText: 'Odometer'),
+                    decoration: InputDecoration(
+                      label: RichText(
+                        text: TextSpan(
+                          children: [
+                            TextSpan(
+                              text: 'Odometer',
+                                style: TextStyle(
+                                  color: Colors.black54,
+                                  fontSize: 16.w,
+                                )
+                            ),
+                            TextSpan(
+                              text: ' *',
+                                style: TextStyle(
+                                  color: Colors.red,
+                                  fontSize: 14.w,
+                                )
+                            ),
+                          ]
+                        ),
+                      ),
+                    ),
                     keyboardType: TextInputType.number,
                   ),
                 ),

@@ -354,8 +354,27 @@ class _SalesActivityFormCheckInScreenState
                       },
                       child: TextFormField(
                         controller: _odometerController,
-                        decoration: const InputDecoration(
-                          labelText: 'Odometer',
+                        decoration: InputDecoration(
+                          label: RichText(
+                            text: TextSpan(
+                              children: [
+                                TextSpan(
+                                  text: 'Odometer',
+                                    style: TextStyle(
+                                      color: Colors.black54,
+                                      fontSize: 16.w,
+                                    )
+                                ),
+                                TextSpan(
+                                  text: ' *',
+                                    style: TextStyle(
+                                      color: Colors.red,
+                                      fontSize: 14.w,
+                                    )
+                                ),
+                              ]
+                            ),
+                          ),
                         ),
                         keyboardType: TextInputType.number,
                       ),
@@ -408,11 +427,10 @@ class _SalesActivityFormCheckInScreenState
                           SalesActivityFormCheckInState
                         >(
                           listenWhen:
-                              (previous, current) =>
-                                  current is SalesActivityFormCheckInSuccess ||
-                                  current is SalesActivityFormCheckInError,
+                              (prev, curr) =>
+                                  prev.status != curr.status,
                           listener: (context, state) {
-                            if (state is SalesActivityFormCheckInSuccess) {
+                            if (state.status == FormStatus.success) {
                               final bool isCheckIn = widget.isCheckIn;
                               final String message =
                                   isCheckIn
@@ -442,11 +460,12 @@ class _SalesActivityFormCheckInScreenState
                                   );
                                 },
                               );
-                            } else if (state is SalesActivityFormCheckInError) {
+                            } else if (state.status == FormStatus.error) {
+                              final bool isCheckIn = widget.isCheckIn;
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
                                   content: Text(
-                                    "Checkout gagal: ${state.message}",
+                                    "${isCheckIn ? 'Checkin' : 'Checkout'} gagal: ${state.errorMessage}",
                                   ),
                                   backgroundColor: Colors.red,
                                 ),
@@ -454,8 +473,7 @@ class _SalesActivityFormCheckInScreenState
                             }
                           },
                           builder: (context, state) {
-                            final isLoading =
-                                state is SalesActivityFormCheckInLoading;
+                            final isLoading = state.status == FormStatus.loading;
 
                             return Expanded(
                               child: BasePrimaryButton(

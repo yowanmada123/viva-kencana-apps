@@ -21,7 +21,6 @@ class SalesActivityHistoryDetailScreen extends StatefulWidget {
 }
 
 class _SalesActivityHistoryDetailScreenState extends State<SalesActivityHistoryDetailScreen> {
-  final MapController _mapController = MapController();
 
   @override
   void initState() {
@@ -87,8 +86,9 @@ class _SalesActivityHistoryDetailScreenState extends State<SalesActivityHistoryD
                         final Color mainColor = d.startEndPoint == 'OS'
                           ? Colors.green.shade400
                           : Colors.red.shade400;
-                        final latitude = double.tryParse(d.latitude) ?? 0.0;
-                        final longitude = double.tryParse(d.longitude) ?? 0.0;
+                        final latitude = double.tryParse(d.latitude) ?? -7.250445;
+                        final longitude = double.tryParse(d.longitude) ?? 112.768845;
+                        final MapController mapController = MapController();
                         Map<String, dynamic> activities = {
                           "product_offer": d.productOffer,
                           "take_order": d.takeOrder,
@@ -99,7 +99,7 @@ class _SalesActivityHistoryDetailScreenState extends State<SalesActivityHistoryD
                         };
                         WidgetsBinding.instance.addPostFrameCallback((_) {
                           if (mounted) {
-                            _mapController.move(
+                            mapController.move(
                               LatLng(
                                 latitude,
                                 longitude,
@@ -206,10 +206,10 @@ class _SalesActivityHistoryDetailScreenState extends State<SalesActivityHistoryD
                                           height: 150.w,
                                           width: 300.w,
                                           child: FlutterMap(
-                                            mapController: _mapController,
+                                            mapController: mapController,
                                             options: MapOptions(
-                                              initialCenter: LatLng(latitude, longitude),
-                                              initialZoom: 12,
+                                              initialCenter: LatLng(-7.250445, 112.768845),
+                                              initialZoom: 10,
                                             ),
                                             children: [
                                               TileLayer(
