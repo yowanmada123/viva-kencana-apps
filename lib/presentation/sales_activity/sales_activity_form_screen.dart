@@ -689,7 +689,7 @@ class _SalesActivityFormScreenState extends State<SalesActivityFormScreen> {
                           curve: Curves.linear,
                         );
                       },
-                      custId: custIdController.text,
+                      custId: selectedCustomerInfo?.customerId ?? '',
                       custName: nameController.text,
                       ktpNpwp: ktpController.text,
                       phone: phoneController.text,
