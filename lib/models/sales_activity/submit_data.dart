@@ -224,7 +224,7 @@ class SalesActivityFormData {
       chkNewCustRequest: map['chkNewCustRequest'] ?? false,
       latitude: map['latitude']?.toDouble() ?? 0.0,
       longitude: map['longitude']?.toDouble() ?? 0.0,
-      currentLocation: map['currentLocation'] ?? '',
+      currentLocation: map['gps_location'] ?? '',
       remark: map['remark'] ?? '',
       image: map['image'] ?? '',
       images: List<ImageItem>.from(map['images']?.map((x) => ImageItem.fromMap(x))),
