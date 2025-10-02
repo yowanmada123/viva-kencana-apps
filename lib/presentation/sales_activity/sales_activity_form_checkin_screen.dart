@@ -511,8 +511,7 @@ class _SalesActivityFormCheckInScreenState
                                               );
                                           final formData =
                                               model.SalesActivityFormData(
-                                                checkboxCar:
-                                                    selectedSalesVehicle,
+                                                checkboxCar: selectedSalesVehicle,
                                                 latitude:
                                                     blocState
                                                         .position!
@@ -523,10 +522,10 @@ class _SalesActivityFormCheckInScreenState
                                                         .longitude,
                                                 remark: remarkController.text,
                                                 images: modelImages,
+                                                currentLocation: blocState.address,
                                                 speedoKmModel:
                                                     _odometerController.text,
-                                                checkpoint:
-                                                    widget.isCheckIn
+                                                checkpoint: widget.isCheckIn
                                                         ? "OS"
                                                         : "OE",
                                                 salesid: widget.sales.salesId,
