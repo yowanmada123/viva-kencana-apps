@@ -82,7 +82,7 @@ class _SalesActivityDashboardScreenState extends State<SalesActivityDashboardScr
           Expanded(
             child: Center(
               child: Padding(
-                padding: EdgeInsetsGeometry.symmetric(horizontal: 32.w),
+                padding: EdgeInsets.symmetric(horizontal: 32.w),
                 child: BlocBuilder<SalesActivityFormCheckInBloc, SalesActivityFormCheckInState>(
                   builder: (context, state) {
 
