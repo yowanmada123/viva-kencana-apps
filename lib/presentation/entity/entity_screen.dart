@@ -136,7 +136,7 @@ class _GridLayoutState extends State<GridLayout> {
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsetsGeometry.only(right: 16.w),
+                  padding: EdgeInsets.only(right: 16.w),
                   child: Icon(Icons.category_sharp),
                 )
               ]

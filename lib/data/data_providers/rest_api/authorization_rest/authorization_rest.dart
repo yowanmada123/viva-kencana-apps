@@ -19,7 +19,7 @@ class AuthorizationRest {
     try {
       dio.options.headers['requiresToken'] = true;
 
-      log('Request to https://v2.kencana.org/api/mobile/getMenu (POST)');
+      log('Request to https://v3.kencana.org/api/mobile/getMenu (POST)');
       final data = {"entity_id": entityId, "appl_id": applId};
       final response = await dio.post("api/mobile/getMenu", data: data);
 
@@ -51,7 +51,7 @@ class AuthorizationRest {
       dio.options.headers['requiresToken'] = true;
 
       log(
-        'Request to https://v2.kencana.org/api/mobile/getEnvConf (POST)',
+        'Request to https://v3.kencana.org/api/mobile/getEnvConf (POST)',
       );
       final data = {"entity_id": entityId, "appl_id": applId};
       final response = await dio.post("api/mobile/getEnvConf", data: data);
