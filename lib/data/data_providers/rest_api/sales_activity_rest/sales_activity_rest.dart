@@ -295,6 +295,7 @@ class SalesActivityRest {
       log(
         'Request to https://v2.kencana.org/api/viva/sales_activity/CustomerVisit/submitCustomerActivity (POST)',
       );
+      print(['name: ${formData.customerName}, ktp: ${ formData.customerKtpNpwp}, phone: ${formData.customerPhone}, email: ${formData.customerEmail}, address: ${formData.customerAddress}, province: ${formData.customerProvince}, city: ${formData.customerCity}, district: ${formData.customerDistrict}, village: ${formData.customerVillage}']);
       final response = await http.post(
         "api/viva/sales_activity/CustomerVisit/submitCustomerActivity",
         data: formData.toMap(),

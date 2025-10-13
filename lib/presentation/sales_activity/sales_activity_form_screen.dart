@@ -360,13 +360,6 @@ class _SalesActivityFormScreenState extends State<SalesActivityFormScreen> {
                                               fontSize: 16.w,
                                             )
                                         ),
-                                        TextSpan(
-                                          text: ' *',
-                                            style: TextStyle(
-                                              color: Colors.red,
-                                              fontSize: 14.w,
-                                            )
-                                        ),
                                       ]
                                     ),
                                   ),
@@ -389,13 +382,6 @@ class _SalesActivityFormScreenState extends State<SalesActivityFormScreen> {
                                             style: TextStyle(
                                               color: Colors.black54,
                                               fontSize: 16.w,
-                                            )
-                                        ),
-                                        TextSpan(
-                                          text: ' *',
-                                            style: TextStyle(
-                                              color: Colors.red,
-                                              fontSize: 14.w,
                                             )
                                         ),
                                       ]
