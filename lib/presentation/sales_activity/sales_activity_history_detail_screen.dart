@@ -151,13 +151,13 @@ class _SalesActivityHistoryDetailScreenState extends State<SalesActivityHistoryD
                                                 maxLines: 1,
                                               ),
                                             ),
-                                            BasePrimaryButton(
-                                              label: '', 
-                                              onPressed: () {
-                                                Navigator.push(context, MaterialPageRoute(builder: (route) => SalesActivityHistoryUpdateScreen(entityId: widget.visit.entityId)));
-                                              },
-                                              icon: Icons.edit
-                                            ),
+                                            // BasePrimaryButton(
+                                            //   label: '', 
+                                            //   onPressed: () {
+                                            //     Navigator.push(context, MaterialPageRoute(builder: (route) => SalesActivityHistoryUpdateScreen(entityId: widget.visit.entityId)));
+                                            //   },
+                                            //   icon: Icons.edit
+                                            // ),
                                           ],
                                         ),
                                         Text(
