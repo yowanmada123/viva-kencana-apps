@@ -64,14 +64,12 @@ class SalesActivityRepository {
     final connectivityResult = await Connectivity().checkConnectivity();
 
     if (connectivityResult == ConnectivityResult.none) {
-      print('masuk tidak ada koneksi');
       await SalesActivityLocalDatabase.instance.insertActivity(formData);
       return Right("Data disimpan offline. Akan dikirim ketika online.");
     }
 
     final isReallyOffline = await _checkRealConnection();
     if (isReallyOffline) {
-      print('masuk koneksi jelek');
       await SalesActivityLocalDatabase.instance.insertActivity(formData);
       return Right("Koneksi tidak stabil. Data disimpan offline sementara.");
     }
