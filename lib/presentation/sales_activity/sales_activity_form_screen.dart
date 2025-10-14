@@ -81,7 +81,7 @@ class _SalesActivityFormScreenState extends State<SalesActivityFormScreen> {
     "Online Transport": "Online Transport",
   };
 
-  dynamic newOrExisting = {"Y": "New Customer", "N": "Existing Customer"};
+  dynamic newOrExisting = {"N": "Existing Customer", "Y": "New Customer"};
 
   String customerType = 'Existing Customer';
   String? selectedCustomer;
