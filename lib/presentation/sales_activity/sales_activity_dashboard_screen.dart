@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 
 import '../../bloc/sales_activity/checkin/sales_activity_form_checkin_bloc.dart';
 import '../../models/sales_activity/sales_info.dart';
+import '../../utils/sales_activity/sales_activity_sync_service.dart';
 import '../widgets/base_primary_button.dart';
 import 'sales_activity_form_checkin_screen.dart';
 import 'sales_activity_form_screen.dart';
@@ -26,6 +27,7 @@ class _SalesActivityDashboardScreenState extends State<SalesActivityDashboardScr
   @override
   void initState() {
     super.initState();
+    SalesActivitySyncService().syncPendingActivities();
     context.read<SalesActivityFormCheckInBloc>().add(LoadSalesData());
   }
 

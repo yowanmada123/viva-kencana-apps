@@ -156,7 +156,7 @@ class _SalesActivityHistoryVisitScreenState extends State<SalesActivityHistoryVi
                       },
                     );
                   } else if (state is HistoryVisitFailure) {
-                    return Center(child: Text("Gagal memuat data: ${state.exception}"));
+                    return Center(child: Text(state.exception.toString()));
                   } else {
                     return const SizedBox();
                   }

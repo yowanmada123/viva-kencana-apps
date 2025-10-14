@@ -81,7 +81,7 @@ class _SalesActivityFormScreenState extends State<SalesActivityFormScreen> {
     "Online Transport": "Online Transport",
   };
 
-  dynamic newOrExisting = {"Y": "New Customer", "N": "Existing Customer"};
+  dynamic newOrExisting = {"N": "Existing Customer", "Y": "New Customer"};
 
   String customerType = 'Existing Customer';
   String? selectedCustomer;
@@ -360,13 +360,6 @@ class _SalesActivityFormScreenState extends State<SalesActivityFormScreen> {
                                               fontSize: 16.w,
                                             )
                                         ),
-                                        TextSpan(
-                                          text: ' *',
-                                            style: TextStyle(
-                                              color: Colors.red,
-                                              fontSize: 14.w,
-                                            )
-                                        ),
                                       ]
                                     ),
                                   ),
@@ -389,13 +382,6 @@ class _SalesActivityFormScreenState extends State<SalesActivityFormScreen> {
                                             style: TextStyle(
                                               color: Colors.black54,
                                               fontSize: 16.w,
-                                            )
-                                        ),
-                                        TextSpan(
-                                          text: ' *',
-                                            style: TextStyle(
-                                              color: Colors.red,
-                                              fontSize: 14.w,
                                             )
                                         ),
                                       ]

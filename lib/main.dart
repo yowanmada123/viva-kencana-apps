@@ -33,9 +33,12 @@ import 'environment.dart';
 import 'presentation/entity/entity_screen.dart';
 import 'presentation/login/login_form_screen.dart';
 import 'utils/interceptors/dio_request_token_interceptor.dart';
+import 'utils/sales_activity/sales_activity_sync_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  SalesActivitySyncService().syncPendingActivities();
 
   HydratedBloc.storage = await HydratedStorage.build(
     storageDirectory:

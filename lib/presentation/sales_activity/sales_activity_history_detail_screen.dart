@@ -7,6 +7,8 @@ import 'package:latlong2/latlong.dart';
 
 import '../../bloc/sales_activity/history_visit/history_visit_detail/sales_activity_history_visit_detail_bloc.dart';
 import '../../models/sales_activity/history_visit.dart';
+import '../widgets/base_primary_button.dart';
+import 'sales_activity_history_update_screen.dart';
 
 class SalesActivityHistoryDetailScreen extends StatefulWidget {
   final HistoryVisit visit;
@@ -134,14 +136,29 @@ class _SalesActivityHistoryDetailScreenState extends State<SalesActivityHistoryD
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        Text(
-                                          d.trId,
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 16.sp,
-                                          ),
-                                          overflow: TextOverflow.ellipsis,
-                                          maxLines: 1,
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            SizedBox(
+                                              width: 216.w,
+                                              child: Text(
+                                                d.trId,
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 16.sp,
+                                                ),
+                                                overflow: TextOverflow.ellipsis,
+                                                maxLines: 1,
+                                              ),
+                                            ),
+                                            // BasePrimaryButton(
+                                            //   label: '', 
+                                            //   onPressed: () {
+                                            //     Navigator.push(context, MaterialPageRoute(builder: (route) => SalesActivityHistoryUpdateScreen(entityId: widget.visit.entityId)));
+                                            //   },
+                                            //   icon: Icons.edit
+                                            // ),
+                                          ],
                                         ),
                                         Text(
                                           DateFormat('hh:mm a').format(DateTime.parse(d.trDate)),

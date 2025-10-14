@@ -1,4 +1,6 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dartz/dartz.dart';
+import 'package:dio/dio.dart';
 
 import '../../models/errors/custom_exception.dart';
 import '../../models/sales_activity/customer_detail.dart';
@@ -7,6 +9,7 @@ import '../../models/sales_activity/history_detail.dart';
 import '../../models/sales_activity/history_visit.dart';
 import '../../models/sales_activity/sales_info.dart';
 import '../../models/sales_activity/submit_data.dart';
+import '../../utils/sales_activity/sales_activity_local_database.dart';
 import '../data_providers/rest_api/sales_activity_rest/sales_activity_rest.dart';
 
 class SalesActivityRepository {
@@ -58,6 +61,19 @@ class SalesActivityRepository {
   Future<Either<CustomException, String>> submitSalesActivity({
     required SalesActivityFormData formData,
   }) async {
+    final connectivityResult = await Connectivity().checkConnectivity();
+
+    if (connectivityResult == ConnectivityResult.none) {
+      await SalesActivityLocalDatabase.instance.insertActivity(formData);
+      return Right("Data disimpan offline. Akan dikirim ketika online.");
+    }
+
+    final isReallyOffline = await _checkRealConnection();
+    if (isReallyOffline) {
+      await SalesActivityLocalDatabase.instance.insertActivity(formData);
+      return Right("Koneksi tidak stabil. Data disimpan offline sementara.");
+    }
+
     return salesActivityRest.submitSalesActivity(formData: formData);
   }
 
@@ -79,5 +95,23 @@ class SalesActivityRepository {
     required String activityId,
   }) async {
     return salesActivityRest.getHistoryDetail(activityId: activityId);
+  }
+
+  Future<bool> _checkRealConnection() async {
+    try {
+      await Future.delayed(const Duration(seconds: 3));
+
+      final response = await Dio().get(
+        'https://www.google.com',
+        options: Options(
+          sendTimeout: const Duration(seconds: 3),
+          receiveTimeout: const Duration(seconds: 3),
+        ),
+      );
+
+      return response.statusCode != 200;
+    } catch (_) {
+      return true;
+    }
   }
 }
