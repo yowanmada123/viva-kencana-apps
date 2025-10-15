@@ -16,6 +16,7 @@ String _getMimeType(File file) {
   final extension = file.path.split('.').last.toLowerCase();
   switch (extension) {
     case 'jpg':
+      return 'image/jpg';
     case 'jpeg':
       return 'image/jpeg';
     case 'png':
