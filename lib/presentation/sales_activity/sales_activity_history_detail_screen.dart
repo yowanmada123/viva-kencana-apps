@@ -1,11 +1,16 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:latlong2/latlong.dart';
 
 import '../../bloc/sales_activity/history_visit/history_visit_detail/sales_activity_history_visit_detail_bloc.dart';
+import '../../bloc/sales_activity/history_visit/history_visit_detail/upload_image/sales_activity_history_visit_upload_image_bloc.dart';
+import '../../models/sales_activity/history_detail.dart';
 import '../../models/sales_activity/history_visit.dart';
 import '../widgets/base_primary_button.dart';
 import 'sales_activity_history_update_screen.dart';
@@ -151,13 +156,38 @@ class _SalesActivityHistoryDetailScreenState extends State<SalesActivityHistoryD
                                                 maxLines: 1,
                                               ),
                                             ),
-                                            // BasePrimaryButton(
-                                            //   label: '', 
-                                            //   onPressed: () {
-                                            //     Navigator.push(context, MaterialPageRoute(builder: (route) => SalesActivityHistoryUpdateScreen(entityId: widget.visit.entityId)));
-                                            //   },
-                                            //   icon: Icons.edit
-                                            // ),
+                                            PopupMenuButton<String>(
+                                              icon: const Icon(Icons.more_vert),
+                                              onSelected: (value) {
+                                                switch (value) {
+                                                  case 'edit':
+                                                    Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder: (_) => SalesActivityHistoryUpdateScreen(
+                                                          entityId: widget.visit.entityId,
+                                                        ),
+                                                      ),
+                                                    );
+                                                    break;
+                                                  case 'add_image':
+                                                    _showAddImageDialog(context, d.seqId, d);
+                                                    break;
+                                                }
+                                              },
+                                              itemBuilder: (context) => [
+                                                const PopupMenuItem(
+                                                  value: 'add_image',
+                                                  child: Row(
+                                                    children: [
+                                                      Icon(Icons.camera_alt, size: 20),
+                                                      SizedBox(width: 8),
+                                                      Text("Add Image"),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
                                           ],
                                         ),
                                         Text(
@@ -301,4 +331,108 @@ class _SalesActivityHistoryDetailScreenState extends State<SalesActivityHistoryD
     );
   }
 
+  void _showAddImageDialog(BuildContext context, String seqId, HistoryDetail detail) {
+    File? imageFile;
+    final remarkController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text("Add Image"),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (imageFile != null)
+                      Column(
+                        children: [
+                          Image.file(imageFile!, height: 180),
+                          const SizedBox(height: 8),
+                          TextFormField(
+                            controller: remarkController,
+                            decoration: const InputDecoration(
+                              labelText: "Remark",
+                              border: OutlineInputBorder(),
+                            ),
+                          ),
+                        ],
+                      )
+                    else
+                      BasePrimaryButton(
+                        label: "Ambil Gambar", 
+                        icon: Icons.camera_alt,
+                        onPressed: () async {
+                          final picker = ImagePicker();
+                          final picked = await picker.pickImage(
+                            source: ImageSource.camera,
+                            imageQuality: 75,
+                          );
+                          if (picked != null) {
+                            setState(() {
+                              imageFile = File(picked.path);
+                            });
+                          }
+                        },
+                      )
+                  ],
+                ),
+              ),
+              actions: [
+                BlocConsumer<SalesActivityHistoryVisitUploadImageBloc, SalesActivityHistoryVisitUploadImageState>(
+                  listener: (context, state) {
+                    if (state is UploadImageSuccess) {
+                      Navigator.pop(dialogContext);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Gambar berhasil diupload'),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
+                    } else if (state is UploadImageError) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(state.message),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    }
+                  },
+                  builder: (context, state) {
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(dialogContext),
+                          child: const Text("Batal", style: TextStyle(color: Colors.redAccent)),
+                        ),
+                        BasePrimaryButton(
+                          label: "Submit",
+                          onPressed: imageFile == null
+                            ? null
+                            : () {
+                                context.read<SalesActivityHistoryVisitUploadImageBloc>().add(
+                                      SubmitUploadImage(
+                                        entityId: detail.entityId,
+                                        trId: detail.trId,
+                                        seqId: seqId,
+                                        imageFile: imageFile!,
+                                        remark: remarkController.text,
+                                      ),
+                                    );
+                              }
+                        ),
+                      ],
+                    );
+                  }
+                )
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
 }

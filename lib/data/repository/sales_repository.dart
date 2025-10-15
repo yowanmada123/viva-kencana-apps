@@ -97,6 +97,16 @@ class SalesActivityRepository {
     return salesActivityRest.getHistoryDetail(activityId: activityId);
   }
 
+  Future<Either<CustomException, String>> submitImagesDetail({
+    required String entityId,
+    required String trId,
+    required String seqId,
+    required String remark,
+    required String image,
+  }) async {
+    return salesActivityRest.submitImagesDetail(entityId: entityId, trId: trId, seqId: seqId, remark: remark, image: image);
+  }
+
   Future<bool> _checkRealConnection() async {
     try {
       await Future.delayed(const Duration(seconds: 3));
