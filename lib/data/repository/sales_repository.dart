@@ -6,6 +6,7 @@ import '../../models/errors/custom_exception.dart';
 import '../../models/sales_activity/customer_detail.dart';
 import '../../models/sales_activity/customer_info.dart';
 import '../../models/sales_activity/history_detail.dart';
+import '../../models/sales_activity/history_image.dart';
 import '../../models/sales_activity/history_visit.dart';
 import '../../models/sales_activity/sales_info.dart';
 import '../../models/sales_activity/submit_data.dart';
@@ -95,6 +96,14 @@ class SalesActivityRepository {
     required String activityId,
   }) async {
     return salesActivityRest.getHistoryDetail(activityId: activityId);
+  }
+
+  Future<Either<CustomException, List<HistoryImage>>> getHistoryImages({
+    required String entityId,
+    required String trId,
+    required String seqId,
+  }) async {
+    return salesActivityRest.getDetailImages(entityId: entityId, trId: trId, seqId: seqId);
   }
 
   Future<Either<CustomException, String>> submitImagesDetail({
