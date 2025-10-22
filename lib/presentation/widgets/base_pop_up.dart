@@ -22,38 +22,74 @@ class BasePopUpDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text('Konfirmasi'),
-      content: Text(question, style: Theme.of(context).textTheme.labelMedium),
-      actions: <Widget>[
-        TextButton(
-          child: Text(
-            noText,
-            style: TextStyle(
-              fontFamily: "Poppins",
-              fontSize: 12.w,
-              color: Theme.of(context).primaryColor,
-            ),
-          ),
-          onPressed: () {
-            onNoPressed();
-            if (autoPopOnPressed) {
-              Navigator.of(context).pop();
-            }
-          },
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16.r),
+      ),
+      backgroundColor: Colors.white,
+      surfaceTintColor: Colors.transparent,
+      titlePadding: EdgeInsets.only(top: 20.w),
+      contentPadding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.w),
+      actionsPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.w),
+
+      title: Center(
+        child: Text(
+          "Konfirmasi",
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w700,
+                color: Colors.black87,
+              ),
         ),
-        TextButton(
-          child: Text(
-            yesText,
-            style: TextStyle(
-              fontFamily: "Poppins",
-              fontSize: 12.w,
-              color: Theme.of(context).primaryColor,
+      ),
+
+      content: Text(
+        question,
+        textAlign: TextAlign.center,
+        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              fontSize: 14.sp,
+              height: 1.4,
+              color: Colors.grey.shade700,
             ),
+      ),
+
+      actionsAlignment: MainAxisAlignment.spaceEvenly,
+      actions: [
+        SizedBox(
+          height: 38.w,
+          child: OutlinedButton(
+            style: OutlinedButton.styleFrom(
+              side: BorderSide(color: Colors.grey.shade400),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12.r),
+              ),
+              foregroundColor: Colors.grey.shade600,
+              textStyle: TextStyle(fontWeight: FontWeight.w500),
+            ),
+            onPressed: () {
+              onNoPressed();
+              if (autoPopOnPressed) {
+                Navigator.of(context).pop();
+              }
+            },
+            child: Text(noText),
           ),
-          onPressed: () {
-            onYesPressed();
-            Navigator.of(context).pop();
-          },
+        ),
+        SizedBox(
+          height: 38.w,
+          child: FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: Theme.of(context).primaryColor,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12.r),
+              ),
+              foregroundColor: Colors.white,
+              textStyle: TextStyle(fontWeight: FontWeight.w600),
+            ),
+            onPressed: () {
+              onYesPressed();
+              Navigator.of(context).pop();
+            },
+            child: Text(yesText),
+          ),
         ),
       ],
     );

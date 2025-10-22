@@ -7,6 +7,7 @@ import '../../../../models/errors/custom_exception.dart';
 import '../../../../models/sales_activity/customer_detail.dart';
 import '../../../../models/sales_activity/customer_info.dart';
 import '../../../../models/sales_activity/history_detail.dart';
+import '../../../../models/sales_activity/history_image.dart';
 import '../../../../models/sales_activity/history_visit.dart';
 import '../../../../models/sales_activity/sales_info.dart';
 import '../../../../models/sales_activity/submit_data.dart';
@@ -421,6 +422,48 @@ class SalesActivityRest {
       if (response.statusCode == 200) {
         final body = response.data;
         return Right(body['message']);
+      } else {
+        return Left(NetUtils.parseErrorResponse(response: response.data));
+      }
+    } on DioException catch (e) {
+      return Left(NetUtils.parseDioException(e));
+    } on Exception catch (e) {
+      if (e is DioException) {
+        return Left(NetUtils.parseDioException(e));
+      }
+      return Future.value(Left(CustomException(message: e.toString())));
+    } catch (e) {
+      return Left(CustomException(message: e.toString()));
+    }
+  }
+
+  Future<Either<CustomException, List<HistoryImage>>> getDetailImages({
+    required String entityId,
+    required String trId,
+    required String seqId,
+  }) async {
+    try {
+      http.options.headers['requiresToken'] = true;
+      log(
+        'Request to https://v2.kencana.org/api/viva/transaction/ActivityReport/getDetailImages (POST)',
+      );
+      final body = {
+        'entity_id': entityId,
+        'tr_id': trId,
+        'seq_id': seqId,
+      };
+      final response = await http.post(
+        "api/viva/transaction/ActivityReport/getDetailImages",
+        data: body,
+      );
+      if (response.statusCode == 200) {
+        final body = response.data;
+        final List<HistoryImage> detail =
+            (body['result'] as List)
+                .map((item) => HistoryImage.fromMap(item))
+                .toList();
+
+        return Right(detail);
       } else {
         return Left(NetUtils.parseErrorResponse(response: response.data));
       }

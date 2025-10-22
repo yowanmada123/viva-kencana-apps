@@ -122,10 +122,8 @@ class _SettingScreenState extends State<SettingScreen> {
                           BlocProvider.of<AuthenticationBloc>(context).add(
                             SetAuthenticationStatus(isAuthenticated: false),
                           );
-                          Navigator.of(
-                            context,
-                          ).popUntil((route) => route.isFirst);
                         }
+                        Navigator.of(context).popUntil((route) => route.isFirst);
                       },
                       builder: (context, state) {
                         return InkWell(
