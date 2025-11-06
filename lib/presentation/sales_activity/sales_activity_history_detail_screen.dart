@@ -13,7 +13,7 @@ import '../../bloc/sales_activity/history_visit/history_visit_detail/upload_imag
 import '../../models/sales_activity/history_detail.dart';
 import '../../models/sales_activity/history_visit.dart';
 import '../widgets/base_primary_button.dart';
-import 'sales_activity_history_update_screen.dart';
+import 'sales_activity_history_detail_images_screen.dart';
 
 class SalesActivityHistoryDetailScreen extends StatefulWidget {
   final HistoryVisit visit;
@@ -160,12 +160,12 @@ class _SalesActivityHistoryDetailScreenState extends State<SalesActivityHistoryD
                                               icon: const Icon(Icons.more_vert),
                                               onSelected: (value) {
                                                 switch (value) {
-                                                  case 'edit':
+                                                  case 'show':
                                                     Navigator.push(
                                                       context,
                                                       MaterialPageRoute(
-                                                        builder: (_) => SalesActivityHistoryUpdateScreen(
-                                                          entityId: widget.visit.entityId,
+                                                        builder: (_) => SalesActivityHistoryDetailImagesScreen(
+                                                          historyDetail: d,
                                                         ),
                                                       ),
                                                     );
@@ -183,6 +183,16 @@ class _SalesActivityHistoryDetailScreenState extends State<SalesActivityHistoryD
                                                       Icon(Icons.camera_alt, size: 20),
                                                       SizedBox(width: 8),
                                                       Text("Add Image"),
+                                                    ],
+                                                  ),
+                                                ),
+                                                const PopupMenuItem(
+                                                  value: 'show',
+                                                  child: Row(
+                                                    children: [
+                                                      Icon(Icons.add_a_photo, size: 20),
+                                                      SizedBox(width: 8),
+                                                      Text("Show Images"),
                                                     ],
                                                   ),
                                                 ),
@@ -342,6 +352,14 @@ class _SalesActivityHistoryDetailScreenState extends State<SalesActivityHistoryD
           builder: (context, setState) {
             return AlertDialog(
               title: const Text("Add Image"),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16.r),
+              ),
+              backgroundColor: Colors.white,
+              surfaceTintColor: Colors.transparent,
+              titlePadding: EdgeInsets.only(top: 20.w),
+              contentPadding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.w),
+              actionsPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.w),
               content: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,

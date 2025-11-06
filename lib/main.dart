@@ -13,6 +13,7 @@ import 'package:permission_handler/permission_handler.dart';
 
 import 'bloc/auth/authentication/authentication_bloc.dart';
 import 'bloc/sales_activity/checkin/sales_activity_form_checkin_bloc.dart';
+import 'bloc/sales_activity/history_visit/history_visit_detail/list_image/sales_activity_history_visit_detail_list_image_bloc.dart';
 import 'bloc/sales_activity/history_visit/history_visit_detail/sales_activity_history_visit_detail_bloc.dart';
 import 'bloc/sales_activity/history_visit/history_visit_detail/upload_image/sales_activity_history_visit_upload_image_bloc.dart';
 import 'bloc/sales_activity/history_visit/sales_activity_history_visit_bloc.dart';
@@ -52,13 +53,15 @@ void main() async {
     key: SharedPreferencesKey.authKey,
   );
 
+  final authClient = Dio(AuthEnvironment.dioBaseOptions)
+    ..interceptors.addAll([DioRequestTokenInterceptor()]);
   final dioClient = Dio(Environment.dioBaseOptions)
     ..interceptors.addAll([DioRequestTokenInterceptor()]);
 
-  final authRest = AuthRest(dioClient);
+  final authRest = AuthRest(authClient);
   final batchRest = BatchRest(dioClient);
   final entityRest = EntityRest(dioClient);
-  final authorizationRest = AuthorizationRest(dioClient);
+  final authorizationRest = AuthorizationRest(authClient);
   final salesActivityRest = SalesActivityRest(dioClient);
 
   final authRepository = AuthRepository(
@@ -88,6 +91,7 @@ void main() async {
           BlocProvider(lazy: false, create: (context) => SalesActivityHistoryVisitBloc(salesActivityRepository: salesActivityRepository)),
           BlocProvider(lazy: false, create: (context) => SalesActivityHistoryVisitDetailBloc(salesActivityRepository: salesActivityRepository)),
           BlocProvider(lazy: false, create: (context) => SalesActivityHistoryVisitUploadImageBloc(salesActivityRepository: salesActivityRepository)),
+          BlocProvider(lazy: false, create: (context) => SalesActivityHistoryVisitDetailListImageBloc(salesActivityRepository: salesActivityRepository)),
         ],
         child: const MyApp(),
       ),
