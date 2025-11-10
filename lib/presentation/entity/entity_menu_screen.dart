@@ -17,8 +17,8 @@ import '../../utils/strict_location.dart';
 import '../qr_code/qr_code_screen.dart';
 import '../sales_activity/sales_activity_dashboard_screen.dart';
 
-class DriverDashboardScreen extends StatelessWidget {
-  const DriverDashboardScreen({super.key, required this.entityId});
+class EntityMenuScreen extends StatelessWidget {
+  const EntityMenuScreen({super.key, required this.entityId});
 
   final String entityId;
 
