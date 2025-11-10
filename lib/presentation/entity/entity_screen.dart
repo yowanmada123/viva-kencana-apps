@@ -6,12 +6,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../bloc/auth/authentication/authentication_bloc.dart';
 import '../../bloc/auth/logout/logout_bloc.dart';
-import '../../bloc/entity/entity_bloc.dart';
+import '../../bloc/authorization/entity/entity_bloc.dart';
 import '../../data/data_providers/shared-preferences/shared_preferences_manager.dart';
 import '../../data/repository/auth_repository.dart';
 import '../../data/repository/entity_repository.dart';
 import '../../models/errors/custom_exception.dart';
-import '../driver/driver_dashboard_screen.dart';
+import 'entity_menu_screen.dart';
 import '../setting/setting_screen.dart';
 
 class EntityScreen extends StatelessWidget {
@@ -281,7 +281,7 @@ class _GridLayoutState extends State<GridLayout> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => DriverDashboardScreen(entityId: entity.entityId),
+                                  builder: (context) => EntityMenuScreen(entityId: entity.entityId),
                                 ),
                               );
                             },
@@ -356,7 +356,7 @@ class _GridLayoutState extends State<GridLayout> {
                                             Navigator.push(
                                               context,
                                               MaterialPageRoute(
-                                                builder: (context) => DriverDashboardScreen(entityId: entity.entityId),
+                                                builder: (context) => EntityMenuScreen(entityId: entity.entityId),
                                               ),
                                             );
                                           },

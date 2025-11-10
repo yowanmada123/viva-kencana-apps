@@ -1,9 +1,9 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 
-import '../../data/repository/entity_repository.dart';
-import '../../models/entity.dart';
-import '../../utils/strict_location.dart';
+import '../../../data/repository/entity_repository.dart';
+import '../../../models/entity.dart';
+import '../../../utils/strict_location.dart';
 
 part 'entity_event.dart';
 part 'entity_state.dart';
