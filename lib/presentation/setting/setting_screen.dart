@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -36,7 +37,8 @@ class _SettingScreenState extends State<SettingScreen> {
   }
 
   @override
-  void initState() {    
+  void initState() {   
+    log('Access to lib/presentation/setting/setting_screen.dart');  
     loadUserData();
     super.initState();
   }

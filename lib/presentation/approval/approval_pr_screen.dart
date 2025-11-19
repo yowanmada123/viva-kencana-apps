@@ -1,0 +1,327 @@
+// approval_pr_screen.dart
+import 'dart:developer';
+
+import 'package:vivakencanaapp/bloc/approval_pr/approval_pr_list/approval_pr_list_bloc.dart';
+import 'package:vivakencanaapp/bloc/approval_pr/approve_pr/approve_pr_bloc.dart';
+import 'package:vivakencanaapp/bloc/auth/authentication/authentication_bloc.dart';
+import 'package:vivakencanaapp/data/repository/approval_pr_repository.dart';
+import 'package:vivakencanaapp/models/fdpi/approval_pr/approval_pr.dart';
+import 'package:vivakencanaapp/models/errors/custom_exception.dart';
+import 'package:vivakencanaapp/presentation/widgets/approval/approval_pr_card.dart';
+import 'package:vivakencanaapp/presentation/widgets/approval/aprrove_bottom_navigator.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../bloc/authorization/credentials/credentials_bloc.dart';
+
+class ApprovalPrScreen extends StatefulWidget {
+  final String title;
+  const ApprovalPrScreen({super.key, required this.title});
+
+  @override
+  ApprovalPrScreenState createState() => ApprovalPrScreenState();
+}
+
+class ApprovalPrScreenState extends State<ApprovalPrScreen> {
+  final PageController _pageController = PageController();
+  final List<ScrollController> _scrollControllers = [];
+  int _currentPage = 0;
+  bool _isAnimated = false;
+
+  @override
+  void initState() {
+    log('Access to presentation/approval/approval_pr_screen.dart'); 
+    super.initState();
+    _initializeControllers();
+  }
+
+  void _initializeControllers() {
+    for (int i = 0; i < 3; i++) {
+      _scrollControllers.add(ScrollController());
+    }
+  }
+
+  void _handleApproval(
+    int index,
+    List<ApprovalPR> poList,
+    BuildContext context,
+  ) {
+    final credentialState = context.read<CredentialsBloc>().state;
+
+    if (poList[index].aprvBy == "" && poList[index].rjcBy == "") {
+      if (credentialState is CredentialsLoadSuccess) {
+        if (credentialState.credentials["APPROVALPR1"] == "Y") {
+          context.read<ApprovePrBloc>().add(
+            ApprovePrLoadEvent(
+              prId: poList[index].prId,
+              typeAprv: "approve1",
+              status: "approve",
+            ),
+          );
+        } else {
+          _showNoPermissionSnackBar(context);
+          return;
+        }
+      } else {
+        _showNoPermissionSnackBar(context);
+        return;
+      }
+    } else if (poList[index].aprv2By == "" && poList[index].rjc2By == "") {
+      if (credentialState is CredentialsLoadSuccess) {
+        if (credentialState.credentials["APPROVALPR2"] == "Y") {
+          context.read<ApprovePrBloc>().add(
+            ApprovePrLoadEvent(
+              prId: poList[index].prId,
+              typeAprv: "approve2",
+              status: "approve",
+            ),
+          );
+        } else {
+          _showNoPermissionSnackBar(context);
+          return;
+        }
+      } else {
+        _showNoPermissionSnackBar(context);
+        return;
+      }
+    }
+
+    if (index >= poList.length) return;
+
+    context.read<ApprovalPrListBloc>().add(RemoveListIndex(index: index));
+  }
+
+  void _handleReject(int index, List<ApprovalPR> poList, BuildContext context) {
+    final credentialState = context.read<CredentialsBloc>().state;
+
+    if (poList[index].aprvBy == "" && poList[index].rjcBy == "") {
+      if (credentialState is CredentialsLoadSuccess) {
+        if (credentialState.credentials["APPROVALPR1"] == "Y") {
+          context.read<ApprovePrBloc>().add(
+            ApprovePrLoadEvent(
+              prId: poList[index].prId,
+              typeAprv: "approve1",
+              status: "reject",
+            ),
+          );
+        } else {
+          _showNoPermissionSnackBar(context);
+          return;
+        }
+      } else {
+        _showNoPermissionSnackBar(context);
+        return;
+      }
+    } else if (poList[index].aprv2By == "" && poList[index].rjcBy == "") {
+      if (credentialState is CredentialsLoadSuccess) {
+        if (credentialState.credentials["APPROVALPR2"] == "Y") {
+          context.read<ApprovePrBloc>().add(
+            ApprovePrLoadEvent(
+              prId: poList[index].prId,
+              typeAprv: "approve2",
+              status: "reject",
+            ),
+          );
+        } else {
+          _showNoPermissionSnackBar(context);
+          return;
+        }
+      } else {
+        _showNoPermissionSnackBar(context);
+        return;
+      }
+    }
+
+    if (index >= poList.length) return;
+
+    context.read<ApprovalPrListBloc>().add(RemoveListIndex(index: index));
+  }
+
+  void _showNoPermissionSnackBar(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text("Anda tidak memiliki permission untuk approve PR"),
+      ),
+    );
+  }
+
+  ScrollController _getController(int index) {
+    return _scrollControllers[index % 3];
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    for (var controller in _scrollControllers) {
+      controller.dispose();
+    }
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create:
+              (context) => ApprovalPrListBloc(
+                approvalPRRepository: context.read<ApprovalPRRepository>(),
+              )..add(GetApprovalPRListEvent()),
+        ),
+        BlocProvider(
+          create:
+              (context) => ApprovePrBloc(
+                approvalPRRepository: context.read<ApprovalPRRepository>(),
+              ),
+        ),
+      ],
+      child: Scaffold(
+        appBar: AppBar(title: Text(widget.title)),
+        body: SafeArea(
+          child: BlocConsumer<ApprovalPrListBloc, ApprovalPrListState>(
+            listener: (context, state) {
+              if (state is ApprovalPrListFailureState) {
+                if (state.error is UnauthorizedException) {
+                  context.read<AuthenticationBloc>().add(
+                    SetAuthenticationStatus(isAuthenticated: false),
+                  );
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        "Session Anda telah habis. Silakan login kembali",
+                      ),
+                      duration: Duration(seconds: 5),
+                      behavior: SnackBarBehavior.floating,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      backgroundColor: Color(0xffEB5757),
+                    ),
+                  );
+                  Navigator.of(context).popUntil((route) => route.isFirst);
+                  return;
+                }
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text(state.message)));
+              }
+            },
+            builder: (context, state) {
+              if (state is ApprovalPrListInitial ||
+                  state is ApprovalPrListLoadingState) {
+                return Center(child: CircularProgressIndicator());
+              }
+              if (state is ApprovalPrListFailureState) {
+                return Center(child: Text(state.message));
+              }
+              if (state is ApprovalPrListSuccessState) {
+                if (_currentPage >= state.data.length &&
+                    state.data.isNotEmpty) {
+                  _currentPage = state.data.length - 1;
+                  _pageController.animateToPage(
+                    _currentPage,
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeOut,
+                  );
+                }
+
+                if (state.data.isEmpty) {
+                  return Center(
+                    child: Text(
+                      "Approval PR Tidak Tersedia",
+                      style: TextStyle(fontSize: 14),
+                    ),
+                  );
+                }
+                return NotificationListener<ScrollNotification>(
+                  onNotification: (notification) => true,
+                  child: PageView.builder(
+                    controller: _pageController,
+                    scrollDirection: Axis.vertical,
+                    itemCount: state.data.length,
+                    onPageChanged: (index) {
+                      setState(() => _currentPage = index);
+                    },
+                    itemBuilder: (context, index) {
+                      return ApprovalPrCard(
+                        requests: state.data[index],
+                        scrollController: _getController(index),
+                        onReachBottom: () async {
+                          if (_isAnimated) return;
+                          setState(() => _isAnimated = true);
+
+                          final nextPage = index + 1;
+                          if (nextPage < state.data.length) {
+                            await _pageController.animateToPage(
+                              nextPage,
+                              duration: Duration(milliseconds: 300),
+                              curve: Curves.easeOut,
+                            );
+                          }
+
+                          setState(() => _isAnimated = false);
+                        },
+                        onReachTop: () async {
+                          if (_isAnimated) return;
+                          setState(() => _isAnimated = true);
+
+                          final prevPage = index - 1;
+                          if (prevPage >= 0) {
+                            await _pageController.animateToPage(
+                              prevPage,
+                              duration: Duration(milliseconds: 300),
+                              curve: Curves.easeOut,
+                            );
+                          }
+
+                          setState(() => _isAnimated = false);
+                        },
+                      );
+                    },
+                  ),
+                );
+              }
+              return Container();
+            },
+          ),
+        ),
+        bottomNavigationBar:
+            BlocBuilder<ApprovalPrListBloc, ApprovalPrListState>(
+              builder: (context, state) {
+                if (state is! ApprovalPrListSuccessState) {
+                  return SizedBox.shrink();
+                }
+
+                final credentialState = context.read<CredentialsBloc>().state;
+                final poList = state.data;
+
+                if (_currentPage >= poList.length) return SizedBox.shrink();
+                final currentPr = poList[_currentPage];
+
+                bool canApprove = false;
+
+                if (credentialState is CredentialsLoadSuccess) {
+                  if (currentPr.aprvBy == "" && currentPr.rjcBy == "") {
+                    canApprove = true;
+                  } else if (currentPr.aprv2By == "" &&
+                      currentPr.rjc2By == "") {
+                    canApprove = true;
+                  }
+                }
+
+                if (!canApprove) return SizedBox.shrink();
+                return ApprovalBottomBar(
+                  isLoading: false,
+                  onApprove:
+                      () => _handleApproval(_currentPage, state.data, context),
+                  onReject: () {
+                    _handleReject(_currentPage, state.data, context);
+                  },
+                  canApprove: canApprove,
+                );
+              },
+            ),
+      ),
+    );
+  }
+}

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -22,6 +24,7 @@ class _SalesActivityHistoryDetailImagesScreenState extends State<SalesActivityHi
 
   @override
   void initState() {
+    log('Access to lib/presentation/sales_activity/sales_activity_history_detail_images_screen.dart');
     super.initState();
     context.read<SalesActivityHistoryVisitDetailListImageBloc>().add(FetchSalesActivityImages(
       entityId: widget.historyDetail.entityId,

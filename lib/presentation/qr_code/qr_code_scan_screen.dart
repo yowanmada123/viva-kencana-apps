@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -9,6 +10,7 @@ class QrCodeScanScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    log('Access to lib/presentation/qr_code/qr_code_scan_screen.dart'); 
     return const QrCodeScanView();
   }
 }

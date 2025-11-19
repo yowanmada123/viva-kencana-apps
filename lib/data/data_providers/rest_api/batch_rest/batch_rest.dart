@@ -35,7 +35,7 @@ class BatchRest {
         data: body,
       );
       if (response.statusCode == 200) {
-        log('Response body: ${response.data}');
+        // log('Response body: ${response.data}');
         final body = response.data;
         final deliveryDetail = List<DeliveryDetail>.from(
           body['data'].map((e) {
@@ -72,7 +72,7 @@ class BatchRest {
         data: body,
       );
       if (response.statusCode == 200) {
-        log('Response body: ${response.data}');
+       // log('Response body: ${response.data}');
         final body = response.data;
         final batch = Batch.fromMap(body['data']);
         // final warehouse = List<Warehouse>.from(
@@ -118,7 +118,7 @@ class BatchRest {
         data: body,
       );
       if (response.statusCode == 200) {
-        log('Response body: ${response.data}');
+       // log('Response body: ${response.data}');
         final body = response.data;
         final deliveryDetail = List<DeliveryDetail>.from(
           body['data'].map((e) {
@@ -161,7 +161,7 @@ class BatchRest {
         data: body,
       );
       if (response.statusCode == 200) {
-        log('Response body: ${response.data}');
+        // log('Response body: ${response.data}');
         final body = response.data;
         final deliveryDetail = List<DeliveryDetail>.from(
           body['data'].map((e) {
