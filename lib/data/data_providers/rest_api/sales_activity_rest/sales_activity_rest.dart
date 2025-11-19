@@ -21,11 +21,12 @@ class SalesActivityRest {
   Future<Either<CustomException, SalesInfo>> getSalesInfo() async {
     try {
       http.options.headers['requiresToken'] = true;
-      log('Dio headers: ${http.options.headers}');
+      // log('Dio headers: ${http.options.headers}');
+      log('Request to: https://v3.kencana.org/api/viva/transaction/CustomerVisit/getUserData (GET)');
       final response = await http.get(
         "api/viva/transaction/CustomerVisit/getUserData",
       );
-      log(response.toString());
+      log('Response from "api/viva/transaction/CustomerVisit/getUserData" : ${response.toString()}');
       if (response.statusCode == 200) {
         final body = response.data;
         final salesInfo = SalesInfo.fromMap(body['data']);
@@ -54,6 +55,7 @@ class SalesActivityRest {
       final response = await http.get(
         "api/kmb/sales/CustomerVisit/getProvinceMobile",
       );
+       log('Response from "api/kmb/sales/CustomerVisit/getProvinceMobile" : ${response.toString()}');
       if (response.statusCode == 200) {
         final body = response.data;
 
@@ -83,11 +85,15 @@ class SalesActivityRest {
   }) async {
     try {
       http.options.headers['requiresToken'] = true;
-      
+      log(
+        'Request to https://v2.kencana.org/api/kmb/sales/CustomerVisit/provinceOnChange (GET)',
+      );
       final response = await http.get(
         "api/kmb/sales/CustomerVisit/provinceOnChange",
         data: {"province": province},
       );
+      log('Response from "api/kmb/sales/CustomerVisit/provinceOnChange" : ${response.toString()}');
+      
       if (response.statusCode == 200) {
         final body = response.data;
 

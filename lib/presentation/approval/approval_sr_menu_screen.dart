@@ -17,14 +17,14 @@ class ApprovalItem {
   });
 }
 
-class ApprovalSrScreen extends StatefulWidget {
-  const ApprovalSrScreen({super.key});
+class ApprovalSrMenuScreen extends StatefulWidget {
+  const ApprovalSrMenuScreen({super.key});
 
   @override
-  State<ApprovalSrScreen> createState() => _ApprovalSrScreenState();
+  State<ApprovalSrMenuScreen> createState() => _ApprovalSrMenuScreenState();
 }
 
-class _ApprovalSrScreenState extends State<ApprovalSrScreen> {
+class _ApprovalSrMenuScreenState extends State<ApprovalSrMenuScreen> {
   String? selectedDepartment;
   String? selectedStatus;
   DateTime? startDate;
@@ -136,7 +136,7 @@ class _ApprovalSrScreenState extends State<ApprovalSrScreen> {
                   children: [
                     Expanded(
                       child: DropdownButtonFormField<String>(
-                        value: selectedDepartment,
+                        initialValue: selectedDepartment,
                         decoration: const InputDecoration(
                           labelText: 'Department',
                           border: OutlineInputBorder(),
@@ -159,7 +159,7 @@ class _ApprovalSrScreenState extends State<ApprovalSrScreen> {
                     const SizedBox(width: 8),
                     Expanded(
                       child: DropdownButtonFormField<String>(
-                        value: selectedStatus,
+                        initialValue: selectedStatus,
                         decoration: const InputDecoration(
                           labelText: 'Approve Status',
                           border: OutlineInputBorder(),

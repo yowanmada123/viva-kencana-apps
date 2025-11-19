@@ -19,7 +19,7 @@ import '../../models/menu.dart';
 import '../../utils/strict_location.dart';
 import '../qr_code/qr_code_screen.dart';
 import '../sales_activity/sales_activity_dashboard_screen.dart';
-import '../approval/approval_sr_screen.dart';
+import '../approval/approval_sr_menu_screen.dart';
 
 class EntityMenuScreen extends StatelessWidget {
   const EntityMenuScreen({super.key, required this.entityId, required this.entityDescription,});
@@ -145,7 +145,7 @@ class _MyGridLayoutState extends State<MyGridLayout> {
         routeAction = () async {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => ApprovalSrScreen()),
+            MaterialPageRoute(builder: (_) => ApprovalSrMenuScreen()),
           );
         };
 
@@ -240,7 +240,7 @@ class _MyGridLayoutState extends State<MyGridLayout> {
           action: () async {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (_) => ApprovalSrScreen()),
+              MaterialPageRoute(builder: (_) => ApprovalSrMenuScreen()),
             );
           },
         );

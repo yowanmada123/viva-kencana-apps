@@ -5,10 +5,10 @@ import 'package:vivakencanaapp/models/approval_pr/approval_pr.dart';
 import 'package:vivakencanaapp/utils/net_utils.dart';
 import '../../../../models/errors/custom_exception.dart';
 
-class ApprovalRest {
+class ApprovalPrRest {
   Dio dio;
 
-  ApprovalRest(this.dio);
+  ApprovalPrRest(this.dio);
 
   Future<Either<CustomException, List<Map<String, dynamic>>>> getUserData() async {
     try {

@@ -7,10 +7,10 @@ import 'package:vivakencanaapp/models/fdpi/approval_pr/approval_pr.dart';
 import '../../../../models/errors/custom_exception.dart';
 import '../../../../utils/net_utils.dart';
 
-class ApprovalPRRest {
+class ApprovalPrRest {
   Dio http;
 
-  ApprovalPRRest(this.http);
+  ApprovalPrRest(this.http);
 
   Future<Either<CustomException, List<ApprovalPR>>> getPRList() async {
     try {
