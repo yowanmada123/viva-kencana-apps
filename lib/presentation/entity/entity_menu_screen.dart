@@ -1,8 +1,11 @@
 import 'dart:async';
+import 'dart:developer';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:vivakencanaapp/data/data_providers/rest_api/approval_rest/approval_rest.dart';
 
 import '../../bloc/auth/authentication/authentication_bloc.dart';
 import '../../bloc/auth/logout/logout_bloc.dart';
@@ -16,11 +19,13 @@ import '../../models/menu.dart';
 import '../../utils/strict_location.dart';
 import '../qr_code/qr_code_screen.dart';
 import '../sales_activity/sales_activity_dashboard_screen.dart';
+import '../approval/approvalSR_screen.dart';
 
 class EntityMenuScreen extends StatelessWidget {
-  const EntityMenuScreen({super.key, required this.entityId});
+  const EntityMenuScreen({super.key, required this.entityId, required this.entityDescription,});
 
   final String entityId;
+  final String entityDescription; 
 
   @override
   Widget build(BuildContext context) {
@@ -37,15 +42,16 @@ class EntityMenuScreen extends StatelessWidget {
                     ..add(LoadAccessMenu(entityId: entityId)),
         ),
       ],
-      child: MyGridLayout(entityId: entityId),
+      child: MyGridLayout(entityId: entityId, entityDescription: entityDescription),
     );
   }
 }
 
 class MyGridLayout extends StatefulWidget {
-  const MyGridLayout({super.key, required this.entityId});
+  const MyGridLayout({super.key, required this.entityId, required this.entityDescription,});
 
   final String entityId;
+  final String entityDescription;
 
   @override
   _MyGridLayoutState createState() => _MyGridLayoutState();
@@ -132,6 +138,16 @@ class _MyGridLayoutState extends State<MyGridLayout> {
           }
         };
         break;
+      case 'mnuApprovalList':
+        
+        routeAction = () async {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => ApprovalSRScreen()),
+          );
+        };
+
+        break;
       default:
         routeAction = null;
     }
@@ -217,7 +233,15 @@ class _MyGridLayoutState extends State<MyGridLayout> {
             }
           },
         );
-
+      case 'mnuApprovalList':
+        return submenu.copyWith(
+          action: () async {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => ApprovalSRScreen()),
+            );
+          },
+        );
       default:
         return submenu.copyWith(action: null);
     }
@@ -266,7 +290,7 @@ class _MyGridLayoutState extends State<MyGridLayout> {
         backgroundColor: Theme.of(context).primaryColor,
         iconTheme: const IconThemeData(color: Colors.white),
         title: Text(
-          widget.entityId,
+          widget.entityDescription,
           textAlign: TextAlign.center,
           style: TextStyle(
             fontFamily: "Poppins",

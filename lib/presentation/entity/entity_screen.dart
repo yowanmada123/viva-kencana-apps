@@ -281,7 +281,7 @@ class _GridLayoutState extends State<GridLayout> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => EntityMenuScreen(entityId: entity.entityId),
+                                  builder: (context) => EntityMenuScreen(entityId: entity.entityId, entityDescription: entity.description),
                                 ),
                               );
                             },
@@ -356,7 +356,7 @@ class _GridLayoutState extends State<GridLayout> {
                                             Navigator.push(
                                               context,
                                               MaterialPageRoute(
-                                                builder: (context) => EntityMenuScreen(entityId: entity.entityId),
+                                                builder: (context) => EntityMenuScreen(entityId: entity.entityId, entityDescription: entity.description),
                                               ),
                                             );
                                           },

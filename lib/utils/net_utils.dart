@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:dio/dio.dart' as dio;
 import 'package:http/http.dart';
 
@@ -8,6 +10,7 @@ class NetUtils {
     required Response response,
     String? customMessage,
   }) {
+    
     if (response.statusCode == 401) {
       return UnauthorizedException(message: response.body, errorCode: 401);
     } else if (response.statusCode == 403) {
@@ -21,9 +24,9 @@ class NetUtils {
 
   static CustomException parseDioException(dio.DioException e) {
     try {
+      
       dio.Response response = e.response!;
-      String message =
-          response.data['message'] ?? "Terjadi kesalahan! Silakan coba lagi.";
+      String message = response.data['message'] ?? "Terjadi kesalahan! Silakan coba lagi.";
 
       if (response.statusCode == 401) {
         return UnauthorizedException(message: message);
