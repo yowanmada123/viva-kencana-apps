@@ -5,6 +5,7 @@ import 'package:vivakencanaapp/bloc/approval_pr/approval_pr_list/approval_pr_lis
 import 'package:vivakencanaapp/bloc/approval_pr/approve_pr/approve_pr_bloc.dart';
 import 'package:vivakencanaapp/bloc/auth/authentication/authentication_bloc.dart';
 import 'package:vivakencanaapp/data/repository/approval_pr_repository.dart';
+import 'package:vivakencanaapp/models/approval_pr/approval_pr.dart';
 import 'package:vivakencanaapp/models/fdpi/approval_pr/approval_pr.dart';
 import 'package:vivakencanaapp/models/errors/custom_exception.dart';
 import 'package:vivakencanaapp/presentation/widgets/approval/approval_pr_card.dart';

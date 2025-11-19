@@ -1,12 +1,11 @@
-// approval_pr_card.dart
-import 'package:vivakencanaapp/bloc/approval_pr/approval_pr_list/approval_pr_list_bloc.dart';
-import 'package:vivakencanaapp/models/fdpi/approval_pr/approval_pr.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
+import 'package:vivakencanaapp/bloc/approval_pr/approval_pr_list/approval_pr_list_bloc.dart';
+import 'package:vivakencanaapp/models/approval_pr/approval_pr.dart';
+import 'package:vivakencanaapp/presentation/widgets/vertical_timeline.dart';
 
-import '../vertical_timeline.dart';
 
 class ApprovalPrCard extends StatefulWidget {
   final ApprovalPR requests;

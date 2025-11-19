@@ -2,7 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 
 import '../../../data/repository/approval_pr_repository.dart';
-import '../../../models/fdpi/approval_pr/approval_pr.dart';
+import '../../../models/approval_pr/approval_pr.dart';
 
 part 'approval_pr_list_event.dart';
 part 'approval_pr_list_state.dart';

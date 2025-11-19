@@ -10,13 +10,10 @@ import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
-<<<<<<< HEAD
-import 'package:vivakencanaapp/bloc/approval_sr/approval_sr_bloc.dart';
-import 'package:vivakencanaapp/data/data_providers/rest_api/approval_rest/approval_pr_rest.dart';
-=======
+import 'package:vivakencanaapp/data/data_providers/rest_api/approval/approval_pr_rest.dart';
+
 import 'package:vivakencanaapp/bloc/authorization/credentials/credentials_bloc.dart';
 import 'package:vivakencanaapp/data/repository/approval_pr_repository.dart';
->>>>>>> feat/add-approval-pr-feature
 
 import 'bloc/auth/authentication/authentication_bloc.dart';
 import 'bloc/sales_activity/checkin/sales_activity_form_checkin_bloc.dart';
@@ -38,7 +35,6 @@ import 'data/repository/authorization_repository.dart';
 import 'data/repository/batch_repository.dart';
 import 'data/repository/entity_repository.dart';
 import 'data/repository/sales_repository.dart';
-import 'data/repository/approval_sr_repository.dart';
 import 'environment.dart';
 import 'presentation/entity/entity_screen.dart';
 import 'presentation/login/login_form_screen.dart';
@@ -71,7 +67,7 @@ void main() async {
   final entityRest = EntityRest(dioClient);
   final authorizationRest = AuthorizationRest(authClient);
   final salesActivityRest = SalesActivityRest(dioClient);
-  final approvalPrRest = ApprovalPrRest(dioClient);
+  final approvalPrRest = ApprovalPRRest(dioClient);
 
   final authRepository = AuthRepository(
     authRest: authRest,
@@ -81,7 +77,9 @@ void main() async {
   final entityRepository = EntityRepository(entityRest: entityRest);
   final authorizationRepository = AuthorizationRepository(authorizationRest: authorizationRest);
   final salesActivityRepository = SalesActivityRepository(salesActivityRest: salesActivityRest);
-  final approvalSrRepository = ApprovalPrRepository(approvalPrRest: approvalPrRest);
+  final approvalPrRepository = ApprovalPRRepository(
+    approvalPRRest: approvalPrRest,
+  );
 
   runApp(
     MultiRepositoryProvider(
@@ -91,7 +89,7 @@ void main() async {
         RepositoryProvider.value(value: entityRepository),
         RepositoryProvider.value(value: authorizationRepository),
         RepositoryProvider.value(value: salesActivityRepository),
-        RepositoryProvider.value(value: approvalSrRepository),
+        RepositoryProvider.value(value: approvalPrRepository),
       ],
       child: MultiBlocProvider(
         providers: [

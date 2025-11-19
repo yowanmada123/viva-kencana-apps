@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 
 import '../../../utils/datetime_convertion.dart';
 
-class ApprovalPR {
+class ApprovalPr {
   final String prId;
   final DateTime? dtPr;
   final String deptId;
@@ -38,7 +38,7 @@ class ApprovalPR {
   final String wAprv2By;
   final String typePr;
   final List<ApprovalArticlePR> article;
-  ApprovalPR({
+  ApprovalPr({
     required this.prId,
     required this.dtPr,
     required this.deptId,
@@ -74,7 +74,7 @@ class ApprovalPR {
     required this.article,
   });
 
-  ApprovalPR copyWith({
+  ApprovalPr copyWith({
     String? prId,
     DateTime? dtPr,
     String? deptId,
@@ -109,7 +109,7 @@ class ApprovalPR {
     String? typePr,
     List<ApprovalArticlePR>? article,
   }) {
-    return ApprovalPR(
+    return ApprovalPr(
       prId: prId ?? this.prId,
       dtPr: dtPr ?? this.dtPr,
       deptId: deptId ?? this.deptId,
@@ -184,8 +184,8 @@ class ApprovalPR {
     };
   }
 
-  factory ApprovalPR.fromMap(Map<String, dynamic> map) {
-    return ApprovalPR(
+  factory ApprovalPr.fromMap(Map<String, dynamic> map) {
+    return ApprovalPr(
       prId: map['pr_id'] ?? '',
       dtPr: parseDateTime(map['dt_pr'] ?? ''),
       deptId: map['dept_id'] ?? '',
@@ -226,19 +226,19 @@ class ApprovalPR {
 
   String toJson() => json.encode(toMap());
 
-  factory ApprovalPR.fromJson(String source) =>
-      ApprovalPR.fromMap(json.decode(source));
+  factory ApprovalPr.fromJson(String source) =>
+      ApprovalPr.fromMap(json.decode(source));
 
   @override
   String toString() {
-    return 'ApprovalPR(prId: $prId, dtPr: $dtPr, deptId: $deptId, address: $address, city: $city, deptName: $deptName, qty: $qty, picId: $picId, vendorId: $vendorId, vendorName: $vendorName, wgt: $wgt, prNum: $prNum, stat: $stat, memoTxt: $memoTxt, trType: $trType, dtAprv: $dtAprv, dtAprv2: $dtAprv2, dtRjc: $dtRjc, dtRjc2: $dtRjc2, aprvBy: $aprvBy, aprv2By: $aprv2By, rjcBy: $rjcBy, rjc2By: $rjc2By, siteName: $siteName, clusterName: $clusterName, houseName: $houseName, officeId: $officeId, office: $office, wCreatedBy: $wCreatedBy, wAprv1By: $wAprv1By, wAprv2By: $wAprv2By, article: $article, typePr: $typePr)';
+    return 'ApprovalPr(prId: $prId, dtPr: $dtPr, deptId: $deptId, address: $address, city: $city, deptName: $deptName, qty: $qty, picId: $picId, vendorId: $vendorId, vendorName: $vendorName, wgt: $wgt, prNum: $prNum, stat: $stat, memoTxt: $memoTxt, trType: $trType, dtAprv: $dtAprv, dtAprv2: $dtAprv2, dtRjc: $dtRjc, dtRjc2: $dtRjc2, aprvBy: $aprvBy, aprv2By: $aprv2By, rjcBy: $rjcBy, rjc2By: $rjc2By, siteName: $siteName, clusterName: $clusterName, houseName: $houseName, officeId: $officeId, office: $office, wCreatedBy: $wCreatedBy, wAprv1By: $wAprv1By, wAprv2By: $wAprv2By, article: $article, typePr: $typePr)';
   }
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
 
-    return other is ApprovalPR &&
+    return other is ApprovalPr &&
         other.prId == prId &&
         other.dtPr == dtPr &&
         other.deptId == deptId &&

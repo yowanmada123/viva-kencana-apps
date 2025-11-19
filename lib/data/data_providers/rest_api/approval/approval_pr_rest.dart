@@ -2,15 +2,15 @@ import 'dart:developer';
 
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
-import 'package:vivakencanaapp/models/fdpi/approval_pr/approval_pr.dart';
+import 'package:vivakencanaapp/models/approval_pr/approval_pr.dart';
 
 import '../../../../models/errors/custom_exception.dart';
 import '../../../../utils/net_utils.dart';
 
-class ApprovalPrRest {
+class ApprovalPRRest {
   Dio http;
 
-  ApprovalPrRest(this.http);
+  ApprovalPRRest(this.http);
 
   Future<Either<CustomException, List<ApprovalPR>>> getPRList() async {
     try {
