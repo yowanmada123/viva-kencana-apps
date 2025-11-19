@@ -20,7 +20,7 @@ class AuthorizationRest {
       dio.options.headers['requiresToken'] = true;
       final data = {"entity_id": entityId, "appl_id": applId};
       final response = await dio.post("api/mobile/getMenu", data: data);
-
+      log('Request to https://v3.kencana.org/api/fpi/prpo/getList (PRST)');
       if (response.statusCode == 200) {
         final body = response.data;
         log(body.toString());

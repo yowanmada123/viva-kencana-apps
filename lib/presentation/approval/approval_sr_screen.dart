@@ -17,14 +17,14 @@ class ApprovalItem {
   });
 }
 
-class ApprovalSRScreen extends StatefulWidget {
-  const ApprovalSRScreen({super.key});
+class ApprovalSrScreen extends StatefulWidget {
+  const ApprovalSrScreen({super.key});
 
   @override
-  State<ApprovalSRScreen> createState() => _ApprovalSRScreenState();
+  State<ApprovalSrScreen> createState() => _ApprovalSrScreenState();
 }
 
-class _ApprovalSRScreenState extends State<ApprovalSRScreen> {
+class _ApprovalSrScreenState extends State<ApprovalSrScreen> {
   String? selectedDepartment;
   String? selectedStatus;
   DateTime? startDate;

@@ -5,7 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:vivakencanaapp/data/data_providers/rest_api/approval_rest/approval_rest.dart';
+import 'package:vivakencanaapp/data/data_providers/rest_api/approval_rest/approval_pr_rest.dart';
 
 import '../../bloc/auth/authentication/authentication_bloc.dart';
 import '../../bloc/auth/logout/logout_bloc.dart';
@@ -19,7 +19,7 @@ import '../../models/menu.dart';
 import '../../utils/strict_location.dart';
 import '../qr_code/qr_code_screen.dart';
 import '../sales_activity/sales_activity_dashboard_screen.dart';
-import '../approval/approvalSR_screen.dart';
+import '../approval/approval_sr_screen.dart';
 
 class EntityMenuScreen extends StatelessWidget {
   const EntityMenuScreen({super.key, required this.entityId, required this.entityDescription,});
@@ -143,7 +143,7 @@ class _MyGridLayoutState extends State<MyGridLayout> {
         routeAction = () async {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => ApprovalSRScreen()),
+            MaterialPageRoute(builder: (_) => ApprovalSrScreen()),
           );
         };
 
@@ -238,7 +238,7 @@ class _MyGridLayoutState extends State<MyGridLayout> {
           action: () async {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (_) => ApprovalSRScreen()),
+              MaterialPageRoute(builder: (_) => ApprovalSrScreen()),
             );
           },
         );

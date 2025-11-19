@@ -11,7 +11,7 @@ import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:vivakencanaapp/bloc/approval_sr/approval_sr_bloc.dart';
-import 'package:vivakencanaapp/data/data_providers/rest_api/approval_rest/approval_rest.dart';
+import 'package:vivakencanaapp/data/data_providers/rest_api/approval_rest/approval_pr_rest.dart';
 
 import 'bloc/auth/authentication/authentication_bloc.dart';
 import 'bloc/sales_activity/checkin/sales_activity_form_checkin_bloc.dart';
