@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -152,6 +153,7 @@ class _SalesActivityFormScreenState extends State<SalesActivityFormScreen> {
 
   @override
   void initState() {
+    log('Access to lib/presentation/sales_activity/sales_activity_form_screen.dart');
     super.initState();
     _debounce?.cancel();
     context.read<SalesActivityFormBloc>().add(FetchProvinces());

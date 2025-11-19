@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -26,6 +28,7 @@ class SalesActivityDashboardScreen extends StatefulWidget {
 class _SalesActivityDashboardScreenState extends State<SalesActivityDashboardScreen> {
   @override
   void initState() {
+    log('Access to lib/presentation/sales_activity/sales_activity_dashboard_screen.dart'); 
     super.initState();
     SalesActivitySyncService().syncPendingActivities();
     context.read<SalesActivityFormCheckInBloc>().add(LoadSalesData());

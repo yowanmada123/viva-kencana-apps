@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -85,6 +86,7 @@ class _WareHouseContentListState extends State<WareHouseContentListView> {
 
   @override
   void initState() {
+    log('Access to lib/presentation/warehouse/warehouse_content_list_screen.dart'); 
     context.read<DeliveryDetailBloc>().add(
       LoadDeliveryDetail(
         batchID: widget.batchID,

@@ -10,6 +10,7 @@ import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:vivakencanaapp/bloc/authorization/credentials/credentials_bloc.dart';
 
 import 'bloc/auth/authentication/authentication_bloc.dart';
 import 'bloc/sales_activity/checkin/sales_activity_form_checkin_bloc.dart';
@@ -92,6 +93,7 @@ void main() async {
           BlocProvider(lazy: false, create: (context) => SalesActivityHistoryVisitDetailBloc(salesActivityRepository: salesActivityRepository)),
           BlocProvider(lazy: false, create: (context) => SalesActivityHistoryVisitUploadImageBloc(salesActivityRepository: salesActivityRepository)),
           BlocProvider(lazy: false, create: (context) => SalesActivityHistoryVisitDetailListImageBloc(salesActivityRepository: salesActivityRepository)),
+          BlocProvider(lazy: false, create: (context) => CredentialsBloc(authorizationRepository: authorizationRepository,),),
         ],
         child: const MyApp(),
       ),

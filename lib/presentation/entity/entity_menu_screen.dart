@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -24,6 +25,7 @@ class EntityMenuScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    log('Access to presentation/entity/entitiy_menu_screen.dart'); 
     final authRepository = context.read<AuthRepository>();
     final authorizationRepository = context.read<AuthorizationRepository>();
 
@@ -33,6 +35,7 @@ class EntityMenuScreen extends StatelessWidget {
         BlocProvider(
           create:
               (context) =>
+              
                   AccessMenuBloc(authorizationRepository)
                     ..add(LoadAccessMenu(entityId: entityId)),
         ),
