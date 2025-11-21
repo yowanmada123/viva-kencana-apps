@@ -4,8 +4,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:vivakencanaapp/bloc/approval_pr/approval_pr_list/approval_pr_list_bloc.dart';
 import 'package:vivakencanaapp/models/approval_pr/approval_pr.dart';
+import 'package:vivakencanaapp/models/approval_pr/approval_pr_fdpi.dart';
 import 'package:vivakencanaapp/presentation/widgets/vertical_timeline.dart';
-
 
 class ApprovalPrCard extends StatefulWidget {
   final ApprovalPR requests;
@@ -80,24 +80,29 @@ class _ApprovalPrCardState extends State<ApprovalPrCard> {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildSectionTitle(widget.requests.office),
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(16.w, 8.w, 16.w, 8.w),
-                      child: Text(
-                        widget.requests.typePr,
-                        style: TextStyle(fontSize: 14.sp),
-                      ),
-                    ),
-                    _buildInfoRow(
-                      "Departement",
-                      widget.requests.deptName.isNotEmpty
-                          ? widget.requests.deptName
-                          : '-',
-                    ),
-                    _buildInfoRow("Vendor", widget.requests.vendorName),
+                    ///////////////  TER COMMENT SEMENTARA //////////////////
+                    // _buildSectionTitle(widget.requests.office),
+                    // Padding(
+                    //   padding: EdgeInsets.fromLTRB(16.w, 8.w, 16.w, 8.w),
+                    //   child: Text(
+                    //     widget.requests.typePr,
+                    //     style: TextStyle(fontSize: 14.sp),
+                    //   ),
+                    // ),
+                    // _buildInfoRow(
+                    //   "Departement",
+                    //   widget.requests.deptName.isNotEmpty
+                    //       ? widget.requests.deptName
+                    //       : '-',
+                    // ),
+                    // _buildInfoRow("Vendor", widget.requests.vendorName),
+                    ////////////////////////////////////////////////////////
+
+                    ///////////////  MEMANG TER COMMENT //////////////////
                     // _buildInfoRow("Site", widget.requests.siteName),
                     // _buildInfoRow("Cluster", widget.requests.clusterName),
                     // _buildInfoRow("House", widget.requests.houseName),
+                    ////////////////////////////////////////////////////////
                     _buildInfoRow("Note", widget.requests.memoTxt),
                     Padding(
                       padding: EdgeInsets.symmetric(
@@ -120,104 +125,109 @@ class _ApprovalPrCardState extends State<ApprovalPrCard> {
                               ),
                             ),
                             SizedBox(height: 8.w),
-                            ListView.builder(
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              itemCount: widget.requests.article.length,
-                              itemBuilder: (context, index) {
-                                final article = widget.requests.article[index];
-                                final String description = article.description;
-                                final String unitPrice = formatCurrency(
-                                  article.unitPrice,
-                                );
-                                final String qty = article.qty;
 
-                                final String price = formatCurrency(
-                                  article.amount,
-                                );
+                            ///////////////  TER COMMENT SEMENTARA //////////////////
+                            // ListView.builder(
+                            //   shrinkWrap: true,
+                            //   physics: const NeverScrollableScrollPhysics(),
+                            //   itemCount: widget.requests.article.length,
+                            //   itemBuilder: (context, index) {
+                            //     final article = widget.requests.article[index];
+                            //     final String description = article.description;
+                            //     final String unitPrice = formatCurrency(
+                            //       article.unitPrice,
+                            //     );
+                            //     final String qty = article.qty;
 
-                                return Card(
-                                  elevation: 2,
-                                  color:
-                                      Theme.of(
-                                        context,
-                                      ).colorScheme.surfaceBright,
-                                  margin: EdgeInsets.symmetric(vertical: 4.w),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Padding(
-                                    padding: EdgeInsets.all(8.w),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          description,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: TextStyle(
-                                            fontSize: 16.sp,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                        SizedBox(height: 4.w),
-                                        Text(
-                                          "Site: ${article.siteName}",
-                                          style: TextStyle(fontSize: 14.sp),
-                                        ),
-                                        Text(
-                                          "Cluster: ${article.clusterName}",
-                                          style: TextStyle(fontSize: 14.sp),
-                                        ),
-                                        Text(
-                                          "House: ${article.houseName}",
-                                          style: TextStyle(fontSize: 14.sp),
-                                        ),
-                                        Text(
-                                          "Quantity: $qty",
-                                          style: TextStyle(fontSize: 14.sp),
-                                        ),
-                                        Text(
-                                          "Unit price: $unitPrice",
-                                          style: TextStyle(fontSize: 14.sp),
-                                        ),
-                                        Text(
-                                          "Amount: $price",
-                                          style: TextStyle(fontSize: 14.sp),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
+                            //     final String price = formatCurrency(
+                            //       article.amount,
+                            //     );
+
+                            //     return Card(
+                            //       elevation: 2,
+                            //       color:
+                            //           Theme.of(
+                            //             context,
+                            //           ).colorScheme.surfaceBright,
+                            //       margin: EdgeInsets.symmetric(vertical: 4.w),
+                            //       shape: RoundedRectangleBorder(
+                            //         borderRadius: BorderRadius.circular(8),
+                            //       ),
+                            //       child: Padding(
+                            //         padding: EdgeInsets.all(8.w),
+                            //         child: Column(
+                            //           crossAxisAlignment:
+                            //               CrossAxisAlignment.start,
+                            //           children: [
+                            //             Text(
+                            //               description,
+                            //               overflow: TextOverflow.ellipsis,
+                            //               style: TextStyle(
+                            //                 fontSize: 16.sp,
+                            //                 fontWeight: FontWeight.bold,
+                            //               ),
+                            //             ),
+                            //             SizedBox(height: 4.w),
+                            //             Text(
+                            //               "Site: ${article.siteName}",
+                            //               style: TextStyle(fontSize: 14.sp),
+                            //             ),
+                            //             Text(
+                            //               "Cluster: ${article.clusterName}",
+                            //               style: TextStyle(fontSize: 14.sp),
+                            //             ),
+                            //             Text(
+                            //               "House: ${article.houseName}",
+                            //               style: TextStyle(fontSize: 14.sp),
+                            //             ),
+                            //             Text(
+                            //               "Quantity: $qty",
+                            //               style: TextStyle(fontSize: 14.sp),
+                            //             ),
+                            //             Text(
+                            //               "Unit price: $unitPrice",
+                            //               style: TextStyle(fontSize: 14.sp),
+                            //             ),
+                            //             Text(
+                            //               "Amount: $price",
+                            //               style: TextStyle(fontSize: 14.sp),
+                            //             ),
+                            //           ],
+                            //         ),
+                            //       ),
+                            //     );
+                            //   },
+                            // ),
+                            ///////////////  TER COMMENT SEMENTARA //////////////////
+                            ///
                           ],
                         ),
                       ),
                     ),
-
-                    _buildSection(
-                      "Proses Pengajuan",
-                      TimelineProgress(
-                        steps: [
-                          TimelineStep(
-                            header: "Pengajuan",
-                            detail: widget.requests.wCreatedBy,
-                            date: widget.requests.dtPr,
-                          ),
-                          TimelineStep(
-                            header: "Approve 1",
-                            detail: widget.requests.wAprv1By,
-                            date: widget.requests.dtAprv,
-                          ),
-                          TimelineStep(
-                            header: "Approve 2",
-                            detail: widget.requests.wAprv2By,
-                            date: widget.requests.dtAprv2,
-                          ),
-                        ],
-                      ),
-                    ),
+                    ///////////////  TER COMMENT SEMENTARA //////////////////
+                    // _buildSection(
+                    //   "Proses Pengajuan",
+                    //   TimelineProgress(
+                    //     steps: [
+                    //       TimelineStep(
+                    //         header: "Pengajuan",
+                    //         detail: widget.requests.wCreatedBy,
+                    //         date: widget.requests.dtPr,
+                    //       ),
+                    //       TimelineStep(
+                    //         header: "Approve 1",
+                    //         detail: widget.requests.wAprv1By,
+                    //         date: widget.requests.dtAprv,
+                    //       ),
+                    //       TimelineStep(
+                    //         header: "Approve 2",
+                    //         detail: widget.requests.wAprv2By,
+                    //         date: widget.requests.dtAprv2,
+                    //       ),
+                    //     ],
+                    //   ),
+                    // ),
+                    ///////////////  TER COMMENT SEMENTARA //////////////////
                     SizedBox(height: 40.w),
                   ],
                 );

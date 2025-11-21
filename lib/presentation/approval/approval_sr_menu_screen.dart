@@ -1,5 +1,45 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:vivakencanaapp/bloc/approval_pr/approval_pr_department/approval_pr_department_bloc.dart';
+import 'package:vivakencanaapp/bloc/approval_pr/approval_pr_list/approval_pr_list_bloc.dart';
+import 'package:vivakencanaapp/bloc/approval_pr/approve_pr/approve_pr_bloc.dart';
+import 'package:vivakencanaapp/data/repository/approval_pr_repository.dart';
+
+class ApprovalSrMenuScreen extends StatelessWidget {
+  const ApprovalSrMenuScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    log('Access to presentation/approval/approval_pr_screen.dart');
+
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create:
+              (context) => ApprovalPrDepartmentBloc(
+                approvalPRRepository: context.read<ApprovalPRRepository>(),
+              )..add(GetApprovalPrDepartmentEvent()),
+        ),
+        BlocProvider(
+          create:
+              (context) => ApprovalPrListBloc(
+                approvalPRRepository: context.read<ApprovalPRRepository>(),
+              ),
+        ),
+        BlocProvider(
+          create:
+              (context) => ApprovePrBloc(
+                approvalPRRepository: context.read<ApprovalPRRepository>(),
+              ),
+        ),
+      ],
+      child: ApprovalSrMenuView(),
+    );
+  }
+}
 
 class ApprovalItem {
   final String id;
@@ -17,20 +57,39 @@ class ApprovalItem {
   });
 }
 
-class ApprovalSrMenuScreen extends StatefulWidget {
-  const ApprovalSrMenuScreen({super.key});
+class ApprovalSrMenuView extends StatefulWidget {
+  const ApprovalSrMenuView({super.key});
 
   @override
-  State<ApprovalSrMenuScreen> createState() => _ApprovalSrMenuScreenState();
+  State<ApprovalSrMenuView> createState() => _ApprovalSrMenuScreenState();
 }
 
-class _ApprovalSrMenuScreenState extends State<ApprovalSrMenuScreen> {
+class _ApprovalSrMenuScreenState extends State<ApprovalSrMenuView> {
+  final PageController _pageController = PageController();
+  final List<ScrollController> _scrollControllers = [];
+  int _currentPage = 0;
+  bool _isAnimated = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeControllers();
+    // context.read<ApprovalPrDepartmentBloc>().add(
+    //   GetApprovalPrDepartmentEvent(),
+    // );
+  }
+
+  void _initializeControllers() {
+    for (int i = 0; i < 3; i++) {
+      _scrollControllers.add(ScrollController());
+    }
+  }
+
   String? selectedDepartment;
   String? selectedStatus;
   DateTime? startDate;
   DateTime? endDate;
 
-  final List<String> departments = ['Sales', 'Finance', 'HR', 'IT'];
   final List<String> statuses = ['Pending', 'Approved', 'Rejected'];
 
   List<ApprovalItem> getDummyApprovals() {
@@ -80,15 +139,18 @@ class _ApprovalSrMenuScreenState extends State<ApprovalSrMenuScreen> {
   List<ApprovalItem> getFilteredApprovals() {
     final approvals = getDummyApprovals();
     return approvals.where((item) {
-      final matchesDepartment = selectedDepartment == null || item.department == selectedDepartment;
-      final matchesStatus = selectedStatus == null || item.status == selectedStatus;
+      final matchesDepartment =
+          selectedDepartment == null || item.department == selectedDepartment;
+      final matchesStatus =
+          selectedStatus == null || item.status == selectedStatus;
       // Dummy date filter, since ApprovalItem doesn't have date. Adjust if you add date field.
       return matchesDepartment && matchesStatus;
     }).toList();
   }
 
   Future<void> pickDate(BuildContext context, bool isStart) async {
-    final initialDate = isStart ? (startDate ?? DateTime.now()) : (endDate ?? DateTime.now());
+    final initialDate =
+        isStart ? (startDate ?? DateTime.now()) : (endDate ?? DateTime.now());
     final picked = await showDatePicker(
       context: context,
       initialDate: initialDate,
@@ -122,160 +184,258 @@ class _ApprovalSrMenuScreenState extends State<ApprovalSrMenuScreen> {
             fontFamily: "Poppins",
             color: Colors.white,
             fontWeight: FontWeight.w600,
-            fontSize: 18,
+            fontSize: 16,
           ),
         ),
       ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: DropdownButtonFormField<String>(
-                        initialValue: selectedDepartment,
-                        decoration: const InputDecoration(
-                          labelText: 'Department',
-                          border: OutlineInputBorder(),
-                          isDense: true,
+      body: SafeArea(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: BlocConsumer<
+                          ApprovalPrDepartmentBloc,
+                          ApprovalPrDepartmentState
+                        >(
+                          listener: (context, state) {},
+                          builder: (BuildContext context, state) {
+                            if (state is ApprovalPrDepartmentInitial ||
+                                state is ApprovalPrDepartmentLoadingState) {
+                              return Center(child: CircularProgressIndicator());
+                            }
+                            if (state is ApprovalPrDepartmentFailureState) {
+                              return Center(child: Text(state.message));
+                            }
+                            if (state is ApprovalPrDepartmentSuccessState) {
+                              return LayoutBuilder(
+                                builder: (context, constraints) {
+                                  return DropdownButtonFormField<String>(
+                                    isExpanded: true,
+                                    initialValue:
+                                        selectedDepartment ??
+                                        state.data.first.deptId,
+                                    decoration: const InputDecoration(
+                                      labelText: 'Department',
+                                      border: OutlineInputBorder(),
+                                      isDense: true,
+                                      labelStyle: TextStyle(fontSize: 12),
+                                    ),
+                                    // 👇 Mengatasi overflow di selected value
+                                    selectedItemBuilder: (context) {
+                                      return state.data.map((dept) {
+                                        return Align(
+                                          alignment: Alignment.centerLeft,
+                                          child: Text(
+                                            dept.descr,
+                                            overflow: TextOverflow.ellipsis,
+                                            maxLines: 1,
+                                            softWrap: false,
+                                            style: TextStyle(fontSize: 12),
+                                          ),
+                                        );
+                                      }).toList();
+                                    },
+
+                                    // 👇 Mengatasi overflow di dropdown item
+                                    items:
+                                        state.data
+                                            .map(
+                                              (dept) => DropdownMenuItem(
+                                                value: dept.deptId,
+                                                child: Row(
+                                                  children: [
+                                                    Expanded(
+                                                      child: Text(
+                                                        dept.descr,
+                                                        overflow:
+                                                            TextOverflow
+                                                                .ellipsis,
+                                                        maxLines: 1,
+                                                        softWrap: false,
+                                                        style: TextStyle(
+                                                          fontSize: 12,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            )
+                                            .toList(),
+                                    onChanged: (value) {
+                                      setState(() {
+                                        selectedDepartment = value;
+                                      });
+                                    },
+                                  );
+                                },
+                              );
+                            }
+                            return Container();
+                          },
                         ),
-                        items: [
-                          const DropdownMenuItem(value: null, child: Text('All')),
-                          ...departments.map((dept) => DropdownMenuItem(
-                                value: dept,
-                                child: Text(dept),
-                              )),
-                        ],
-                        onChanged: (value) {
-                          setState(() {
-                            selectedDepartment = value;
-                          });
-                        },
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: DropdownButtonFormField<String>(
-                        initialValue: selectedStatus,
-                        decoration: const InputDecoration(
-                          labelText: 'Approve Status',
-                          border: OutlineInputBorder(),
-                          isDense: true,
-                        ),
-                        items: [
-                          const DropdownMenuItem(value: null, child: Text('All')),
-                          ...statuses.map((status) => DropdownMenuItem(
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: DropdownButtonFormField<String>(
+                          initialValue: selectedStatus,
+                          decoration: const InputDecoration(
+                            labelText: 'Approve Status',
+                            border: OutlineInputBorder(),
+                            isDense: true,
+                            labelStyle: TextStyle(fontSize: 12),
+                          ),
+                          items: [
+                            const DropdownMenuItem(
+                              value: null,
+                              child: Text(
+                                'All',
+                                style: TextStyle(fontSize: 12),
+                              ),
+                            ),
+                            ...statuses.map(
+                              (status) => DropdownMenuItem(
                                 value: status,
-                                child: Text(status),
-                              )),
-                        ],
-                        onChanged: (value) {
-                          setState(() {
-                            selectedStatus = value;
-                          });
-                        },
+                                child: Text(
+                                  status,
+                                  style: TextStyle(fontSize: 12),
+                                ),
+                              ),
+                            ),
+                          ],
+                          onChanged: (value) {
+                            setState(() {
+                              selectedStatus = value;
+                            });
+                          },
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Expanded(
-                      child: InkWell(
-                        onTap: () => pickDate(context, true),
-                        child: InputDecorator(
-                          decoration: const InputDecoration(
-                            labelText: 'Start Date',
-                            border: OutlineInputBorder(),
-                            isDense: true,
-                          ),
-                          child: Text(
-                            startDate != null ? dateFormat.format(startDate!) : 'Pilih tanggal',
-                            style: TextStyle(
-                              color: startDate != null ? Colors.black : Colors.grey,
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: InkWell(
+                          onTap: () => pickDate(context, true),
+                          child: InputDecorator(
+                            decoration: const InputDecoration(
+                              labelText: 'Start Date',
+                              border: OutlineInputBorder(),
+                              isDense: true,
+                              labelStyle: TextStyle(fontSize: 12),
+                            ),
+                            child: Text(
+                              startDate != null
+                                  ? dateFormat.format(startDate!)
+                                  : 'Pilih tanggal',
+                              style: TextStyle(
+                                color:
+                                    startDate != null
+                                        ? Colors.black
+                                        : Colors.grey,
+                                fontSize: 12,
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: InkWell(
-                        onTap: () => pickDate(context, false),
-                        child: InputDecorator(
-                          decoration: const InputDecoration(
-                            labelText: 'End Date',
-                            border: OutlineInputBorder(),
-                            isDense: true,
-                          ),
-                          child: Text(
-                            endDate != null ? dateFormat.format(endDate!) : 'Pilih tanggal',
-                            style: TextStyle(
-                              color: endDate != null ? Colors.black : Colors.grey,
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: InkWell(
+                          onTap: () => pickDate(context, false),
+                          child: InputDecorator(
+                            decoration: const InputDecoration(
+                              labelText: 'End Date',
+                              border: OutlineInputBorder(),
+                              isDense: true,
+                              labelStyle: TextStyle(fontSize: 12),
+                            ),
+                            child: Text(
+                              endDate != null
+                                  ? dateFormat.format(endDate!)
+                                  : 'Pilih tanggal',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color:
+                                    endDate != null
+                                        ? Colors.black
+                                        : Colors.grey,
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton.icon(
-                    icon: const Icon(Icons.search),
-                    label: const Text('Cari'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Theme.of(context).primaryColor,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      textStyle: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        // Trigger filter, jika nanti pakai API, panggil di sini
-                      });
-                    },
+                    ],
                   ),
-                ),
-              ],
-            ),
-          ),
-          const Divider(height: 1),
-          Expanded(
-            child: ListView.builder(
-              itemCount: approvals.length,
-              itemBuilder: (context, index) {
-                final approval = approvals[index];
-                return Card(
-                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: ListTile(
-                    leading: CircleAvatar(
-                      backgroundColor: getStatusColor(approval.status),
-                      child: Text(approval.title.substring(0, 2)),
-                    ),
-                    title: Text(approval.title),
-                    subtitle: Text('${approval.description}\nDept: ${approval.department}'),
-                    trailing: Text(
-                      approval.status,
-                      style: TextStyle(
-                        color: getStatusColor(approval.status),
-                        fontWeight: FontWeight.bold,
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      icon: const Icon(Icons.search),
+                      label: const Text('Cari'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Theme.of(context).primaryColor,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        textStyle: const TextStyle(fontWeight: FontWeight.bold),
                       ),
+                      onPressed: () {
+                        print(selectedDepartment);
+                        print(selectedStatus);
+                        print(startDate);
+                        print(endDate);
+                        setState(() {
+                          // Trigger filter, jika nanti pakai API, panggil di sini
+                        });
+                      },
                     ),
-                    onTap: () {
-                      // TODO: Navigasi ke detail approval jika diperlukan
-                    },
                   ),
-                );
-              },
+                ],
+              ),
             ),
-          ),
-        ],
+            const Divider(height: 1),
+            Expanded(
+              child: ListView.builder(
+                itemCount: approvals.length,
+                itemBuilder: (context, index) {
+                  final approval = approvals[index];
+                  return Card(
+                    margin: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    child: ListTile(
+                      leading: CircleAvatar(
+                        backgroundColor: getStatusColor(approval.status),
+                        child: Text(approval.title.substring(0, 2)),
+                      ),
+                      title: Text(approval.title),
+                      subtitle: Text(
+                        '${approval.description}\nDept: ${approval.department}',
+                      ),
+                      trailing: Text(
+                        approval.status,
+                        style: TextStyle(
+                          color: getStatusColor(approval.status),
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      onTap: () {
+                        // TODO: Navigasi ke detail approval jika diperlukan
+                      },
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -23,7 +23,9 @@ class AuthorizationRest {
       log('Request to https://v3.kencana.org/api/mobile/getMenu (Post)');
       if (response.statusCode == 200) {
         final body = response.data;
-        log('Response "https://v3.kencana.org/api/mobile/getMenu (Post)" : ${body.toString()}');
+        log(
+          'Response "https://v3.kencana.org/api/mobile/getMenu (Post)" : ${body.toString()}',
+        );
         final menu = List<Menu>.from(
           body['data'].map((e) {
             return Menu.fromMap(e);

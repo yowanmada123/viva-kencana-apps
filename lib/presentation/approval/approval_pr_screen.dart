@@ -6,6 +6,7 @@ import 'package:vivakencanaapp/bloc/approval_pr/approve_pr/approve_pr_bloc.dart'
 import 'package:vivakencanaapp/bloc/auth/authentication/authentication_bloc.dart';
 import 'package:vivakencanaapp/data/repository/approval_pr_repository.dart';
 import 'package:vivakencanaapp/models/approval_pr/approval_pr.dart';
+import 'package:vivakencanaapp/models/approval_pr/approval_pr_fdpi.dart';
 import 'package:vivakencanaapp/models/fdpi/approval_pr/approval_pr.dart';
 import 'package:vivakencanaapp/models/errors/custom_exception.dart';
 import 'package:vivakencanaapp/presentation/widgets/approval/approval_pr_card.dart';
@@ -31,7 +32,7 @@ class ApprovalPrScreenState extends State<ApprovalPrScreen> {
 
   @override
   void initState() {
-    log('Access to presentation/approval/approval_pr_screen.dart'); 
+    log('Access to presentation/approval/approval_pr_screen.dart');
     super.initState();
     _initializeControllers();
   }
@@ -42,101 +43,101 @@ class ApprovalPrScreenState extends State<ApprovalPrScreen> {
     }
   }
 
-  void _handleApproval(
-    int index,
-    List<ApprovalPR> poList,
-    BuildContext context,
-  ) {
-    final credentialState = context.read<CredentialsBloc>().state;
+  // void _handleApproval(
+  //   int index,
+  //   List<ApprovalPR> poList,
+  //   BuildContext context,
+  // ) {
+  //   final credentialState = context.read<CredentialsBloc>().state;
 
-    if (poList[index].aprvBy == "" && poList[index].rjcBy == "") {
-      if (credentialState is CredentialsLoadSuccess) {
-        if (credentialState.credentials["APPROVALPR1"] == "Y") {
-          context.read<ApprovePrBloc>().add(
-            ApprovePrLoadEvent(
-              prId: poList[index].prId,
-              typeAprv: "approve1",
-              status: "approve",
-            ),
-          );
-        } else {
-          _showNoPermissionSnackBar(context);
-          return;
-        }
-      } else {
-        _showNoPermissionSnackBar(context);
-        return;
-      }
-    } else if (poList[index].aprv2By == "" && poList[index].rjc2By == "") {
-      if (credentialState is CredentialsLoadSuccess) {
-        if (credentialState.credentials["APPROVALPR2"] == "Y") {
-          context.read<ApprovePrBloc>().add(
-            ApprovePrLoadEvent(
-              prId: poList[index].prId,
-              typeAprv: "approve2",
-              status: "approve",
-            ),
-          );
-        } else {
-          _showNoPermissionSnackBar(context);
-          return;
-        }
-      } else {
-        _showNoPermissionSnackBar(context);
-        return;
-      }
-    }
+  //   if (poList[index].aprvBy == "" && poList[index].rjcBy == "") {
+  //     if (credentialState is CredentialsLoadSuccess) {
+  //       if (credentialState.credentials["APPROVALPR1"] == "Y") {
+  //         context.read<ApprovePrBloc>().add(
+  //           ApprovePrLoadEvent(
+  //             prId: poList[index].prId,
+  //             typeAprv: "approve1",
+  //             status: "approve",
+  //           ),
+  //         );
+  //       } else {
+  //         _showNoPermissionSnackBar(context);
+  //         return;
+  //       }
+  //     } else {
+  //       _showNoPermissionSnackBar(context);
+  //       return;
+  //     }
+  //   } else if (poList[index].aprv2By == "" && poList[index].rjc2By == "") {
+  //     if (credentialState is CredentialsLoadSuccess) {
+  //       if (credentialState.credentials["APPROVALPR2"] == "Y") {
+  //         context.read<ApprovePrBloc>().add(
+  //           ApprovePrLoadEvent(
+  //             prId: poList[index].prId,
+  //             typeAprv: "approve2",
+  //             status: "approve",
+  //           ),
+  //         );
+  //       } else {
+  //         _showNoPermissionSnackBar(context);
+  //         return;
+  //       }
+  //     } else {
+  //       _showNoPermissionSnackBar(context);
+  //       return;
+  //     }
+  //   }
 
-    if (index >= poList.length) return;
+  //   if (index >= poList.length) return;
 
-    context.read<ApprovalPrListBloc>().add(RemoveListIndex(index: index));
-  }
+  //   context.read<ApprovalPrListBloc>().add(RemoveListIndex(index: index));
+  // }
 
-  void _handleReject(int index, List<ApprovalPR> poList, BuildContext context) {
-    final credentialState = context.read<CredentialsBloc>().state;
+  // void _handleReject(int index, List<ApprovalPR> poList, BuildContext context) {
+  //   final credentialState = context.read<CredentialsBloc>().state;
 
-    if (poList[index].aprvBy == "" && poList[index].rjcBy == "") {
-      if (credentialState is CredentialsLoadSuccess) {
-        if (credentialState.credentials["APPROVALPR1"] == "Y") {
-          context.read<ApprovePrBloc>().add(
-            ApprovePrLoadEvent(
-              prId: poList[index].prId,
-              typeAprv: "approve1",
-              status: "reject",
-            ),
-          );
-        } else {
-          _showNoPermissionSnackBar(context);
-          return;
-        }
-      } else {
-        _showNoPermissionSnackBar(context);
-        return;
-      }
-    } else if (poList[index].aprv2By == "" && poList[index].rjcBy == "") {
-      if (credentialState is CredentialsLoadSuccess) {
-        if (credentialState.credentials["APPROVALPR2"] == "Y") {
-          context.read<ApprovePrBloc>().add(
-            ApprovePrLoadEvent(
-              prId: poList[index].prId,
-              typeAprv: "approve2",
-              status: "reject",
-            ),
-          );
-        } else {
-          _showNoPermissionSnackBar(context);
-          return;
-        }
-      } else {
-        _showNoPermissionSnackBar(context);
-        return;
-      }
-    }
+  //   if (poList[index].aprvBy == "" && poList[index].rjcBy == "") {
+  //     if (credentialState is CredentialsLoadSuccess) {
+  //       if (credentialState.credentials["APPROVALPR1"] == "Y") {
+  //         context.read<ApprovePrBloc>().add(
+  //           ApprovePrLoadEvent(
+  //             prId: poList[index].prId,
+  //             typeAprv: "approve1",
+  //             status: "reject",
+  //           ),
+  //         );
+  //       } else {
+  //         _showNoPermissionSnackBar(context);
+  //         return;
+  //       }
+  //     } else {
+  //       _showNoPermissionSnackBar(context);
+  //       return;
+  //     }
+  //   } else if (poList[index].aprv2By == "" && poList[index].rjcBy == "") {
+  //     if (credentialState is CredentialsLoadSuccess) {
+  //       if (credentialState.credentials["APPROVALPR2"] == "Y") {
+  //         context.read<ApprovePrBloc>().add(
+  //           ApprovePrLoadEvent(
+  //             prId: poList[index].prId,
+  //             typeAprv: "approve2",
+  //             status: "reject",
+  //           ),
+  //         );
+  //       } else {
+  //         _showNoPermissionSnackBar(context);
+  //         return;
+  //       }
+  //     } else {
+  //       _showNoPermissionSnackBar(context);
+  //       return;
+  //     }
+  //   }
 
-    if (index >= poList.length) return;
+  //   if (index >= poList.length) return;
 
-    context.read<ApprovalPrListBloc>().add(RemoveListIndex(index: index));
-  }
+  //   context.read<ApprovalPrListBloc>().add(RemoveListIndex(index: index));
+  // }
 
   void _showNoPermissionSnackBar(BuildContext context) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -163,12 +164,12 @@ class ApprovalPrScreenState extends State<ApprovalPrScreen> {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(
-          create:
-              (context) => ApprovalPrListBloc(
-                approvalPRRepository: context.read<ApprovalPRRepository>(),
-              )..add(GetApprovalPRListEvent()),
-        ),
+        // BlocProvider(
+        //   create:
+        //       (context) => ApprovalPrListBloc(
+        //         approvalPRRepository: context.read<ApprovalPRRepository>(),
+        //       )..add(GetApprovalPRListEvent()),
+        // ),
         BlocProvider(
           create:
               (context) => ApprovePrBloc(
@@ -302,22 +303,25 @@ class ApprovalPrScreenState extends State<ApprovalPrScreen> {
                 bool canApprove = false;
 
                 if (credentialState is CredentialsLoadSuccess) {
-                  if (currentPr.aprvBy == "" && currentPr.rjcBy == "") {
-                    canApprove = true;
-                  } else if (currentPr.aprv2By == "" &&
-                      currentPr.rjc2By == "") {
-                    canApprove = true;
-                  }
+                  // if (currentPr.aprvBy == "" && currentPr.rjcBy == "") {
+                  //   canApprove = true;
+                  // } else if (currentPr.aprv2By == "" &&
+                  //     currentPr.rjc2By == "") {
+                  //   canApprove = true;
+                  // }
+                  // DUMMY
+                  canApprove = true;
                 }
 
                 if (!canApprove) return SizedBox.shrink();
                 return ApprovalBottomBar(
                   isLoading: false,
-                  onApprove:
-                      () => _handleApproval(_currentPage, state.data, context),
-                  onReject: () {
-                    _handleReject(_currentPage, state.data, context);
-                  },
+                  onApprove: () {},
+                  // () => _handleApproval(_currentPage, state.data, context),
+                  onReject: () {},
+                  // () {
+                  //   _handleReject(_currentPage, state.data, context);
+                  // },
                   canApprove: canApprove,
                 );
               },
