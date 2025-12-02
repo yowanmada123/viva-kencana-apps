@@ -53,21 +53,24 @@ class ApprovalPRRest {
     }
   }
 
-  Future<Either<CustomException, List<ApprovalPR>>> getPRList({
-    required String departmentId,
-    required String approveStatus,
-    required String startDate,
-    required String endDate,
-  }) async {
+  Future<Either<CustomException, List<ApprovalPR>>> getPRList(
+    // {
+    // required String departmentId,
+    // required String approveStatus,
+    // required String startDate,
+    // required String endDate,
+    // }
+  ) async {
     try {
       http.options.headers['requiresToken'] = true;
       log('Request to https://api-fpi.kencana.org/api/fpi/prpo/getList (PRST)');
 
       final body = {
-        "department_id": departmentId, //*required
-        "approve_status": approveStatus, //ex. pending, approved, rejected
-        "start_date": startDate, //ex. 2025-03-01 *required
-        "end_date": endDate, //ex. 2025-03-01 *required
+        // "department_id": departmentId, //*required
+        // "approve_status": approveStatus, //ex. pending, approved, rejected
+        // "start_date": startDate, //ex. 2025-03-01 *required
+        // "end_date": endDate, //ex. 2025-03-01 *required
+        "tr_type": "PR", //ex. 2025-03-01 *required
       };
 
       final response = await http.post(

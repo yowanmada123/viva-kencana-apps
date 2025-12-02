@@ -43,101 +43,101 @@ class ApprovalPrScreenState extends State<ApprovalPrScreen> {
     }
   }
 
-  // void _handleApproval(
-  //   int index,
-  //   List<ApprovalPR> poList,
-  //   BuildContext context,
-  // ) {
-  //   final credentialState = context.read<CredentialsBloc>().state;
+  void _handleApproval(
+    int index,
+    List<ApprovalPR> poList,
+    BuildContext context,
+  ) {
+    final credentialState = context.read<CredentialsBloc>().state;
 
-  //   if (poList[index].aprvBy == "" && poList[index].rjcBy == "") {
-  //     if (credentialState is CredentialsLoadSuccess) {
-  //       if (credentialState.credentials["APPROVALPR1"] == "Y") {
-  //         context.read<ApprovePrBloc>().add(
-  //           ApprovePrLoadEvent(
-  //             prId: poList[index].prId,
-  //             typeAprv: "approve1",
-  //             status: "approve",
-  //           ),
-  //         );
-  //       } else {
-  //         _showNoPermissionSnackBar(context);
-  //         return;
-  //       }
-  //     } else {
-  //       _showNoPermissionSnackBar(context);
-  //       return;
-  //     }
-  //   } else if (poList[index].aprv2By == "" && poList[index].rjc2By == "") {
-  //     if (credentialState is CredentialsLoadSuccess) {
-  //       if (credentialState.credentials["APPROVALPR2"] == "Y") {
-  //         context.read<ApprovePrBloc>().add(
-  //           ApprovePrLoadEvent(
-  //             prId: poList[index].prId,
-  //             typeAprv: "approve2",
-  //             status: "approve",
-  //           ),
-  //         );
-  //       } else {
-  //         _showNoPermissionSnackBar(context);
-  //         return;
-  //       }
-  //     } else {
-  //       _showNoPermissionSnackBar(context);
-  //       return;
-  //     }
-  //   }
+    if (poList[index].aprvBy == "" && poList[index].rjcBy == "") {
+      if (credentialState is CredentialsLoadSuccess) {
+        if (credentialState.credentials["APPROVALPR1"] == "Y") {
+          context.read<ApprovePrBloc>().add(
+            ApprovePrLoadEvent(
+              prId: poList[index].prId,
+              typeAprv: "approve1",
+              status: "approve",
+            ),
+          );
+        } else {
+          _showNoPermissionSnackBar(context);
+          return;
+        }
+      } else {
+        _showNoPermissionSnackBar(context);
+        return;
+      }
+    } else if (poList[index].aprv2By == "" && poList[index].rjc2By == "") {
+      if (credentialState is CredentialsLoadSuccess) {
+        if (credentialState.credentials["APPROVALPR2"] == "Y") {
+          context.read<ApprovePrBloc>().add(
+            ApprovePrLoadEvent(
+              prId: poList[index].prId,
+              typeAprv: "approve2",
+              status: "approve",
+            ),
+          );
+        } else {
+          _showNoPermissionSnackBar(context);
+          return;
+        }
+      } else {
+        _showNoPermissionSnackBar(context);
+        return;
+      }
+    }
 
-  //   if (index >= poList.length) return;
+    if (index >= poList.length) return;
 
-  //   context.read<ApprovalPrListBloc>().add(RemoveListIndex(index: index));
-  // }
+    context.read<ApprovalPrListBloc>().add(RemoveListIndex(index: index));
+  }
 
-  // void _handleReject(int index, List<ApprovalPR> poList, BuildContext context) {
-  //   final credentialState = context.read<CredentialsBloc>().state;
+  void _handleReject(int index, List<ApprovalPR> poList, BuildContext context) {
+    final credentialState = context.read<CredentialsBloc>().state;
 
-  //   if (poList[index].aprvBy == "" && poList[index].rjcBy == "") {
-  //     if (credentialState is CredentialsLoadSuccess) {
-  //       if (credentialState.credentials["APPROVALPR1"] == "Y") {
-  //         context.read<ApprovePrBloc>().add(
-  //           ApprovePrLoadEvent(
-  //             prId: poList[index].prId,
-  //             typeAprv: "approve1",
-  //             status: "reject",
-  //           ),
-  //         );
-  //       } else {
-  //         _showNoPermissionSnackBar(context);
-  //         return;
-  //       }
-  //     } else {
-  //       _showNoPermissionSnackBar(context);
-  //       return;
-  //     }
-  //   } else if (poList[index].aprv2By == "" && poList[index].rjcBy == "") {
-  //     if (credentialState is CredentialsLoadSuccess) {
-  //       if (credentialState.credentials["APPROVALPR2"] == "Y") {
-  //         context.read<ApprovePrBloc>().add(
-  //           ApprovePrLoadEvent(
-  //             prId: poList[index].prId,
-  //             typeAprv: "approve2",
-  //             status: "reject",
-  //           ),
-  //         );
-  //       } else {
-  //         _showNoPermissionSnackBar(context);
-  //         return;
-  //       }
-  //     } else {
-  //       _showNoPermissionSnackBar(context);
-  //       return;
-  //     }
-  //   }
+    if (poList[index].aprvBy == "" && poList[index].rjcBy == "") {
+      if (credentialState is CredentialsLoadSuccess) {
+        if (credentialState.credentials["APPROVALPR1"] == "Y") {
+          context.read<ApprovePrBloc>().add(
+            ApprovePrLoadEvent(
+              prId: poList[index].prId,
+              typeAprv: "approve1",
+              status: "reject",
+            ),
+          );
+        } else {
+          _showNoPermissionSnackBar(context);
+          return;
+        }
+      } else {
+        _showNoPermissionSnackBar(context);
+        return;
+      }
+    } else if (poList[index].aprv2By == "" && poList[index].rjcBy == "") {
+      if (credentialState is CredentialsLoadSuccess) {
+        if (credentialState.credentials["APPROVALPR2"] == "Y") {
+          context.read<ApprovePrBloc>().add(
+            ApprovePrLoadEvent(
+              prId: poList[index].prId,
+              typeAprv: "approve2",
+              status: "reject",
+            ),
+          );
+        } else {
+          _showNoPermissionSnackBar(context);
+          return;
+        }
+      } else {
+        _showNoPermissionSnackBar(context);
+        return;
+      }
+    }
 
-  //   if (index >= poList.length) return;
+    if (index >= poList.length) return;
 
-  //   context.read<ApprovalPrListBloc>().add(RemoveListIndex(index: index));
-  // }
+    context.read<ApprovalPrListBloc>().add(RemoveListIndex(index: index));
+  }
 
   void _showNoPermissionSnackBar(BuildContext context) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -164,12 +164,19 @@ class ApprovalPrScreenState extends State<ApprovalPrScreen> {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        // BlocProvider(
-        //   create:
-        //       (context) => ApprovalPrListBloc(
-        //         approvalPRRepository: context.read<ApprovalPRRepository>(),
-        //       )..add(GetApprovalPRListEvent()),
-        // ),
+        BlocProvider(
+          create:
+              (context) => ApprovalPrListBloc(
+                approvalPRRepository: context.read<ApprovalPRRepository>(),
+              )..add(
+                GetApprovalPRListEvent(
+                  // departmentId: '',
+                  // approveStatus: '',
+                  // startDate: '',
+                  // endDate: '',
+                ),
+              ),
+        ),
         BlocProvider(
           create:
               (context) => ApprovePrBloc(

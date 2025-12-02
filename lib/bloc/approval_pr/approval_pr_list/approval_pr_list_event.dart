@@ -8,17 +8,17 @@ sealed class ApprovalPrListEvent extends Equatable {
 }
 
 class GetApprovalPRListEvent extends ApprovalPrListEvent {
-  final String departmentId;
-  final String approveStatus;
-  final String startDate;
-  final String endDate;  
+  // final String departmentId;
+  // final String approveStatus;
+  // final String startDate;
+  // final String endDate;
 
-    const GetApprovalPRListEvent({
-    required this.departmentId,
-    required this.approveStatus,
-    required this.startDate,
-    required this.endDate,
-  });
+  //   const GetApprovalPRListEvent({
+  //   required this.departmentId,
+  //   required this.approveStatus,
+  //   required this.startDate,
+  //   required this.endDate,
+  // });
 }
 
 class RemoveListIndex extends ApprovalPrListEvent {

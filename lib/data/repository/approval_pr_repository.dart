@@ -15,17 +15,19 @@ class ApprovalPRRepository {
     return approvalPRRest.getPrDepartmentListAndUserData();
   }
 
-  Future<Either<CustomException, List<ApprovalPR>>> getPRList({
-    required String departmentId,
-    required String approveStatus,
-    required String startDate,
-    required String endDate,
-  }) async {
+  Future<Either<CustomException, List<ApprovalPR>>> getPRList(
+    //   {
+    //   required String departmentId,
+    //   required String approveStatus,
+    //   required String startDate,
+    //   required String endDate,
+    // }
+  ) async {
     return approvalPRRest.getPRList(
-      departmentId: departmentId,
-      approveStatus: approveStatus,
-      startDate: startDate,
-      endDate: endDate,
+      // departmentId: departmentId,
+      // approveStatus: approveStatus,
+      // startDate: startDate,
+      // endDate: endDate,
     );
   }
 

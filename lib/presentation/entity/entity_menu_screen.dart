@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:vivakencanaapp/presentation/approval/approval_pr_screen.dart';
 
 import '../../bloc/auth/authentication/authentication_bloc.dart';
 import '../../bloc/auth/logout/logout_bloc.dart';
@@ -20,14 +21,18 @@ import '../sales_activity/sales_activity_dashboard_screen.dart';
 import '../approval/approval_sr_menu_screen.dart';
 
 class EntityMenuScreen extends StatelessWidget {
-  const EntityMenuScreen({super.key, required this.entityId, required this.entityDescription,});
+  const EntityMenuScreen({
+    super.key,
+    required this.entityId,
+    required this.entityDescription,
+  });
 
   final String entityId;
-  final String entityDescription; 
+  final String entityDescription;
 
   @override
   Widget build(BuildContext context) {
-    log('Access to presentation/entity/entitiy_menu_screen.dart'); 
+    log('Access to presentation/entity/entitiy_menu_screen.dart');
     final authRepository = context.read<AuthRepository>();
     final authorizationRepository = context.read<AuthorizationRepository>();
 
@@ -37,18 +42,24 @@ class EntityMenuScreen extends StatelessWidget {
         BlocProvider(
           create:
               (context) =>
-              
                   AccessMenuBloc(authorizationRepository)
                     ..add(LoadAccessMenu(entityId: entityId)),
         ),
       ],
-      child: MyGridLayout(entityId: entityId, entityDescription: entityDescription),
+      child: MyGridLayout(
+        entityId: entityId,
+        entityDescription: entityDescription,
+      ),
     );
   }
 }
 
 class MyGridLayout extends StatefulWidget {
-  const MyGridLayout({super.key, required this.entityId, required this.entityDescription,});
+  const MyGridLayout({
+    super.key,
+    required this.entityId,
+    required this.entityDescription,
+  });
 
   final String entityId;
   final String entityDescription;
@@ -123,7 +134,9 @@ class _MyGridLayoutState extends State<MyGridLayout> {
               MaterialPageRoute(
                 builder:
                     (_) => BlocProvider.value(
-                      value: SalesActivityFormCheckInBloc(salesActivityRepository: salesRepository),
+                      value: SalesActivityFormCheckInBloc(
+                        salesActivityRepository: salesRepository,
+                      ),
                       child: SalesActivityDashboardScreen(
                         sales: salesState.sales,
                       ),
@@ -139,11 +152,12 @@ class _MyGridLayoutState extends State<MyGridLayout> {
         };
         break;
       case 'mnuApprovalList':
-        
         routeAction = () async {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => ApprovalSrMenuScreen()),
+            MaterialPageRoute(
+              builder: (_) => ApprovalPrScreen(title: 'Daftar Approval PR'),
+            ),
           );
         };
 
@@ -185,7 +199,9 @@ class _MyGridLayoutState extends State<MyGridLayout> {
             Timer(const Duration(seconds: 3), () {
               if (!isHandled) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("Permintaan terlalu lama, coba lagi")),
+                  const SnackBar(
+                    content: Text("Permintaan terlalu lama, coba lagi"),
+                  ),
                 );
               }
             });
@@ -204,7 +220,9 @@ class _MyGridLayoutState extends State<MyGridLayout> {
               if (position.isMocked) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                    content: Text("Perangkat terdeteksi menggunakan lokasi palsu"),
+                    content: Text(
+                      "Perangkat terdeteksi menggunakan lokasi palsu",
+                    ),
                     backgroundColor: Colors.red,
                   ),
                 );
@@ -215,14 +233,15 @@ class _MyGridLayoutState extends State<MyGridLayout> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => BlocProvider.value(
-                    value: SalesActivityFormCheckInBloc(
-                      salesActivityRepository: salesRepository,
-                    ),
-                    child: SalesActivityDashboardScreen(
-                      sales: salesState.sales,
-                    ),
-                  ),
+                  builder:
+                      (_) => BlocProvider.value(
+                        value: SalesActivityFormCheckInBloc(
+                          salesActivityRepository: salesRepository,
+                        ),
+                        child: SalesActivityDashboardScreen(
+                          sales: salesState.sales,
+                        ),
+                      ),
                 ),
               );
             } else if (salesState is SalesDataError) {
@@ -266,9 +285,9 @@ class _MyGridLayoutState extends State<MyGridLayout> {
     if (isLoading) return;
 
     if (submenu.action == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Fitur belum tersedia")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Fitur belum tersedia")));
       return;
     }
 
@@ -317,7 +336,9 @@ class _MyGridLayoutState extends State<MyGridLayout> {
             if (state is AccessMenuLoadSuccess) {
               final menus = state.menus;
               if (menus.isEmpty) {
-                return Center(child: Text("Tidak ada menu yang dapat diakses."));
+                return Center(
+                  child: Text("Tidak ada menu yang dapat diakses."),
+                );
               }
               return buildGroupMenu(context, menus);
             } else if (state is AccessMenuLoading) {
@@ -341,7 +362,7 @@ class _MyGridLayoutState extends State<MyGridLayout> {
         final submenus = menu.submenus;
 
         return Padding(
-          padding: EdgeInsets.symmetric(vertical: 8.w,),
+          padding: EdgeInsets.symmetric(vertical: 8.w),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -349,23 +370,24 @@ class _MyGridLayoutState extends State<MyGridLayout> {
                 padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 4.w),
                 child: Text(
                   "Pilihan menu operasional untuk ${menu.menuHeaderCaption}",
-                  style: TextStyle(
-                    fontSize: 12.w,
-                    color: Colors.black87,
-                  ),
+                  style: TextStyle(fontSize: 12.w, color: Colors.black87),
                 ),
               ),
 
               Column(
                 children: List.generate(submenus.length, (submenuIndex) {
                   final submenu = attachAction(context, submenus[submenuIndex]);
-                  final iconCode = int.tryParse(submenu.icon) ?? Icons.help.codePoint;
+                  final iconCode =
+                      int.tryParse(submenu.icon) ?? Icons.help.codePoint;
                   final isLoading = _loadingMenuId == submenu.menuId;
 
                   return GestureDetector(
                     onTap: () => _navigateToScreen(context, submenu, isLoading),
                     child: Container(
-                      margin: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.w),
+                      margin: EdgeInsets.symmetric(
+                        horizontal: 12.w,
+                        vertical: 6.w,
+                      ),
                       padding: EdgeInsets.all(12.w),
                       decoration: BoxDecoration(
                         color: Colors.white,
@@ -388,31 +410,37 @@ class _MyGridLayoutState extends State<MyGridLayout> {
                               color: Theme.of(context).primaryColor,
                               borderRadius: BorderRadius.circular(8.w),
                             ),
-                            child: isLoading
-                                ? const Center(
-                                    child: SizedBox(
-                                      width: 20,
-                                      height: 20,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        color: Colors.white,
+                            child:
+                                isLoading
+                                    ? const Center(
+                                      child: SizedBox(
+                                        width: 20,
+                                        height: 20,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          color: Colors.white,
+                                        ),
                                       ),
+                                    )
+                                    : Icon(
+                                      IconData(
+                                        iconCode,
+                                        fontFamily: 'MaterialIcons',
+                                      ),
+                                      color: Colors.white,
+                                      size: 20.w,
                                     ),
-                                  )
-                                : Icon(
-                                  IconData(iconCode, fontFamily: 'MaterialIcons'),
-                                  color: Colors.white,
-                                  size: 20.w,
-                                ),
                           ),
                           SizedBox(width: 12.w),
-                    
+
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  isLoading ? 'Loading...' : submenu.menuCaption,
+                                  isLoading
+                                      ? 'Loading...'
+                                      : submenu.menuCaption,
                                   style: TextStyle(
                                     fontSize: 14.w,
                                     fontWeight: FontWeight.w600,
@@ -430,7 +458,7 @@ class _MyGridLayoutState extends State<MyGridLayout> {
                               ],
                             ),
                           ),
-                    
+
                           if (!isLoading)
                             Icon(
                               Icons.arrow_forward_ios,

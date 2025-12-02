@@ -24,10 +24,10 @@ class ApprovalPrListBloc
   ) async {
     emit(ApprovalPrListLoadingState());
     final result = await approvalPRRepository.getPRList(
-      departmentId: event.departmentId,
-      approveStatus: event.approveStatus,
-      startDate: event.startDate,
-      endDate: event.endDate,
+      // departmentId: event.departmentId,
+      // approveStatus: event.approveStatus,
+      // startDate: event.startDate,
+      // endDate: event.endDate,
     );
     result.fold(
       (failure) => emit(

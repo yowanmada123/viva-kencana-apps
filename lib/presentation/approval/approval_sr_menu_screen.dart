@@ -7,13 +7,14 @@ import 'package:vivakencanaapp/bloc/approval_pr/approval_pr_department/approval_
 import 'package:vivakencanaapp/bloc/approval_pr/approval_pr_list/approval_pr_list_bloc.dart';
 import 'package:vivakencanaapp/bloc/approval_pr/approve_pr/approve_pr_bloc.dart';
 import 'package:vivakencanaapp/data/repository/approval_pr_repository.dart';
+import 'package:vivakencanaapp/utils/string_extension.dart';
 
 class ApprovalSrMenuScreen extends StatelessWidget {
   const ApprovalSrMenuScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    log('Access to presentation/approval/approval_pr_screen.dart');
+    log('Access to presentation/approval/approval_sr_menu_screen.dart');
 
     return MultiBlocProvider(
       providers: [
@@ -69,10 +70,32 @@ class _ApprovalSrMenuScreenState extends State<ApprovalSrMenuView> {
   final List<ScrollController> _scrollControllers = [];
   int _currentPage = 0;
   bool _isAnimated = false;
+  final List<String> statuses = ['all', 'pending', 'approved', 'rejected'];
+  String? selectedStatus;
+
+  // final dateFormat = DateFormat('yyyy-MM-dd');
+  DateTime? startDate;
+  DateTime? endDate;
+  String? startDateFormatted; // ← disimpan dalam format
+  String? endDateFormatted;
+  final displayFormat = DateFormat('dd-MM-yyyy'); // untuk UI
+  final valueFormat = DateFormat('yyyy-MM-dd');
+
+  String? selectedDepartment;
 
   @override
   void initState() {
     super.initState();
+
+    startDate = DateTime.now();
+    endDate = DateTime.now();
+
+    // ⬇⬇ SAVE FORMAT SAAT PERTAMA KALI
+    startDateFormatted = valueFormat.format(startDate!);
+    endDateFormatted = valueFormat.format(endDate!);
+
+    selectedStatus = statuses[0];
+
     _initializeControllers();
     // context.read<ApprovalPrDepartmentBloc>().add(
     //   GetApprovalPrDepartmentEvent(),
@@ -85,41 +108,34 @@ class _ApprovalSrMenuScreenState extends State<ApprovalSrMenuView> {
     }
   }
 
-  String? selectedDepartment;
-  String? selectedStatus;
-  DateTime? startDate;
-  DateTime? endDate;
-
-  final List<String> statuses = ['Pending', 'Approved', 'Rejected'];
-
   List<ApprovalItem> getDummyApprovals() {
     return [
       ApprovalItem(
         id: '1',
         title: 'Approval SR #1',
         description: 'Pengajuan Sales Request 1',
-        status: 'Pending',
+        status: 'pending',
         department: 'Sales',
       ),
       ApprovalItem(
         id: '2',
         title: 'Approval SR #2',
         description: 'Pengajuan Sales Request 2',
-        status: 'Approved',
+        status: 'approved',
         department: 'Finance',
       ),
       ApprovalItem(
         id: '3',
-        title: 'Approval SR #3',
+        title: 'approval SR #3',
         description: 'Pengajuan Sales Request 3',
-        status: 'Rejected',
+        status: 'rejected',
         department: 'HR',
       ),
       ApprovalItem(
         id: '4',
         title: 'Approval SR #4',
         description: 'Pengajuan Sales Request 4',
-        status: 'Pending',
+        status: 'pending',
         department: 'IT',
       ),
     ];
@@ -127,9 +143,9 @@ class _ApprovalSrMenuScreenState extends State<ApprovalSrMenuView> {
 
   Color getStatusColor(String status) {
     switch (status) {
-      case 'Approved':
+      case 'approved':
         return Colors.green;
-      case 'Rejected':
+      case 'rejected':
         return Colors.red;
       default:
         return Colors.orange;
@@ -161,8 +177,10 @@ class _ApprovalSrMenuScreenState extends State<ApprovalSrMenuView> {
       setState(() {
         if (isStart) {
           startDate = picked;
+          startDateFormatted = valueFormat.format(picked);
         } else {
           endDate = picked;
+          endDateFormatted = valueFormat.format(picked);
         }
       });
     }
@@ -171,14 +189,13 @@ class _ApprovalSrMenuScreenState extends State<ApprovalSrMenuView> {
   @override
   Widget build(BuildContext context) {
     final approvals = getFilteredApprovals();
-    final dateFormat = DateFormat('dd/MM/yyyy');
 
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).primaryColor,
         iconTheme: const IconThemeData(color: Colors.white),
         title: Text(
-          'Approval List',
+          'Approval PR',
           textAlign: TextAlign.center,
           style: const TextStyle(
             fontFamily: "Poppins",
@@ -212,6 +229,7 @@ class _ApprovalSrMenuScreenState extends State<ApprovalSrMenuView> {
                               return Center(child: Text(state.message));
                             }
                             if (state is ApprovalPrDepartmentSuccessState) {
+                              selectedDepartment = state.data.first.deptId;
                               return LayoutBuilder(
                                 builder: (context, constraints) {
                                   return DropdownButtonFormField<String>(
@@ -283,7 +301,7 @@ class _ApprovalSrMenuScreenState extends State<ApprovalSrMenuView> {
                       const SizedBox(width: 8),
                       Expanded(
                         child: DropdownButtonFormField<String>(
-                          initialValue: selectedStatus,
+                          initialValue: statuses[0],
                           decoration: const InputDecoration(
                             labelText: 'Approve Status',
                             border: OutlineInputBorder(),
@@ -291,18 +309,11 @@ class _ApprovalSrMenuScreenState extends State<ApprovalSrMenuView> {
                             labelStyle: TextStyle(fontSize: 12),
                           ),
                           items: [
-                            const DropdownMenuItem(
-                              value: null,
-                              child: Text(
-                                'All',
-                                style: TextStyle(fontSize: 12),
-                              ),
-                            ),
                             ...statuses.map(
                               (status) => DropdownMenuItem(
                                 value: status,
                                 child: Text(
-                                  status,
+                                  status.capitalize(),
                                   style: TextStyle(fontSize: 12),
                                 ),
                               ),
@@ -332,7 +343,9 @@ class _ApprovalSrMenuScreenState extends State<ApprovalSrMenuView> {
                             ),
                             child: Text(
                               startDate != null
-                                  ? dateFormat.format(startDate!)
+                                  ? displayFormat.format(
+                                    startDate!,
+                                  ) // ⬅ tampil dd-MM-yyyy
                                   : 'Pilih tanggal',
                               style: TextStyle(
                                 color:
@@ -358,7 +371,9 @@ class _ApprovalSrMenuScreenState extends State<ApprovalSrMenuView> {
                             ),
                             child: Text(
                               endDate != null
-                                  ? dateFormat.format(endDate!)
+                                  ? displayFormat.format(
+                                    endDate!,
+                                  ) // ⬅ tampil dd-MM-yyyy
                                   : 'Pilih tanggal',
                               style: TextStyle(
                                 fontSize: 12,
@@ -388,8 +403,8 @@ class _ApprovalSrMenuScreenState extends State<ApprovalSrMenuView> {
                       onPressed: () {
                         print(selectedDepartment);
                         print(selectedStatus);
-                        print(startDate);
-                        print(endDate);
+                        print(startDateFormatted);
+                        print(endDateFormatted);
                         setState(() {
                           // Trigger filter, jika nanti pakai API, panggil di sini
                         });
