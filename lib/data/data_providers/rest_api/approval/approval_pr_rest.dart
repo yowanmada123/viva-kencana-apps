@@ -147,6 +147,10 @@ class ApprovalPRRest {
         data: body,
       );
 
+      log(
+        'Response from http://10.65.65.222:8000/api/srs/mobile/approval/submitApprove (PRST): $response',
+      );
+
       if (response.statusCode == 200) {
         return Right("Successfully rejected");
       } else {

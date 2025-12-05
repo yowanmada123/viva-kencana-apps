@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 
@@ -16,7 +14,7 @@ class ApprovalPrListBloc
   ApprovalPrListBloc({required this.approvalPRRepository})
     : super(ApprovalPrListInitial()) {
     on<GetApprovalPRListEvent>(_onGetListApprovalPR);
-    on<RemoveListIndex>(_onRemoveListIndex);
+    on<RemoveListByPrId>(_onRemoveListByPrId);
   }
 
   void _onGetListApprovalPR(
@@ -33,16 +31,17 @@ class ApprovalPrListBloc
     );
   }
 
-  void _onRemoveListIndex(
-    RemoveListIndex event,
+  void _onRemoveListByPrId(
+    RemoveListByPrId event,
     Emitter<ApprovalPrListState> emit,
   ) {
-    print("index ${event.index}");
     final currentState = state;
+
     if (currentState is ApprovalPrListSuccessState) {
       emit(ApprovalPrListLoadingState());
-      final updatedList = List<ApprovalPrFSunrise>.from(currentState.data)
-        ..removeAt(event.index);
+
+      final updatedList =
+          currentState.data.where((item) => item.prId != event.prId).toList();
 
       emit(ApprovalPrListSuccessState(data: updatedList));
     }

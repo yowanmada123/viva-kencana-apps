@@ -25,7 +25,7 @@ class ApprovePrBloc extends Bloc<ApprovePrEvent, ApprovePrState> {
       result.fold(
         (error) =>
             emit(ApprovePrFailure(message: error.message!, exception: error)),
-        (data) => emit(ApprovePrSuccess(message: data)),
+        (data) => emit(ApprovePrSuccess(message: data, prId: event.prId)),
       );
     }
 
@@ -34,7 +34,7 @@ class ApprovePrBloc extends Bloc<ApprovePrEvent, ApprovePrState> {
       result.fold(
         (error) =>
             emit(ApprovePrFailure(message: error.message!, exception: error)),
-        (data) => emit(ApprovePrSuccess(message: data)),
+        (data) => emit(ApprovePrSuccess(message: data, prId: event.prId)),
       );
     }
   }

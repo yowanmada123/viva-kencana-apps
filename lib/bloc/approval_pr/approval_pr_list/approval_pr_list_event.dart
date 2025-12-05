@@ -9,8 +9,7 @@ sealed class ApprovalPrListEvent extends Equatable {
 
 class GetApprovalPRListEvent extends ApprovalPrListEvent {}
 
-class RemoveListIndex extends ApprovalPrListEvent {
-  final int index;
-
-  const RemoveListIndex({required this.index});
+class RemoveListByPrId extends ApprovalPrListEvent {
+  final String prId;
+  const RemoveListByPrId({required this.prId});
 }

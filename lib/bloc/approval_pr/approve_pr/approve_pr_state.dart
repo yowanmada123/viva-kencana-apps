@@ -19,5 +19,6 @@ final class ApprovePrFailure extends ApprovePrState {
 
 final class ApprovePrSuccess extends ApprovePrState {
   final String message;
-  const ApprovePrSuccess({required this.message});
+  final String prId;
+  const ApprovePrSuccess({required this.message, required this.prId});
 }
