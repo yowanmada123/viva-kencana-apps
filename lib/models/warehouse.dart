@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 class Warehouse {
+  final String companyID;
   final String millID;
   final String whID;
   final String descr;
@@ -14,6 +15,7 @@ class Warehouse {
   final String locID;
   final String whCategory;
   Warehouse({
+    required this.companyID,
     required this.millID,
     required this.whID,
     required this.descr,
@@ -29,6 +31,7 @@ class Warehouse {
   });
 
   Warehouse copyWith({
+    String? companyID,
     String? millID,
     String? whID,
     String? descr,
@@ -43,6 +46,7 @@ class Warehouse {
     String? whCategory,
   }) {
     return Warehouse(
+      companyID: companyID ?? this.companyID,
       millID: millID ?? this.millID,
       whID: whID ?? this.whID,
       descr: descr ?? this.descr,
@@ -60,6 +64,7 @@ class Warehouse {
 
   Map<String, dynamic> toMap() {
     return {
+      'company_id': companyID,
       'mill_id': millID,
       'wh_id': whID,
       'descr': descr,
@@ -77,6 +82,7 @@ class Warehouse {
 
   factory Warehouse.fromMap(Map<String, dynamic> map) {
     return Warehouse(
+      companyID: map['company_id'] ?? '',
       millID: map['mill_id'] ?? '',
       whID: map['wh_id'] ?? '',
       descr: map['descr'] ?? '',
@@ -99,7 +105,7 @@ class Warehouse {
 
   @override
   String toString() {
-    return 'Warehouse(mill_id: $millID, wh_id: $whID, descr: $descr, active_flag: $activeFlag, dt_created: $dtCreated, dt_modified: $dtModified, user_id: $userID, dept_id: $deptID, wh_lock: $whLock, user_created: $userCreated, loc_id: $locID, wh_category: $whCategory)';
+    return 'Warehouse(company_id: $companyID, mill_id: $millID, wh_id: $whID, descr: $descr, active_flag: $activeFlag, dt_created: $dtCreated, dt_modified: $dtModified, user_id: $userID, dept_id: $deptID, wh_lock: $whLock, user_created: $userCreated, loc_id: $locID, wh_category: $whCategory)';
   }
 
   @override
@@ -107,6 +113,7 @@ class Warehouse {
     if (identical(this, other)) return true;
 
     return other is Warehouse &&
+        other.companyID == companyID &&
         other.millID == millID &&
         other.whID == whID &&
         other.descr == descr &&
@@ -123,7 +130,8 @@ class Warehouse {
 
   @override
   int get hashCode {
-    return millID.hashCode ^
+    return companyID.hashCode ^
+        millID.hashCode ^
         whID.hashCode ^
         descr.hashCode ^
         activeFlag.hashCode ^

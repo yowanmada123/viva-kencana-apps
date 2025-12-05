@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -259,7 +261,7 @@ class _WarehouseSelectViewState extends State<WarehouseSelectView> {
                               ),
                               minLeadingWidth: 0,
                               title: Text(
-                                state.batch.warehouses[index].whID,
+                                "${state.batch.warehouses[index].millID} - ${state.batch.warehouses[index].companyID}",
                                 style: TextStyle(
                                   fontSize: 14.w,
                                   color: Colors.black,
@@ -274,30 +276,79 @@ class _WarehouseSelectViewState extends State<WarehouseSelectView> {
                                 ),
                               ),
                               trailing: ElevatedButton(
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder:
-                                          (context) =>
-                                              WareHouseContentListScreen(
-                                                batchID: widget.batchID,
-                                                companyID:
-                                                    state.batch.companyID,
-                                                millID: state.batch.millID,
-                                                whID:
-                                                    state
-                                                        .batch
-                                                        .warehouses[index]
-                                                        .whID,
+                                onPressed: () async {
+                                  final confirm = await showDialog<bool>(
+                                    context: context,
+                                    builder: (context) {
+                                      return AlertDialog(
+                                        title: Text(
+                                          "Start Load ?",
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        content: Text(
+                                          "Jika anda menekan Ya maka waktu Load akan mulai berjalan.",
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            onPressed:
+                                                () => Navigator.pop(
+                                                  context,
+                                                  false,
+                                                ),
+                                            child: const Text("Tidak"),
+                                          ),
+                                          TextButton(
+                                            onPressed:
+                                                () => Navigator.pop(
+                                                  context,
+                                                  true,
+                                                ),
+                                            child: const Text(
+                                              "Ya",
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
                                               ),
-                                    ),
+                                            ),
+                                          ),
+                                        ],
+                                      );
+                                    },
                                   );
+
+                                  if (confirm == true) {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder:
+                                            (context) =>
+                                                WareHouseContentListScreen(
+                                                  batchID: widget.batchID,
+                                                  companyID:
+                                                      state
+                                                          .batch
+                                                          .warehouses[index]
+                                                          .companyID,
+                                                  millID:
+                                                      state
+                                                          .batch
+                                                          .warehouses[index]
+                                                          .millID,
+                                                  whID:
+                                                      state
+                                                          .batch
+                                                          .warehouses[index]
+                                                          .whID,
+                                                ),
+                                      ),
+                                    );
+                                  }
                                 },
                                 style: ElevatedButton.styleFrom(
                                   padding: EdgeInsets.symmetric(
-                                    horizontal: 24.w,
-                                    vertical: 8.w,
+                                    horizontal: 12.w,
+                                    vertical: 4.w,
                                   ),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(8),
@@ -306,7 +357,7 @@ class _WarehouseSelectViewState extends State<WarehouseSelectView> {
                                       Theme.of(context).primaryColor,
                                 ),
                                 child: Text(
-                                  'Pilih',
+                                  'Start Loading',
                                   style: TextStyle(
                                     fontSize: 12.w,
                                     fontWeight: FontWeight.bold,
