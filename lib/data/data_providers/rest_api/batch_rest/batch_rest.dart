@@ -71,10 +71,13 @@ class BatchRest {
         "api/viva/confirm_muat/getDataWh",
         data: body,
       );
+      log("Status Code: ${response.statusCode}");
       if (response.statusCode == 200) {
         log('Response body: ${response.data}');
         final body = response.data;
         final batch = Batch.fromMap(body['data']);
+        log("A");
+
         // final warehouse = List<Warehouse>.from(
         //   body['data'].map((e) {
         //     return Warehouse.fromMap(e);
@@ -82,6 +85,7 @@ class BatchRest {
         // );
         return Right(batch);
       } else {
+        log("Error Executed");
         return Left(NetUtils.parseErrorResponse(response: response.data));
       }
     } on DioException catch (e) {

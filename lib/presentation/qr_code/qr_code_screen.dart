@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
@@ -96,6 +98,8 @@ class QrCodeView extends StatelessWidget {
                               builder: (context) => const QrCodeManualScreen(),
                             ),
                           );
+
+                          log("ID: $id");
                           if (id != "") {
                             Navigator.push(
                               context,

@@ -5,17 +5,11 @@ import 'package:flutter/foundation.dart';
 import 'warehouse.dart';
 
 class Batch {
-  final String companyID;
-  final String companyName;
-  final String millID;
   final String vehicleID;
   final String driverID;
   final String kategori;
   final List<Warehouse> warehouses;
   Batch(
-    this.companyID,
-    this.companyName,
-    this.millID,
     this.vehicleID,
     this.driverID,
     this.kategori, {
@@ -23,18 +17,12 @@ class Batch {
   });
 
   Batch copyWith({
-    String? companyID,
-    String? companyName,
-    String? millID,
     String? vehicleID,
     String? driverID,
     String? kategori,
     List<Warehouse>? warehouses,
   }) {
     return Batch(
-      companyID ?? this.companyID,
-      companyName ?? this.companyName,
-      millID ?? this.millID,
       vehicleID ?? this.vehicleID,
       driverID ?? this.driverID,
       kategori ?? this.kategori,
@@ -44,9 +32,6 @@ class Batch {
 
   Map<String, dynamic> toMap() {
     return {
-      'company_id': companyID,
-      'company_name ': companyName,
-      'mill_id': millID,
       'vehicle_id': vehicleID,
       'driver_id': driverID,
       'kategori': kategori,
@@ -56,9 +41,6 @@ class Batch {
 
   factory Batch.fromMap(Map<String, dynamic> map) {
     return Batch(
-      map['company_id'] ?? '',
-      map['company_name'] ?? '',
-      map['mill_id'] ?? '',
       map['vehicle_id'] ?? '',
       map['driver_id'] ?? '',
       map['kategori'] ?? '',
@@ -77,7 +59,7 @@ class Batch {
 
   @override
   String toString() {
-    return 'Batch(company_id: $companyID, company_name: $companyName, mill_id: $millID, vehicle_id: $vehicleID, driver_id: $driverID, kategori: $kategori, warehouses: $warehouses)';
+    return 'Batch(vehicle_id: $vehicleID, driver_id: $driverID, kategori: $kategori, warehouses: $warehouses)';
   }
 
   @override
@@ -85,9 +67,6 @@ class Batch {
     if (identical(this, other)) return true;
 
     return other is Batch &&
-        other.companyID == companyID &&
-        other.companyName == companyName &&
-        other.millID == millID &&
         other.vehicleID == vehicleID &&
         other.driverID == driverID &&
         other.kategori == kategori &&
@@ -96,10 +75,7 @@ class Batch {
 
   @override
   int get hashCode {
-    return companyID.hashCode ^
-        companyName.hashCode ^
-        millID.hashCode ^
-        vehicleID.hashCode ^
+    return vehicleID.hashCode ^
         driverID.hashCode ^
         kategori.hashCode ^
         warehouses.hashCode;

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -48,6 +50,7 @@ class QrCodeView extends StatelessWidget {
                     Expanded(
                       child: ElevatedButton(
                         onPressed: () async {
+                          log(qrCodeManualController.text);
                           Navigator.pop(context, qrCodeManualController.text);
                         },
                         style: ElevatedButton.styleFrom(
