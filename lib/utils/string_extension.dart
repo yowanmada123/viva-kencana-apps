@@ -12,4 +12,12 @@ extension StringExtensions on String {
     }
     return split(' ').map((word) => word.capitalize()).join(' ');
   }
+
+  String removeTrailingZeros() {
+    String value = this;
+    if (value.contains('.')) {
+      value = value.replaceFirst(RegExp(r'\.?0+$'), '');
+    }
+    return value;
+  }
 }

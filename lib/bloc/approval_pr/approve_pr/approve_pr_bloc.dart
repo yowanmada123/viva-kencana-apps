@@ -21,10 +21,7 @@ class ApprovePrBloc extends Bloc<ApprovePrEvent, ApprovePrState> {
     emit(ApprovePrLoading());
 
     if (event.status == "reject") {
-      final result = await approvalPRRepository.rejectPR(
-        prId: event.prId,
-        typeAprv: event.typeAprv,
-      );
+      final result = await approvalPRRepository.rejectPR(prId: event.prId);
       result.fold(
         (error) =>
             emit(ApprovePrFailure(message: error.message!, exception: error)),
@@ -33,10 +30,7 @@ class ApprovePrBloc extends Bloc<ApprovePrEvent, ApprovePrState> {
     }
 
     if (event.status == "approve") {
-      final result = await approvalPRRepository.approvalPR(
-        prId: event.prId,
-        typeAprv: event.typeAprv,
-      );
+      final result = await approvalPRRepository.approvalPR(prId: event.prId);
       result.fold(
         (error) =>
             emit(ApprovePrFailure(message: error.message!, exception: error)),

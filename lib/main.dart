@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -46,6 +47,7 @@ import 'utils/sales_activity/sales_activity_sync_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await initializeDateFormatting('id_ID', null);
 
   SalesActivitySyncService().syncPendingActivities();
 
@@ -64,13 +66,20 @@ void main() async {
     ..interceptors.addAll([DioRequestTokenInterceptor()]);
   final dioClient = Dio(Environment.dioBaseOptions)
     ..interceptors.addAll([DioRequestTokenInterceptor()]);
+  final devClient = Dio(DevEnvironment.dioBaseOptions)
+    ..interceptors.addAll([DioRequestTokenInterceptor()]);
 
   final authRest = AuthRest(authClient);
   final batchRest = BatchRest(dioClient);
   final entityRest = EntityRest(dioClient);
   final authorizationRest = AuthorizationRest(authClient);
   final salesActivityRest = SalesActivityRest(dioClient);
-  final approvalPrRest = ApprovalPRRest(dioClient);
+
+  // final approvalPrRest = ApprovalPRRest(dioClient);
+  // Production Server
+
+  final approvalPrRest = ApprovalPRRest(devClient);
+  // Development Server For Testing
 
   final authRepository = AuthRepository(
     authRest: authRest,

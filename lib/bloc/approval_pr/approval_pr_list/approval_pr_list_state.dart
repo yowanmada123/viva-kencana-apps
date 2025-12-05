@@ -21,6 +21,6 @@ final class ApprovalPrListFailureState extends ApprovalPrListState {
 }
 
 final class ApprovalPrListSuccessState extends ApprovalPrListState {
-  final List<ApprovalPR> data;
+  final List<ApprovalPrFSunrise> data;
   const ApprovalPrListSuccessState({required this.data});
 }

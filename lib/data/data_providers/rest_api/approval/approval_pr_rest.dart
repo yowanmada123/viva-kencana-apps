@@ -2,26 +2,26 @@ import 'dart:developer';
 
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
-import 'package:vivakencanaapp/models/approval_pr/approval_pr.dart';
 import 'package:vivakencanaapp/models/approval_pr/approval_pr_department.dart';
+import 'package:vivakencanaapp/models/approval_pr/approval_pr_fdpi.dart';
 
 import '../../../../models/errors/custom_exception.dart';
 import '../../../../utils/net_utils.dart';
 
 class ApprovalPRRest {
-  Dio http;
+  Dio dio;
 
-  ApprovalPRRest(this.http);
+  ApprovalPRRest(this.dio);
 
   Future<Either<CustomException, List<Department>>>
   getPrDepartmentListAndUserData() async {
     try {
-      http.options.headers['requiresToken'] = true;
+      dio.options.headers['requiresToken'] = true;
       log(
-        'Request to https://v2.kencana.org/api/srs/mobile/approval/getUserData (GET)',
+        'Request to dios://v2.kencana.org/api/srs/mobile/approval/getUserData (GET)',
       );
 
-      final response = await http.get(
+      final response = await dio.get(
         "api/srs/mobile/approval/getUserData",
         options: Options(
           sendTimeout: const Duration(seconds: 15),
@@ -30,7 +30,7 @@ class ApprovalPRRest {
         ),
       );
       log(
-        'Response from "https://v2.kencana.org/api/srs/mobile/approval/getUserData": ${response.toString()}',
+        'Response from "dios://v2.kencana.org/api/srs/mobile/approval/getUserData": ${response.toString()}',
       );
       if (response.statusCode == 200) {
         final data = response.data;
@@ -53,7 +53,7 @@ class ApprovalPRRest {
     }
   }
 
-  Future<Either<CustomException, List<ApprovalPR>>> getPRList(
+  Future<Either<CustomException, List<ApprovalPrFSunrise>>> getPRList(
     // {
     // required String departmentId,
     // required String approveStatus,
@@ -62,8 +62,8 @@ class ApprovalPRRest {
     // }
   ) async {
     try {
-      http.options.headers['requiresToken'] = true;
-      log('Request to https://api-fpi.kencana.org/api/fpi/prpo/getList (PRST)');
+      dio.options.headers['requiresToken'] = true;
+      log('Request to dios://api-fpi.kencana.org/api/fpi/prpo/getList (PRST)');
 
       final body = {
         // "department_id": departmentId, //*required
@@ -73,7 +73,7 @@ class ApprovalPRRest {
         "tr_type": "PR", //ex. 2025-03-01 *required
       };
 
-      final response = await http.post(
+      final response = await dio.post(
         "api/srs/mobile/approval/getApprovalList",
         data: body,
       );
@@ -81,9 +81,9 @@ class ApprovalPRRest {
       if (response.statusCode == 200) {
         final data = response.data;
 
-        final List<ApprovalPR> items =
-            List<ApprovalPR>.from(
-              data['data'].map((e) => ApprovalPR.fromMap(e)),
+        final List<ApprovalPrFSunrise> items =
+            List<ApprovalPrFSunrise>.from(
+              data['data'].map((e) => ApprovalPrFSunrise.fromMap(e)),
             ).toList();
 
         return Right(items);
@@ -101,15 +101,23 @@ class ApprovalPRRest {
 
   Future<Either<CustomException, String>> approvalPR({
     required String prId, // prId
-    required String typeAprv, // Approve1 atau Approve2
   }) async {
     try {
-      http.options.headers['requiresToken'] = true;
-      log('Request to https://api-fpi.kencana.org/api/fpi/prpo/approve (PRST)');
+      dio.options.headers['requiresToken'] = true;
+      log(
+        'Request to http://10.65.65.222:8000/api/srs/mobile/approval/submitApprove (PRST)',
+      );
 
-      final body = {"tr_id": prId, "tr_type": "PR", "type_aprv": typeAprv};
+      final body = {"pr_id": prId, "approve_type": "approve"};
 
-      final response = await http.post("api/fpi/prpo/approve", data: body);
+      final response = await dio.post(
+        "api/srs/mobile/approval/submitApprove",
+        data: body,
+      );
+
+      log(
+        'Response from http://10.65.65.222:8000/api/srs/mobile/approval/submitApprove (PRST): $response',
+      );
 
       if (response.statusCode == 200) {
         return Right("Successfully approved");
@@ -127,15 +135,17 @@ class ApprovalPRRest {
 
   Future<Either<CustomException, String>> rejectPR({
     required String prId, // prId
-    required String typeAprv, // Approve1 atau Approve2
   }) async {
     try {
-      http.options.headers['requiresToken'] = true;
-      log('Request to https://api-fpi.kencana.org/api/fpi/prpo/cancel (PRST)');
+      dio.options.headers['requiresToken'] = true;
+      log('Request to dios://api-fpi.kencana.org/api/fpi/prpo/cancel (PRST)');
 
-      final body = {"tr_id": prId, "tr_type": "PR", "type_aprv": typeAprv};
+      final body = {"tr_id": prId, "type_aprv": "reject"};
 
-      final response = await http.post("api/fpi/prpo/cancel", data: body);
+      final response = await dio.post(
+        "api/srs/mobile/approval/submitApprove",
+        data: body,
+      );
 
       if (response.statusCode == 200) {
         return Right("Successfully rejected");

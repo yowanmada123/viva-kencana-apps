@@ -45,7 +45,7 @@ class ApprovalPrScreenState extends State<ApprovalPrScreen> {
 
   void _handleApproval(
     int index,
-    List<ApprovalPR> poList,
+    List<ApprovalPrFSunrise> poList,
     BuildContext context,
   ) {
     final credentialState = context.read<CredentialsBloc>().state;
@@ -54,11 +54,7 @@ class ApprovalPrScreenState extends State<ApprovalPrScreen> {
       if (credentialState is CredentialsLoadSuccess) {
         if (credentialState.credentials["APPROVALPR1"] == "Y") {
           context.read<ApprovePrBloc>().add(
-            ApprovePrLoadEvent(
-              prId: poList[index].prId,
-              typeAprv: "approve1",
-              status: "approve",
-            ),
+            ApprovePrLoadEvent(prId: poList[index].prId, status: "approve"),
           );
         } else {
           _showNoPermissionSnackBar(context);
@@ -72,11 +68,7 @@ class ApprovalPrScreenState extends State<ApprovalPrScreen> {
       if (credentialState is CredentialsLoadSuccess) {
         if (credentialState.credentials["APPROVALPR2"] == "Y") {
           context.read<ApprovePrBloc>().add(
-            ApprovePrLoadEvent(
-              prId: poList[index].prId,
-              typeAprv: "approve2",
-              status: "approve",
-            ),
+            ApprovePrLoadEvent(prId: poList[index].prId, status: "approve"),
           );
         } else {
           _showNoPermissionSnackBar(context);
@@ -93,18 +85,18 @@ class ApprovalPrScreenState extends State<ApprovalPrScreen> {
     context.read<ApprovalPrListBloc>().add(RemoveListIndex(index: index));
   }
 
-  void _handleReject(int index, List<ApprovalPR> poList, BuildContext context) {
+  void _handleReject(
+    int index,
+    List<ApprovalPrFSunrise> poList,
+    BuildContext context,
+  ) {
     final credentialState = context.read<CredentialsBloc>().state;
 
     if (poList[index].aprvBy == "" && poList[index].rjcBy == "") {
       if (credentialState is CredentialsLoadSuccess) {
         if (credentialState.credentials["APPROVALPR1"] == "Y") {
           context.read<ApprovePrBloc>().add(
-            ApprovePrLoadEvent(
-              prId: poList[index].prId,
-              typeAprv: "approve1",
-              status: "reject",
-            ),
+            ApprovePrLoadEvent(prId: poList[index].prId, status: "reject"),
           );
         } else {
           _showNoPermissionSnackBar(context);
@@ -118,11 +110,7 @@ class ApprovalPrScreenState extends State<ApprovalPrScreen> {
       if (credentialState is CredentialsLoadSuccess) {
         if (credentialState.credentials["APPROVALPR2"] == "Y") {
           context.read<ApprovePrBloc>().add(
-            ApprovePrLoadEvent(
-              prId: poList[index].prId,
-              typeAprv: "approve2",
-              status: "reject",
-            ),
+            ApprovePrLoadEvent(prId: poList[index].prId, status: "reject"),
           );
         } else {
           _showNoPermissionSnackBar(context);
@@ -168,14 +156,7 @@ class ApprovalPrScreenState extends State<ApprovalPrScreen> {
           create:
               (context) => ApprovalPrListBloc(
                 approvalPRRepository: context.read<ApprovalPRRepository>(),
-              )..add(
-                GetApprovalPRListEvent(
-                  // departmentId: '',
-                  // approveStatus: '',
-                  // startDate: '',
-                  // endDate: '',
-                ),
-              ),
+              )..add(GetApprovalPRListEvent()),
         ),
         BlocProvider(
           create:
@@ -185,7 +166,20 @@ class ApprovalPrScreenState extends State<ApprovalPrScreen> {
         ),
       ],
       child: Scaffold(
-        appBar: AppBar(title: Text(widget.title)),
+        appBar: AppBar(
+          title: Text(
+            widget.title,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontFamily: "Poppins",
+              color: Colors.white,
+              fontWeight: FontWeight.w600,
+              fontSize: 18,
+            ),
+          ),
+          backgroundColor: Theme.of(context).primaryColor,
+          iconTheme: const IconThemeData(color: Colors.white),
+        ),
         body: SafeArea(
           child: BlocConsumer<ApprovalPrListBloc, ApprovalPrListState>(
             listener: (context, state) {
@@ -297,7 +291,10 @@ class ApprovalPrScreenState extends State<ApprovalPrScreen> {
         bottomNavigationBar:
             BlocBuilder<ApprovalPrListBloc, ApprovalPrListState>(
               builder: (context, state) {
+                log("This Work");
                 if (state is! ApprovalPrListSuccessState) {
+                  log("A");
+
                   return SizedBox.shrink();
                 }
 
@@ -306,29 +303,39 @@ class ApprovalPrScreenState extends State<ApprovalPrScreen> {
 
                 if (_currentPage >= poList.length) return SizedBox.shrink();
                 final currentPr = poList[_currentPage];
+                log("B");
 
                 bool canApprove = false;
 
                 if (credentialState is CredentialsLoadSuccess) {
-                  // if (currentPr.aprvBy == "" && currentPr.rjcBy == "") {
-                  //   canApprove = true;
-                  // } else if (currentPr.aprv2By == "" &&
-                  //     currentPr.rjc2By == "") {
-                  //   canApprove = true;
-                  // }
+                  log("C");
+
+                  if (currentPr.aprvBy == "" && currentPr.rjcBy == "") {
+                    log("D");
+
+                    canApprove = true;
+                  } else if (currentPr.aprv2By == "" &&
+                      currentPr.rjc2By == "") {
+                    canApprove = true;
+                    log("E");
+                  }
                   // DUMMY
-                  canApprove = true;
+                  // canApprove = true;
                 }
 
                 if (!canApprove) return SizedBox.shrink();
+                log("This Button Must Be Shown");
+
                 return ApprovalBottomBar(
                   isLoading: false,
-                  onApprove: () {},
-                  // () => _handleApproval(_currentPage, state.data, context),
-                  onReject: () {},
-                  // () {
-                  //   _handleReject(_currentPage, state.data, context);
-                  // },
+                  onApprove:
+                      // () {},
+                      () => _handleApproval(_currentPage, state.data, context),
+                  onReject:
+                  // () {},
+                  () {
+                    _handleReject(_currentPage, state.data, context);
+                  },
                   canApprove: canApprove,
                 );
               },

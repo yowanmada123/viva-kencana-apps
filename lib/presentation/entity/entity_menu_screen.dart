@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:vivakencanaapp/bloc/authorization/credentials/credentials_bloc.dart';
 import 'package:vivakencanaapp/presentation/approval/approval_pr_screen.dart';
 
 import '../../bloc/auth/authentication/authentication_bloc.dart';
@@ -44,6 +45,9 @@ class EntityMenuScreen extends StatelessWidget {
               (context) =>
                   AccessMenuBloc(authorizationRepository)
                     ..add(LoadAccessMenu(entityId: entityId)),
+        ),
+        BlocProvider.value(
+          value: context.read<CredentialsBloc>()..add(CredentialsLoad()),
         ),
       ],
       child: MyGridLayout(
@@ -257,7 +261,10 @@ class _MyGridLayoutState extends State<MyGridLayout> {
           action: () async {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (_) => ApprovalSrMenuScreen()),
+              MaterialPageRoute(
+                builder:
+                    (_) => ApprovalPrScreen(title: 'Purchase Request Approval'),
+              ),
             );
           },
         );

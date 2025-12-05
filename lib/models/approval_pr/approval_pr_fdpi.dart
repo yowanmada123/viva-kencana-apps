@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 
 import '../../utils/datetime_convertion.dart';
 
-class ApprovalPrFdpi {
+class ApprovalPrFSunrise {
   final String prId;
   final DateTime? dtPr;
   final String deptId;
@@ -31,6 +31,8 @@ class ApprovalPrFdpi {
   final String siteName;
   final String clusterName;
   final String houseName;
+  final String millId;
+  final String millName;
   final String officeId;
   final String office;
   final String wCreatedBy;
@@ -38,7 +40,7 @@ class ApprovalPrFdpi {
   final String wAprv2By;
   final String typePr;
   final List<ApprovalArticlePR> article;
-  ApprovalPrFdpi({
+  ApprovalPrFSunrise({
     required this.prId,
     required this.dtPr,
     required this.deptId,
@@ -65,6 +67,8 @@ class ApprovalPrFdpi {
     required this.siteName,
     required this.clusterName,
     required this.houseName,
+    required this.millId,
+    required this.millName,
     required this.officeId,
     required this.office,
     required this.wCreatedBy,
@@ -74,7 +78,7 @@ class ApprovalPrFdpi {
     required this.article,
   });
 
-  ApprovalPrFdpi copyWith({
+  ApprovalPrFSunrise copyWith({
     String? prId,
     DateTime? dtPr,
     String? deptId,
@@ -101,6 +105,8 @@ class ApprovalPrFdpi {
     String? siteName,
     String? clusterName,
     String? houseName,
+    String? millId,
+    String? millName,
     String? officeId,
     String? office,
     String? wCreatedBy,
@@ -109,7 +115,7 @@ class ApprovalPrFdpi {
     String? typePr,
     List<ApprovalArticlePR>? article,
   }) {
-    return ApprovalPrFdpi(
+    return ApprovalPrFSunrise(
       prId: prId ?? this.prId,
       dtPr: dtPr ?? this.dtPr,
       deptId: deptId ?? this.deptId,
@@ -136,6 +142,8 @@ class ApprovalPrFdpi {
       siteName: siteName ?? this.siteName,
       clusterName: clusterName ?? this.clusterName,
       houseName: houseName ?? this.houseName,
+      millId: millId ?? this.millId,
+      millName: millName ?? this.millName,
       officeId: officeId ?? this.officeId,
       office: office ?? this.office,
       wCreatedBy: wCreatedBy ?? this.wCreatedBy,
@@ -174,6 +182,8 @@ class ApprovalPrFdpi {
       'site_name': siteName,
       'cluster_name': clusterName,
       'house_name': houseName,
+      'mill_id': millId,
+      'mill_name': millName,
       'office_id': officeId,
       'office': office,
       'w_created_by': wCreatedBy,
@@ -184,8 +194,8 @@ class ApprovalPrFdpi {
     };
   }
 
-  factory ApprovalPrFdpi.fromMap(Map<String, dynamic> map) {
-    return ApprovalPrFdpi(
+  factory ApprovalPrFSunrise.fromMap(Map<String, dynamic> map) {
+    return ApprovalPrFSunrise(
       prId: map['pr_id'] ?? '',
       dtPr: parseDateTime(map['dt_pr'] ?? ''),
       deptId: map['dept_id'] ?? '',
@@ -212,6 +222,8 @@ class ApprovalPrFdpi {
       siteName: map['site_name'] ?? '',
       clusterName: map['cluster_name'] ?? '',
       houseName: map['house_name'] ?? '',
+      millId: map['mill_id'] ?? '',
+      millName: map['mill_name'] ?? '',
       officeId: map['office_id'] ?? '',
       office: map['office'] ?? '',
       wCreatedBy: map['w_created_by'] ?? '',
@@ -226,19 +238,19 @@ class ApprovalPrFdpi {
 
   String toJson() => json.encode(toMap());
 
-  factory ApprovalPrFdpi.fromJson(String source) =>
-      ApprovalPrFdpi.fromMap(json.decode(source));
+  factory ApprovalPrFSunrise.fromJson(String source) =>
+      ApprovalPrFSunrise.fromMap(json.decode(source));
 
   @override
   String toString() {
-    return 'ApprovalPrFdpi(prId: $prId, dtPr: $dtPr, deptId: $deptId, address: $address, city: $city, deptName: $deptName, qty: $qty, picId: $picId, vendorId: $vendorId, vendorName: $vendorName, wgt: $wgt, prNum: $prNum, stat: $stat, memoTxt: $memoTxt, trType: $trType, dtAprv: $dtAprv, dtAprv2: $dtAprv2, dtRjc: $dtRjc, dtRjc2: $dtRjc2, aprvBy: $aprvBy, aprv2By: $aprv2By, rjcBy: $rjcBy, rjc2By: $rjc2By, siteName: $siteName, clusterName: $clusterName, houseName: $houseName, officeId: $officeId, office: $office, wCreatedBy: $wCreatedBy, wAprv1By: $wAprv1By, wAprv2By: $wAprv2By, article: $article, typePr: $typePr)';
+    return 'ApprovalPrFSunrise(prId: $prId, dtPr: $dtPr, deptId: $deptId, address: $address, city: $city, deptName: $deptName, qty: $qty, picId: $picId, vendorId: $vendorId, vendorName: $vendorName, wgt: $wgt, prNum: $prNum, stat: $stat, memoTxt: $memoTxt, trType: $trType, dtAprv: $dtAprv, dtAprv2: $dtAprv2, dtRjc: $dtRjc, dtRjc2: $dtRjc2, aprvBy: $aprvBy, aprv2By: $aprv2By, rjcBy: $rjcBy, rjc2By: $rjc2By, siteName: $siteName, clusterName: $clusterName, houseName: $houseName,millId: $millId,millName: $millName, officeId: $officeId, office: $office, wCreatedBy: $wCreatedBy, wAprv1By: $wAprv1By, wAprv2By: $wAprv2By, article: $article, typePr: $typePr)';
   }
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
 
-    return other is ApprovalPrFdpi &&
+    return other is ApprovalPrFSunrise &&
         other.prId == prId &&
         other.dtPr == dtPr &&
         other.deptId == deptId &&
@@ -265,6 +277,8 @@ class ApprovalPrFdpi {
         other.siteName == siteName &&
         other.clusterName == clusterName &&
         other.houseName == houseName &&
+        other.millId == millId &&
+        other.millName == millName &&
         other.officeId == officeId &&
         other.office == office &&
         other.wCreatedBy == wCreatedBy &&
@@ -302,6 +316,8 @@ class ApprovalPrFdpi {
         siteName.hashCode ^
         clusterName.hashCode ^
         houseName.hashCode ^
+        millId.hashCode ^
+        millName.hashCode ^
         officeId.hashCode ^
         office.hashCode ^
         wCreatedBy.hashCode ^

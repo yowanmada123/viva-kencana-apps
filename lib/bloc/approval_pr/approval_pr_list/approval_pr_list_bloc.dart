@@ -1,6 +1,7 @@
+import 'dart:developer';
+
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:vivakencanaapp/models/approval_pr/approval_pr.dart';
 
 import '../../../data/repository/approval_pr_repository.dart';
 import '../../../models/approval_pr/approval_pr_fdpi.dart';
@@ -23,12 +24,7 @@ class ApprovalPrListBloc
     Emitter<ApprovalPrListState> emit,
   ) async {
     emit(ApprovalPrListLoadingState());
-    final result = await approvalPRRepository.getPRList(
-      // departmentId: event.departmentId,
-      // approveStatus: event.approveStatus,
-      // startDate: event.startDate,
-      // endDate: event.endDate,
-    );
+    final result = await approvalPRRepository.getPRList();
     result.fold(
       (failure) => emit(
         ApprovalPrListFailureState(message: failure.message!, error: failure),
@@ -45,7 +41,7 @@ class ApprovalPrListBloc
     final currentState = state;
     if (currentState is ApprovalPrListSuccessState) {
       emit(ApprovalPrListLoadingState());
-      final updatedList = List<ApprovalPR>.from(currentState.data)
+      final updatedList = List<ApprovalPrFSunrise>.from(currentState.data)
         ..removeAt(event.index);
 
       emit(ApprovalPrListSuccessState(data: updatedList));
