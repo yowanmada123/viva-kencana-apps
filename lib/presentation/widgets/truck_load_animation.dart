@@ -48,11 +48,11 @@ class _TruckLoadingAnimationState extends State<TruckLoadingAnimation>
               child: Column(
                 children: [
                   Icon(
-                    Icons.local_shipping_rounded,
-                    color: Color.fromARGB(255, 62, 54, 215),
+                    Icons.warehouse,
+                    color: Color.fromARGB(255, 3, 209, 113),
                     size: 55,
                   ),
-                  const Text("Truck 1", style: TextStyle(fontSize: 12)),
+                  const Text("Warehouse", style: TextStyle(fontSize: 12)),
                 ],
               ),
             ),
@@ -67,10 +67,10 @@ class _TruckLoadingAnimationState extends State<TruckLoadingAnimation>
                 children: [
                   Icon(
                     Icons.local_shipping_outlined,
-                    color: Theme.of(context).primaryColor,
+                    color: Color.fromARGB(255, 255, 171, 15),
                     size: 55,
                   ),
-                  const Text("Truck 2", style: TextStyle(fontSize: 12)),
+                  const Text("Truck", style: TextStyle(fontSize: 12)),
                 ],
               ),
             ),
@@ -89,7 +89,7 @@ class _TruckLoadingAnimationState extends State<TruckLoadingAnimation>
                     width: 30,
                     height: 30,
                     decoration: BoxDecoration(
-                      color: const Color.fromARGB(255, 255, 178, 45),
+                      color: const Color.fromARGB(255, 59, 128, 255),
                       borderRadius: BorderRadius.circular(6),
                     ),
                   ),
