@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:vivakencanaapp/presentation/widgets/warehouse_detail_animation.dart';
 import 'package:vivakencanaapp/presentation/widgets/truck_load_animation.dart';
 
 import '../../bloc/auth/authentication/authentication_bloc.dart';
@@ -693,6 +694,7 @@ class _WareHouseContentListState extends State<WareHouseContentListView> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            TruckLoadingAnimation(),
                             const TruckLoadingAnimation(),
                             const SizedBox(height: 20),
                             if (state.isConfirmed) ...[
@@ -734,7 +736,7 @@ class _WareHouseContentListState extends State<WareHouseContentListView> {
                                 },
                                 builder: (context, state) {
                                   return Container(
-                                    height: 35.w,
+                                    height: 40.w,
                                     width: double.infinity,
                                     decoration: BoxDecoration(
                                       color: Colors.red,
