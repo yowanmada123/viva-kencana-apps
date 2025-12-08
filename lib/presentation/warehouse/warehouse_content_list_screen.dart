@@ -769,7 +769,7 @@ class _WareHouseContentListState extends State<WareHouseContentListView> {
                                 width: double.infinity,
                                 height: 40.w,
                                 decoration: BoxDecoration(
-                                  color: Theme.of(context).primaryColor,
+                                  color: const Color.fromARGB(255, 9, 234, 16),
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: BlocConsumer<
