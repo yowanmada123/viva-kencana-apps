@@ -353,8 +353,12 @@ class _WarehouseSelectViewState extends State<WarehouseSelectView> {
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(8),
                                   ),
-                                  backgroundColor:
-                                      Theme.of(context).primaryColor,
+                                  backgroundColor: const Color.fromARGB(
+                                    255,
+                                    22,
+                                    218,
+                                    48,
+                                  ),
                                 ),
                                 child: Text(
                                   'Start Loading',
