@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -31,6 +32,7 @@ class _SalesActivityHistoryDetailScreenState extends State<SalesActivityHistoryD
 
   @override
   void initState() {
+    log('Access to lib/presentation/sales_activity/sales_activity_history_detail_screen.dart');
     super.initState();
     context.read<SalesActivityHistoryVisitDetailBloc>().add(LoadHistoryDetail(widget.visit.trId));
   }

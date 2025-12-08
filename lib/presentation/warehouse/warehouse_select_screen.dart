@@ -46,6 +46,7 @@ class WarehouseSelectView extends StatefulWidget {
 class _WarehouseSelectViewState extends State<WarehouseSelectView> {
   @override
   void initState() {
+    log('Access to lib/presentation/warehouse/warehouse_select_screen.dart'); 
     // final authState = context.read<AuthenticationBloc>().state as Authenticated;
     // user = authState.user;
     context.read<BatchBloc>().add(LoadBatch(deliveryId: widget.batchID));

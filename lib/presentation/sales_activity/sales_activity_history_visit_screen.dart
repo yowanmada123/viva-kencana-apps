@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -25,6 +27,7 @@ class _SalesActivityHistoryVisitScreenState extends State<SalesActivityHistoryVi
 
   @override
   void initState() {
+    log('Access to lib/presentation/sales_activity/sales_activity_history_visit_screen.dart');
     super.initState();
     final today = DateTime.now();
     startDateController = TextEditingController(text: _formatDate(today));

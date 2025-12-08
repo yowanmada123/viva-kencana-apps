@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -85,7 +86,8 @@ class _GridLayoutState extends State<GridLayout> {
   }
 
   @override
-  void initState() {    
+  void initState() {   
+    log('Access to presentation/entity/entitiy_screen.dart'); 
     loadUserData();
     super.initState();
   }
@@ -281,7 +283,7 @@ class _GridLayoutState extends State<GridLayout> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => EntityMenuScreen(entityId: entity.entityId),
+                                  builder: (context) => EntityMenuScreen(entityId: entity.entityId, entityDescription: entity.description),
                                 ),
                               );
                             },
@@ -356,7 +358,7 @@ class _GridLayoutState extends State<GridLayout> {
                                             Navigator.push(
                                               context,
                                               MaterialPageRoute(
-                                                builder: (context) => EntityMenuScreen(entityId: entity.entityId),
+                                                builder: (context) => EntityMenuScreen(entityId: entity.entityId, entityDescription: entity.description),
                                               ),
                                             );
                                           },
