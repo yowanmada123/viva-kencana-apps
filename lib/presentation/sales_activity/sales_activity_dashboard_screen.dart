@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -26,6 +28,7 @@ class SalesActivityDashboardScreen extends StatefulWidget {
 class _SalesActivityDashboardScreenState extends State<SalesActivityDashboardScreen> {
   @override
   void initState() {
+    log('Access to lib/presentation/sales_activity/sales_activity_dashboard_screen.dart'); 
     super.initState();
     SalesActivitySyncService().syncPendingActivities();
     context.read<SalesActivityFormCheckInBloc>().add(LoadSalesData());
@@ -62,22 +65,23 @@ class _SalesActivityDashboardScreenState extends State<SalesActivityDashboardScr
                     buildCheckCard(time: sales.todayCheckout, isCheckin: false),
                   ],
                 );
-              } else {
-                return Center(
+              } 
+               return Center(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text("Gagal memuat data sales, coba lagi"),
                       BasePrimaryButton(
                         onPressed: () {
-                          context.read<SalesActivityFormCheckInBloc>().add(LoadSalesData());
+                          context
+                          .read<SalesActivityFormCheckInBloc>()
+                          .add(LoadSalesData());
                         },
-                        label: "COba lagi",
+                        label: "Coba lagi",
                       ),
                     ],
                   ),
                 );
-              }
             },
           ),
 
@@ -87,6 +91,10 @@ class _SalesActivityDashboardScreenState extends State<SalesActivityDashboardScr
                 padding: EdgeInsets.symmetric(horizontal: 32.w),
                 child: BlocBuilder<SalesActivityFormCheckInBloc, SalesActivityFormCheckInState>(
                   builder: (context, state) {
+
+                    if (state is SalesDataLoading) {
+                      return Center(child: const CircularProgressIndicator());
+                    }
 
                     if (state is SalesDataSuccess){
                       bool isCheckedIn = state.sales.todayCheckin.isNotEmpty;
@@ -172,8 +180,6 @@ class _SalesActivityDashboardScreenState extends State<SalesActivityDashboardScr
                           ),
                         ],
                       );
-                    } else if (state is SalesDataLoading) {
-                      return Center(child: const CircularProgressIndicator());
                     } else {
                       return Center(child: const Text("Gagal memuat data sales"));
                     }

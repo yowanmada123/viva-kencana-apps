@@ -18,13 +18,14 @@ class AuthorizationRest {
   }) async {
     try {
       dio.options.headers['requiresToken'] = true;
-
-      log('Request to https://v3.kencana.org/api/mobile/getMenu (POST)');
       final data = {"entity_id": entityId, "appl_id": applId};
       final response = await dio.post("api/mobile/getMenu", data: data);
-
+      log('Request to https://v3.kencana.org/api/mobile/getMenu (Post)');
       if (response.statusCode == 200) {
         final body = response.data;
+        log(
+          'Response "https://v3.kencana.org/api/mobile/getMenu (Post)" : ${body.toString()}',
+        );
         final menu = List<Menu>.from(
           body['data'].map((e) {
             return Menu.fromMap(e);
@@ -50,9 +51,6 @@ class AuthorizationRest {
     try {
       dio.options.headers['requiresToken'] = true;
 
-      log(
-        'Request to https://v3.kencana.org/api/mobile/getEnvConf (POST)',
-      );
       final data = {"entity_id": entityId, "appl_id": applId};
       final response = await dio.post("api/mobile/getEnvConf", data: data);
 

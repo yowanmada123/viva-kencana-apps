@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -123,6 +124,12 @@ class _SalesActivityHistoryUpdateScreenState extends State<SalesActivityHistoryU
     );
     return result != null ? File(result.path) : null;
   }
+
+  @override
+  void initState() {
+    log('Access to lib/presentation/sales_activity/sales_activity_history_update_screen.dart');
+    super.initState();
+     }
 
   @override
   Widget build(BuildContext context) {

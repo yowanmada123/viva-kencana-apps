@@ -46,6 +46,7 @@ class WarehouseSelectView extends StatefulWidget {
 class _WarehouseSelectViewState extends State<WarehouseSelectView> {
   @override
   void initState() {
+    log('Access to lib/presentation/warehouse/warehouse_select_screen.dart'); 
     // final authState = context.read<AuthenticationBloc>().state as Authenticated;
     // user = authState.user;
     context.read<BatchBloc>().add(LoadBatch(deliveryId: widget.batchID));
@@ -353,11 +354,11 @@ class _WarehouseSelectViewState extends State<WarehouseSelectView> {
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(8),
                                   ),
-                                  backgroundColor: const Color.fromARGB(
+                                  backgroundColor: Color.fromARGB(
                                     255,
-                                    22,
-                                    218,
-                                    48,
+                                    4,
+                                    117,
+                                    247,
                                   ),
                                 ),
                                 child: Text(

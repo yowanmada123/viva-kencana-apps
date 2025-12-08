@@ -7,9 +7,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:vivakencanaapp/bloc/approval_pr/approval_pr_department/approval_pr_department_bloc.dart';
+import 'package:vivakencanaapp/bloc/approval_pr/approval_pr_list/approval_pr_list_bloc.dart';
+import 'package:vivakencanaapp/bloc/approval_pr/approve_pr/approve_pr_bloc.dart';
+import 'package:vivakencanaapp/data/data_providers/rest_api/approval/approval_pr_rest.dart';
+
+import 'package:vivakencanaapp/bloc/authorization/credentials/credentials_bloc.dart';
+import 'package:vivakencanaapp/data/repository/approval_pr_repository.dart';
 
 import 'bloc/auth/authentication/authentication_bloc.dart';
 import 'bloc/sales_activity/checkin/sales_activity_form_checkin_bloc.dart';
@@ -39,6 +47,7 @@ import 'utils/sales_activity/sales_activity_sync_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await initializeDateFormatting('id_ID', null);
 
   SalesActivitySyncService().syncPendingActivities();
 
@@ -57,6 +66,8 @@ void main() async {
     ..interceptors.addAll([DioRequestTokenInterceptor()]);
   final dioClient = Dio(Environment.dioBaseOptions)
     ..interceptors.addAll([DioRequestTokenInterceptor()]);
+  final devClient = Dio(Environment.dioBaseOptions)
+    ..interceptors.addAll([DioRequestTokenInterceptor()]);
 
   final authRest = AuthRest(authClient);
   final batchRest = BatchRest(dioClient);
@@ -64,14 +75,27 @@ void main() async {
   final authorizationRest = AuthorizationRest(authClient);
   final salesActivityRest = SalesActivityRest(dioClient);
 
+  // final approvalPrRest = ApprovalPRRest(dioClient);
+  // Production Server
+
+  final approvalPrRest = ApprovalPRRest(devClient);
+  // Development Server For Testing
+
   final authRepository = AuthRepository(
     authRest: authRest,
     authSharedPref: authSharedPref,
   );
   final batchRepository = BatchRepository(batchRest: batchRest);
   final entityRepository = EntityRepository(entityRest: entityRest);
-  final authorizationRepository = AuthorizationRepository(authorizationRest: authorizationRest);
-  final salesActivityRepository = SalesActivityRepository(salesActivityRest: salesActivityRest);
+  final authorizationRepository = AuthorizationRepository(
+    authorizationRest: authorizationRest,
+  );
+  final salesActivityRepository = SalesActivityRepository(
+    salesActivityRest: salesActivityRest,
+  );
+  final approvalPrRepository = ApprovalPRRepository(
+    approvalPRRest: approvalPrRest,
+  );
 
   runApp(
     MultiRepositoryProvider(
@@ -81,17 +105,84 @@ void main() async {
         RepositoryProvider.value(value: entityRepository),
         RepositoryProvider.value(value: authorizationRepository),
         RepositoryProvider.value(value: salesActivityRepository),
+        RepositoryProvider.value(value: approvalPrRepository),
       ],
       child: MultiBlocProvider(
         providers: [
           BlocProvider(lazy: false, create: (context) => AuthenticationBloc()),
-          BlocProvider(lazy: false, create: (context) => UpdateBloc()..add(CheckForUpdate())),
-          BlocProvider(lazy: false, create: (context) => SalesActivityFormBloc(salesActivityRepository: salesActivityRepository)),
-          BlocProvider(lazy: false, create: (context) => SalesActivityFormCheckInBloc(salesActivityRepository: salesActivityRepository)),
-          BlocProvider(lazy: false, create: (context) => SalesActivityHistoryVisitBloc(salesActivityRepository: salesActivityRepository)),
-          BlocProvider(lazy: false, create: (context) => SalesActivityHistoryVisitDetailBloc(salesActivityRepository: salesActivityRepository)),
-          BlocProvider(lazy: false, create: (context) => SalesActivityHistoryVisitUploadImageBloc(salesActivityRepository: salesActivityRepository)),
-          BlocProvider(lazy: false, create: (context) => SalesActivityHistoryVisitDetailListImageBloc(salesActivityRepository: salesActivityRepository)),
+          BlocProvider(
+            lazy: false,
+            create: (context) => UpdateBloc()..add(CheckForUpdate()),
+          ),
+          BlocProvider(
+            lazy: false,
+            create:
+                (context) => SalesActivityFormBloc(
+                  salesActivityRepository: salesActivityRepository,
+                ),
+          ),
+          BlocProvider(
+            lazy: false,
+            create:
+                (context) => SalesActivityFormCheckInBloc(
+                  salesActivityRepository: salesActivityRepository,
+                ),
+          ),
+          BlocProvider(
+            lazy: false,
+            create:
+                (context) => SalesActivityHistoryVisitBloc(
+                  salesActivityRepository: salesActivityRepository,
+                ),
+          ),
+          BlocProvider(
+            lazy: false,
+            create:
+                (context) => SalesActivityHistoryVisitDetailBloc(
+                  salesActivityRepository: salesActivityRepository,
+                ),
+          ),
+          BlocProvider(
+            lazy: false,
+            create:
+                (context) => SalesActivityHistoryVisitUploadImageBloc(
+                  salesActivityRepository: salesActivityRepository,
+                ),
+          ),
+          BlocProvider(
+            lazy: false,
+            create:
+                (context) => SalesActivityHistoryVisitDetailListImageBloc(
+                  salesActivityRepository: salesActivityRepository,
+                ),
+          ),
+          BlocProvider(
+            lazy: false,
+            create:
+                (context) => CredentialsBloc(
+                  authorizationRepository: authorizationRepository,
+                ),
+          ),
+          BlocProvider(
+            lazy: false,
+            create:
+                (context) => ApprovalPrDepartmentBloc(
+                  approvalPRRepository: approvalPrRepository,
+                ),
+          ),
+          BlocProvider(
+            lazy: false,
+            create:
+                (context) => ApprovalPrListBloc(
+                  approvalPRRepository: approvalPrRepository,
+                ),
+          ),
+          BlocProvider(
+            lazy: false,
+            create:
+                (context) =>
+                    ApprovePrBloc(approvalPRRepository: approvalPrRepository),
+          ),
         ],
         child: const MyApp(),
       ),
@@ -206,31 +297,33 @@ class MyApp extends StatelessWidget {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) => PopScope(
-        canPop: false,
-        child: AlertDialog(
-          title: Text("Sedang Memperbarui…", style: TextStyle(
-            fontSize: 16.w
-          )),
-          content: BlocBuilder<UpdateBloc, UpdateState>(
-            buildWhen: (prev, curr) => curr is UpdateDownloading,
-            builder: (context, state) {
-              double progress = 0.0;
-              if (state is UpdateDownloading) {
-                progress = state.progress;
-              }
-              return Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  LinearProgressIndicator(value: progress),
-                  const SizedBox(height: 12),
-                  Text("${(progress * 100).toStringAsFixed(0)}%"),
-                ],
-              );
-            },
+      builder:
+          (_) => PopScope(
+            canPop: false,
+            child: AlertDialog(
+              title: Text(
+                "Sedang Memperbarui…",
+                style: TextStyle(fontSize: 16.w),
+              ),
+              content: BlocBuilder<UpdateBloc, UpdateState>(
+                buildWhen: (prev, curr) => curr is UpdateDownloading,
+                builder: (context, state) {
+                  double progress = 0.0;
+                  if (state is UpdateDownloading) {
+                    progress = state.progress;
+                  }
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      LinearProgressIndicator(value: progress),
+                      const SizedBox(height: 12),
+                      Text("${(progress * 100).toStringAsFixed(0)}%"),
+                    ],
+                  );
+                },
+              ),
+            ),
           ),
-        ),
-      ),
     );
   }
 

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -6,6 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:vivakencanaapp/presentation/widgets/warehouse_detail_animation.dart';
+import 'package:vivakencanaapp/presentation/widgets/truck_load_animation.dart';
 
 import '../../bloc/auth/authentication/authentication_bloc.dart';
 import '../../bloc/auth/logout/logout_bloc.dart';
@@ -86,6 +88,7 @@ class _WareHouseContentListState extends State<WareHouseContentListView> {
 
   @override
   void initState() {
+    log('Access to lib/presentation/warehouse/warehouse_content_list_screen.dart'); 
     context.read<DeliveryDetailBloc>().add(
       LoadDeliveryDetail(
         batchID: widget.batchID,
@@ -692,6 +695,8 @@ class _WareHouseContentListState extends State<WareHouseContentListView> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             TruckLoadingAnimation(),
+                            const TruckLoadingAnimation(),
+                            const SizedBox(height: 20),
                             if (state.isConfirmed) ...[
                               BlocConsumer<CancelLoadBloc, CancelLoadState>(
                                 listener: (context, state) {
@@ -763,7 +768,7 @@ class _WareHouseContentListState extends State<WareHouseContentListView> {
                                 width: double.infinity,
                                 height: 40.w,
                                 decoration: BoxDecoration(
-                                  color: const Color.fromARGB(255, 34, 222, 40),
+                                  color: Theme.of(context).primaryColor,
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: BlocConsumer<
