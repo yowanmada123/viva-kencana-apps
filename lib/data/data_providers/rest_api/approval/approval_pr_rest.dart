@@ -65,17 +65,18 @@ class ApprovalPRRest {
       dio.options.headers['requiresToken'] = true;
       log('Request to dios://api-fpi.kencana.org/api/fpi/prpo/getList (PRST)');
 
-      final body = {
-        // "department_id": departmentId, //*required
-        // "approve_status": approveStatus, //ex. pending, approved, rejected
-        // "start_date": startDate, //ex. 2025-03-01 *required
-        // "end_date": endDate, //ex. 2025-03-01 *required
-        "tr_type": "PR", //ex. 2025-03-01 *required
-      };
+      final body = {"tr_type": "PR"};
 
       final response = await dio.post(
         "api/srs/mobile/approval/getApprovalList",
         data: body,
+      );
+
+      log(
+        "Full URL: ${dio.options.baseUrl}api/srs/mobile/approval/getApprovalList",
+      );
+      log(
+        'response from API: //api-fpi.kencana.org/api/fpi/prpo/getList (PRST): $response',
       );
 
       if (response.statusCode == 200) {

@@ -66,7 +66,7 @@ void main() async {
     ..interceptors.addAll([DioRequestTokenInterceptor()]);
   final dioClient = Dio(Environment.dioBaseOptions)
     ..interceptors.addAll([DioRequestTokenInterceptor()]);
-  final devClient = Dio(DevEnvironment.dioBaseOptions)
+  final devClient = Dio(Environment.dioBaseOptions)
     ..interceptors.addAll([DioRequestTokenInterceptor()]);
 
   final authRest = AuthRest(authClient);
