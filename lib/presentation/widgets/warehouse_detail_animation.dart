@@ -36,7 +36,7 @@ class _TruckLoadingAnimationState extends State<TruckLoadingAnimation>
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 120,
+      height: 100,
       child: Stack(
         alignment: Alignment.center,
         children: [
