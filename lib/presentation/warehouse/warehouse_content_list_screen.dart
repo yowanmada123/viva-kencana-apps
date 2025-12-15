@@ -269,7 +269,7 @@ class _WareHouseContentListState extends State<WareHouseContentListView> {
                                 padding: EdgeInsets.symmetric(vertical: 8.w),
                                 margin: EdgeInsets.symmetric(horizontal: 2.w),
                                 decoration: BoxDecoration(
-                                  color: Color(0xff8AC8FA),
+                                  color: Color.fromARGB(255, 62, 161, 241),
                                   borderRadius: BorderRadius.circular(8),
                                   boxShadow: [
                                     BoxShadow(
@@ -366,8 +366,14 @@ class _WareHouseContentListState extends State<WareHouseContentListView> {
                                     child: Text(
                                       "Order ID:  ",
                                       style: TextStyle(
-                                        fontSize: 8.w,
+                                        fontSize: 10.w,
                                         fontWeight: FontWeight.w400,
+                                        color: const Color.fromARGB(
+                                          255,
+                                          94,
+                                          93,
+                                          93,
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -408,6 +414,8 @@ class _WareHouseContentListState extends State<WareHouseContentListView> {
                                       ],
                                     ),
                                   ),
+                                  const SizedBox(height: 3),
+
                                   // for (var item
                                   //     in state.groupedItems[key]!) ...[
                                   //   Card(
@@ -769,7 +777,7 @@ class _WareHouseContentListState extends State<WareHouseContentListView> {
                                 width: double.infinity,
                                 height: 40.w,
                                 decoration: BoxDecoration(
-                                  color: const Color.fromARGB(255, 9, 234, 16),
+                                  color: const Color.fromARGB(255, 21, 167, 26),
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: BlocConsumer<

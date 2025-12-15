@@ -20,4 +20,17 @@ extension StringExtensions on String {
     }
     return value;
   }
+
+  String toComma2() {
+    // Ubah string menjadi double dulu
+    final number = double.tryParse(this.replaceAll(',', '.')) ?? 0.0;
+
+    // Format dengan 2 angka di belakang koma
+    String formatted = number.toStringAsFixed(2);
+
+    // Ganti titik menjadi koma
+    formatted = formatted.replaceAll('.', ',');
+
+    return formatted;
+  }
 }

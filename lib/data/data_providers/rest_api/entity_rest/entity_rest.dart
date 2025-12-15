@@ -19,6 +19,10 @@ class EntityRest {
       log('Request to https://v2.kencana.org/api/mobile/getEntity (POST)');
       final response = await dio.post("api/mobile/getEntity");
 
+      log(
+        'Response from https://v2.kencana.org/api/mobile/getEntity (POST): $response',
+      );
+
       if (response.statusCode == 200) {
         final body = response.data;
         final entities = List<Entity>.from(

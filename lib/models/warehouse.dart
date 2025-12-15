@@ -4,6 +4,7 @@ class Warehouse {
   final String companyID;
   final String millID;
   final String whID;
+  final String delivID;
   final String descr;
   final String activeFlag;
   final String dtCreated;
@@ -18,6 +19,7 @@ class Warehouse {
     required this.companyID,
     required this.millID,
     required this.whID,
+    required this.delivID,
     required this.descr,
     required this.activeFlag,
     required this.dtCreated,
@@ -34,6 +36,7 @@ class Warehouse {
     String? companyID,
     String? millID,
     String? whID,
+    String? delivID,
     String? descr,
     String? activeFlag,
     String? dtCreated,
@@ -49,6 +52,7 @@ class Warehouse {
       companyID: companyID ?? this.companyID,
       millID: millID ?? this.millID,
       whID: whID ?? this.whID,
+      delivID: delivID ?? this.delivID,
       descr: descr ?? this.descr,
       activeFlag: activeFlag ?? this.activeFlag,
       dtCreated: dtCreated ?? this.dtCreated,
@@ -67,6 +71,7 @@ class Warehouse {
       'company_id': companyID,
       'mill_id': millID,
       'wh_id': whID,
+      'deliv_id': delivID,
       'descr': descr,
       'active_flag': activeFlag,
       'dt_created': dtCreated,
@@ -85,6 +90,7 @@ class Warehouse {
       companyID: map['company_id'] ?? '',
       millID: map['mill_id'] ?? '',
       whID: map['wh_id'] ?? '',
+      delivID: map['deliv_id'] ?? '',
       descr: map['descr'] ?? '',
       activeFlag: map['active_flag'] ?? '',
       dtCreated: map['dt_created'] ?? '',
@@ -105,7 +111,7 @@ class Warehouse {
 
   @override
   String toString() {
-    return 'Warehouse(company_id: $companyID, mill_id: $millID, wh_id: $whID, descr: $descr, active_flag: $activeFlag, dt_created: $dtCreated, dt_modified: $dtModified, user_id: $userID, dept_id: $deptID, wh_lock: $whLock, user_created: $userCreated, loc_id: $locID, wh_category: $whCategory)';
+    return 'Warehouse(company_id: $companyID, mill_id: $millID, wh_id: $whID, deliv_id: $delivID, descr: $descr, active_flag: $activeFlag, dt_created: $dtCreated, dt_modified: $dtModified, user_id: $userID, dept_id: $deptID, wh_lock: $whLock, user_created: $userCreated, loc_id: $locID, wh_category: $whCategory)';
   }
 
   @override
@@ -116,6 +122,7 @@ class Warehouse {
         other.companyID == companyID &&
         other.millID == millID &&
         other.whID == whID &&
+        other.delivID == delivID &&
         other.descr == descr &&
         other.activeFlag == activeFlag &&
         other.dtCreated == dtCreated &&
@@ -133,6 +140,7 @@ class Warehouse {
     return companyID.hashCode ^
         millID.hashCode ^
         whID.hashCode ^
+        delivID.hashCode ^
         descr.hashCode ^
         activeFlag.hashCode ^
         dtCreated.hashCode ^

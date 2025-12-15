@@ -34,6 +34,8 @@ class EntityMenuScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     log('Access to presentation/entity/entitiy_menu_screen.dart');
+    log(entityId);
+
     final authRepository = context.read<AuthRepository>();
     final authorizationRepository = context.read<AuthorizationRepository>();
 
@@ -160,7 +162,11 @@ class _MyGridLayoutState extends State<MyGridLayout> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) => ApprovalPrScreen(title: 'Daftar Approval PR'),
+              builder:
+                  (_) => ApprovalPrScreen(
+                    title: 'Daftar Approval PR',
+                    entityId: widget.entityId,
+                  ),
             ),
           );
         };
@@ -178,7 +184,7 @@ class _MyGridLayoutState extends State<MyGridLayout> {
     };
   }
 
-  SubMenu attachAction(BuildContext context, SubMenu submenu) {
+  SubMenu attachAction(BuildContext context, SubMenu submenu, String entityId) {
     switch (submenu.menuId) {
       case 'confirmLoading':
         return submenu.copyWith(
@@ -263,7 +269,10 @@ class _MyGridLayoutState extends State<MyGridLayout> {
               context,
               MaterialPageRoute(
                 builder:
-                    (_) => ApprovalPrScreen(title: 'Purchase Request Approval'),
+                    (_) => ApprovalPrScreen(
+                      title: 'Purchase Request Approval',
+                      entityId: entityId,
+                    ),
               ),
             );
           },
@@ -383,7 +392,11 @@ class _MyGridLayoutState extends State<MyGridLayout> {
 
               Column(
                 children: List.generate(submenus.length, (submenuIndex) {
-                  final submenu = attachAction(context, submenus[submenuIndex]);
+                  final submenu = attachAction(
+                    context,
+                    submenus[submenuIndex],
+                    widget.entityId,
+                  );
                   final iconCode =
                       int.tryParse(submenu.icon) ?? Icons.help.codePoint;
                   final isLoading = _loadingMenuId == submenu.menuId;

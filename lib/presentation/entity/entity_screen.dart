@@ -50,7 +50,9 @@ class _GridLayoutState extends State<GridLayout> {
   String? dept;
 
   Future<void> loadUserData() async {
-    final SharedPreferencesManager authSharedPref = SharedPreferencesManager(key: 'auth');
+    final SharedPreferencesManager authSharedPref = SharedPreferencesManager(
+      key: 'auth',
+    );
     final dataString = await authSharedPref.read();
 
     if (dataString != null) {
@@ -86,8 +88,8 @@ class _GridLayoutState extends State<GridLayout> {
   }
 
   @override
-  void initState() {   
-    log('Access to presentation/entity/entitiy_screen.dart'); 
+  void initState() {
+    log('Access to presentation/entity/entitiy_screen.dart');
     loadUserData();
     super.initState();
   }
@@ -120,16 +122,18 @@ class _GridLayoutState extends State<GridLayout> {
                     listener: (context, state) {
                       if (state is LogoutSuccess || state is LogoutFailure) {
                         context.read<AuthenticationBloc>().add(
-                            SetAuthenticationStatus(isAuthenticated: false));
+                          SetAuthenticationStatus(isAuthenticated: false),
+                        );
                       }
                     },
                     builder: (context, state) {
                       return GestureDetector(
                         onTap: () {
                           Navigator.push(
-                            context, MaterialPageRoute(
-                            builder: (context) => SettingScreen(),
-                            )
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => SettingScreen(),
+                            ),
                           );
                         },
                         child: Icon(Icons.settings, color: Colors.white),
@@ -140,8 +144,8 @@ class _GridLayoutState extends State<GridLayout> {
                 Padding(
                   padding: EdgeInsets.only(right: 16.w),
                   child: Icon(Icons.category_sharp),
-                )
-              ]
+                ),
+              ],
             ),
             Positioned(
               bottom: -30.w,
@@ -153,7 +157,10 @@ class _GridLayoutState extends State<GridLayout> {
                   borderRadius: BorderRadius.circular(12.r),
                 ),
                 child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.w),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 16.w,
+                    vertical: 12.w,
+                  ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -162,10 +169,14 @@ class _GridLayoutState extends State<GridLayout> {
                           Container(
                             decoration: BoxDecoration(
                               color: Color(0xffD2F801),
-                              borderRadius: BorderRadius.circular(15.w)
+                              borderRadius: BorderRadius.circular(15.w),
                             ),
                             padding: EdgeInsets.all(4..w),
-                            child: Icon(Icons.person, color: Color(0xff595959), size: 28.w,),
+                            child: Icon(
+                              Icons.person,
+                              color: Color(0xff595959),
+                              size: 28.w,
+                            ),
                           ),
                           SizedBox(width: 8.w),
                           SizedBox(
@@ -177,14 +188,14 @@ class _GridLayoutState extends State<GridLayout> {
                                   "👋 ${getGreeting()}",
                                   style: TextStyle(
                                     fontSize: 10.w,
-                                    fontWeight: FontWeight.w500
+                                    fontWeight: FontWeight.w500,
                                   ),
                                 ),
                                 Text(
                                   name,
                                   style: TextStyle(
                                     fontSize: 14.w,
-                                    fontWeight: FontWeight.w600
+                                    fontWeight: FontWeight.w600,
                                   ),
                                   overflow: TextOverflow.ellipsis,
                                 ),
@@ -195,19 +206,21 @@ class _GridLayoutState extends State<GridLayout> {
                       ),
                       Row(
                         children: [
-                          Icon(Icons.local_fire_department, size: 12.w, color: Theme.of(context).primaryColor),
+                          Icon(
+                            Icons.local_fire_department,
+                            size: 12.w,
+                            color: Theme.of(context).primaryColor,
+                          ),
                           SizedBox(
                             width: 90.w,
                             child: Text(
                               "$dept department",
-                              style: TextStyle(
-                                fontSize: 10.w
-                              ),
+                              style: TextStyle(fontSize: 10.w),
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
                         ],
-                      )
+                      ),
                     ],
                   ),
                 ),
@@ -230,13 +243,11 @@ class _GridLayoutState extends State<GridLayout> {
                     "Let’s see your entity",
                     style: TextStyle(
                       fontSize: 14.sp,
-                      fontWeight: FontWeight.w500
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                   TextButton(
-                    onPressed: () {
-                      
-                    },
+                    onPressed: () {},
                     child: Text(
                       "see all",
                       style: TextStyle(
@@ -268,7 +279,10 @@ class _GridLayoutState extends State<GridLayout> {
                       return const Center(
                         child: Text(
                           "Entitas tidak ditemukan",
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       );
                     }
@@ -283,7 +297,11 @@ class _GridLayoutState extends State<GridLayout> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => EntityMenuScreen(entityId: entity.entityId, entityDescription: entity.description),
+                                  builder:
+                                      (context) => EntityMenuScreen(
+                                        entityId: entity.entityId,
+                                        entityDescription: entity.description,
+                                      ),
                                 ),
                               );
                             },
@@ -299,38 +317,73 @@ class _GridLayoutState extends State<GridLayout> {
                                   SizedBox(
                                     height: 100.w,
                                     width: double.infinity,
-                                    child: entity.urlImage != "" && entity.urlImage.isNotEmpty
-                                      ? Image.network(
-                                          entity.urlImage,
-                                          fit: BoxFit.cover,
-                                          errorBuilder: (context, error, stackTrace) {
-                                            return Center(child: Icon(Icons.broken_image, size: 40.w, color: Theme.of(context).disabledColor));
-                                          },
-                                        )
-                                      : Center(child: Icon(Icons.image, size: 40.w, color: Theme.of(context).disabledColor)),
+                                    child:
+                                        entity.urlImage != "" &&
+                                                entity.urlImage.isNotEmpty
+                                            ? Image.network(
+                                              entity.urlImage,
+                                              fit: BoxFit.cover,
+                                              errorBuilder: (
+                                                context,
+                                                error,
+                                                stackTrace,
+                                              ) {
+                                                return Center(
+                                                  child: Icon(
+                                                    Icons.broken_image,
+                                                    size: 40.w,
+                                                    color:
+                                                        Theme.of(
+                                                          context,
+                                                        ).disabledColor,
+                                                  ),
+                                                );
+                                              },
+                                            )
+                                            : Center(
+                                              child: Icon(
+                                                Icons.image,
+                                                size: 40.w,
+                                                color:
+                                                    Theme.of(
+                                                      context,
+                                                    ).disabledColor,
+                                              ),
+                                            ),
                                   ),
-                                                      
+
                                   Padding(
-                                    padding: EdgeInsets.fromLTRB(8.w, 8.w, 8.w, 4.w),
+                                    padding: EdgeInsets.fromLTRB(
+                                      8.w,
+                                      8.w,
+                                      8.w,
+                                      4.w,
+                                    ),
                                     child: Text(
                                       entity.description,
                                       style: TextStyle(
                                         fontSize: 12.w,
-                                        fontWeight: FontWeight.w500
+                                        fontWeight: FontWeight.w500,
                                       ),
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
                                   Padding(
-                                    padding: EdgeInsets.symmetric(horizontal: 8.w),
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 8.w,
+                                    ),
                                     child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Row(
                                           children: [
                                             CircleAvatar(
-                                              backgroundColor: hexToColor(entity.color),
+                                              backgroundColor: hexToColor(
+                                                entity.color,
+                                              ),
                                               radius: 10.w,
                                             ),
                                             SizedBox(width: 4.w),
@@ -346,19 +399,32 @@ class _GridLayoutState extends State<GridLayout> {
                                             ),
                                           ],
                                         ),
-                                                      
+
                                         TextButton(
                                           style: TextButton.styleFrom(
-                                            padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 0), 
+                                            padding: EdgeInsets.symmetric(
+                                              horizontal: 8.w,
+                                              vertical: 0,
+                                            ),
                                             minimumSize: Size(0, 20.w),
-                                            backgroundColor: Theme.of(context).primaryColor,
-                                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                            backgroundColor:
+                                                Theme.of(context).primaryColor,
+                                            tapTargetSize:
+                                                MaterialTapTargetSize
+                                                    .shrinkWrap,
                                           ),
                                           onPressed: () {
                                             Navigator.push(
                                               context,
                                               MaterialPageRoute(
-                                                builder: (context) => EntityMenuScreen(entityId: entity.entityId, entityDescription: entity.description),
+                                                builder:
+                                                    (
+                                                      context,
+                                                    ) => EntityMenuScreen(
+                                                      entityId: entity.entityId,
+                                                      entityDescription:
+                                                          entity.description,
+                                                    ),
                                               ),
                                             );
                                           },
@@ -366,8 +432,9 @@ class _GridLayoutState extends State<GridLayout> {
                                             "See more",
                                             style: TextStyle(
                                               fontSize: 10.w,
-                                              color: Theme.of(context).hintColor,
-                                              fontWeight: FontWeight.w500
+                                              color:
+                                                  Theme.of(context).hintColor,
+                                              fontWeight: FontWeight.w500,
                                             ),
                                           ),
                                         ),
@@ -375,7 +442,7 @@ class _GridLayoutState extends State<GridLayout> {
                                     ),
                                   ),
                                 ],
-                              )
+                              ),
                             ),
                           );
                         }),

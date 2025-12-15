@@ -7,7 +7,10 @@ sealed class ApprovalPrListEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class GetApprovalPRListEvent extends ApprovalPrListEvent {}
+class GetApprovalPRListEvent extends ApprovalPrListEvent {
+  final String entityId;
+  const GetApprovalPRListEvent({required this.entityId});
+}
 
 class RemoveListByPrId extends ApprovalPrListEvent {
   final String prId;

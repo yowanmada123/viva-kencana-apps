@@ -17,12 +17,11 @@ class AuthRest {
     required String password,
   }) async {
     try {
-      final body = {
-        'username': username,
-        'password': password,
-      };
+      final body = {'username': username, 'password': password};
       log('Request to https://v3.kencana.org/api/login (POST)');
       final response = await http.post('api/login', data: body);
+      // log('Response from: https://v3.kencana.org/api/login (POST): $response');
+
       if (response.statusCode == 200) {
         // log('Response body: ${response.data}');
         final body = response.data;

@@ -16,19 +16,23 @@ class ApprovalPRRepository {
     return approvalPRRest.getPrDepartmentListAndUserData();
   }
 
-  Future<Either<CustomException, List<ApprovalPrFSunrise>>> getPRList() async {
-    return approvalPRRest.getPRList();
+  Future<Either<CustomException, List<ApprovalPrFSunrise>>> getPRList(
+    String entityId,
+  ) async {
+    return approvalPRRest.getPRList(entityId: entityId);
   }
 
   Future<Either<CustomException, String>> approvalPR({
     required String prId,
+    required String entityId,
   }) async {
-    return approvalPRRest.approvalPR(prId: prId);
+    return approvalPRRest.approvalPR(prId: prId, entityId: entityId);
   }
 
   Future<Either<CustomException, String>> rejectPR({
     required String prId,
+    required String entityId,
   }) async {
-    return approvalPRRest.rejectPR(prId: prId);
+    return approvalPRRest.rejectPR(prId: prId, entityId: entityId);
   }
 }

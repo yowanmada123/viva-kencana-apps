@@ -13,6 +13,7 @@ class ApprovalPrFSunrise {
   final String deptName;
   final String qty;
   final String picId;
+  final String picName;
   final String vendorId;
   final String vendorName;
   final String wgt;
@@ -49,6 +50,7 @@ class ApprovalPrFSunrise {
     required this.deptName,
     required this.qty,
     required this.picId,
+    required this.picName,
     required this.vendorId,
     required this.vendorName,
     required this.wgt,
@@ -87,6 +89,7 @@ class ApprovalPrFSunrise {
     String? deptName,
     String? qty,
     String? picId,
+    String? picName,
     String? vendorId,
     String? vendorName,
     String? wgt,
@@ -124,6 +127,7 @@ class ApprovalPrFSunrise {
       deptName: deptName ?? this.deptName,
       qty: qty ?? this.qty,
       picId: picId ?? this.picId,
+      picName: picName ?? this.picName,
       vendorId: vendorId ?? this.vendorId,
       vendorName: vendorName ?? this.vendorName,
       wgt: wgt ?? this.wgt,
@@ -164,6 +168,7 @@ class ApprovalPrFSunrise {
       'dept_name': deptName,
       'qty': qty,
       'pic_id': picId,
+      'pic_name': picName,
       'vendor_id': vendorId,
       'vendor_name': vendorName,
       'wgt': wgt,
@@ -204,6 +209,7 @@ class ApprovalPrFSunrise {
       deptName: map['dept_name'] ?? '',
       qty: map['qty'] ?? '',
       picId: map['pic_id'] ?? '',
+      picName: map['pic_name'] ?? '',
       vendorId: map['vendor_id'] ?? '',
       vendorName: map['vendor_name'] ?? '',
       wgt: map['wgt'] ?? '',
@@ -243,7 +249,7 @@ class ApprovalPrFSunrise {
 
   @override
   String toString() {
-    return 'ApprovalPrFSunrise(prId: $prId, dtPr: $dtPr, deptId: $deptId, address: $address, city: $city, deptName: $deptName, qty: $qty, picId: $picId, vendorId: $vendorId, vendorName: $vendorName, wgt: $wgt, prNum: $prNum, stat: $stat, memoTxt: $memoTxt, trType: $trType, dtAprv: $dtAprv, dtAprv2: $dtAprv2, dtRjc: $dtRjc, dtRjc2: $dtRjc2, aprvBy: $aprvBy, aprv2By: $aprv2By, rjcBy: $rjcBy, rjc2By: $rjc2By, siteName: $siteName, clusterName: $clusterName, houseName: $houseName,millId: $millId,millName: $millName, officeId: $officeId, office: $office, wCreatedBy: $wCreatedBy, wAprv1By: $wAprv1By, wAprv2By: $wAprv2By, article: $article, typePr: $typePr)';
+    return 'ApprovalPrFSunrise(prId: $prId, dtPr: $dtPr, deptId: $deptId, address: $address, city: $city, deptName: $deptName, qty: $qty, picName: $picName, picId: $picId, vendorId: $vendorId, vendorName: $vendorName, wgt: $wgt, prNum: $prNum, stat: $stat, memoTxt: $memoTxt, trType: $trType, dtAprv: $dtAprv, dtAprv2: $dtAprv2, dtRjc: $dtRjc, dtRjc2: $dtRjc2, aprvBy: $aprvBy, aprv2By: $aprv2By, rjcBy: $rjcBy, rjc2By: $rjc2By, siteName: $siteName, clusterName: $clusterName, houseName: $houseName,millId: $millId,millName: $millName, officeId: $officeId, office: $office, wCreatedBy: $wCreatedBy, wAprv1By: $wAprv1By, wAprv2By: $wAprv2By, article: $article, typePr: $typePr)';
   }
 
   @override
@@ -259,6 +265,7 @@ class ApprovalPrFSunrise {
         other.deptName == deptName &&
         other.qty == qty &&
         other.picId == picId &&
+        other.picName == picName &&
         other.vendorId == vendorId &&
         other.vendorName == vendorName &&
         other.wgt == wgt &&
@@ -298,6 +305,7 @@ class ApprovalPrFSunrise {
         deptName.hashCode ^
         qty.hashCode ^
         picId.hashCode ^
+        picName.hashCode ^
         vendorId.hashCode ^
         vendorName.hashCode ^
         wgt.hashCode ^

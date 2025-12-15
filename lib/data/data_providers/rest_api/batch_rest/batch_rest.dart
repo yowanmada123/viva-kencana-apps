@@ -71,9 +71,14 @@ class BatchRest {
         "api/viva/confirm_muat/getDataWh",
         data: body,
       );
+
+      log(
+        'Response From: https://v2.kencana.org/api/viva/confirm_muat/getDataWh (POST): $response',
+      );
+
       log("Status Code: ${response.statusCode}");
       if (response.statusCode == 200) {
-       // log('Response body: ${response.data}');
+        // log('Response body: ${response.data}');
         final body = response.data;
         final batch = Batch.fromMap(body['data']);
         log("A");
@@ -121,8 +126,12 @@ class BatchRest {
         "api/viva/confirm_muat/confirmLoad",
         data: body,
       );
+
+      log(
+        'Response From: https://v2.kencana.org/api/viva/confirm_muat/confirmLoad (POST): $response',
+      );
       if (response.statusCode == 200) {
-       // log('Response body: ${response.data}');
+        // log('Response body: ${response.data}');
         final body = response.data;
         final deliveryDetail = List<DeliveryDetail>.from(
           body['data'].map((e) {

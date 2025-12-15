@@ -5,20 +5,25 @@ import 'package:vivakencanaapp/bloc/approval_pr/approval_pr_list/approval_pr_lis
 import 'package:vivakencanaapp/bloc/approval_pr/approve_pr/approve_pr_bloc.dart';
 import 'package:vivakencanaapp/bloc/auth/authentication/authentication_bloc.dart';
 import 'package:vivakencanaapp/data/repository/approval_pr_repository.dart';
-import 'package:vivakencanaapp/models/approval_pr/approval_pr.dart';
+// import 'package:vivakencanaapp/models/approval_pr/approval_pr.dart';
 import 'package:vivakencanaapp/models/approval_pr/approval_pr_fdpi.dart';
-import 'package:vivakencanaapp/models/fdpi/approval_pr/approval_pr.dart';
+// import 'package:vivakencanaapp/models/fdpi/approval_pr/approval_pr.dart';
 import 'package:vivakencanaapp/models/errors/custom_exception.dart';
 import 'package:vivakencanaapp/presentation/widgets/approval/approval_pr_card.dart';
-import 'package:vivakencanaapp/presentation/widgets/approval/aprrove_bottom_navigator.dart';
+// import 'package:vivakencanaapp/presentation/widgets/approval/aprrove_bottom_navigator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../bloc/authorization/credentials/credentials_bloc.dart';
+// import '../../bloc/authorization/credentials/credentials_bloc.dart';
 
 class ApprovalPrScreen extends StatefulWidget {
   final String title;
-  const ApprovalPrScreen({super.key, required this.title});
+  final String entityId;
+  const ApprovalPrScreen({
+    super.key,
+    required this.title,
+    required this.entityId,
+  });
 
   @override
   ApprovalPrScreenState createState() => ApprovalPrScreenState();
@@ -54,11 +59,12 @@ class ApprovalPrScreenState extends State<ApprovalPrScreen> {
 
     // Langsung approve (BE yang validasi levelnya)
     context.read<ApprovePrBloc>().add(
-      ApprovePrLoadEvent(prId: current.prId, status: "approve"),
+      ApprovePrLoadEvent(
+        prId: current.prId,
+        status: "approve",
+        entityId: widget.entityId.toLowerCase(),
+      ),
     );
-
-    // Hapus item
-    // context.read<ApprovalPrListBloc>().add(RemoveListIndex(index: index));
   }
 
   void _handleReject(
@@ -72,104 +78,21 @@ class ApprovalPrScreenState extends State<ApprovalPrScreen> {
 
     // Langsung reject (BE yang validasi levelnya)
     context.read<ApprovePrBloc>().add(
-      ApprovePrLoadEvent(prId: current.prId, status: "reject"),
-    );
-
-    // Hapus item
-    // context.read<ApprovalPrListBloc>().add(RemoveListIndex(index: index));
-  }
-
-  // void _handleApproval(
-  //   int index,
-  //   List<ApprovalPrFSunrise> poList,
-  //   BuildContext context,
-  // ) {
-  //   final credentialState = context.read<CredentialsBloc>().state;
-
-  //   if (poList[index].aprvBy == "" && poList[index].rjcBy == "") {
-  //     if (credentialState is CredentialsLoadSuccess) {
-  //       if (credentialState.credentials["APPROVALPR1"] == "Y") {
-  //         context.read<ApprovePrBloc>().add(
-  //           ApprovePrLoadEvent(prId: poList[index].prId, status: "approve"),
-  //         );
-  //       } else {
-  //         _showNoPermissionSnackBar(context);
-  //         return;
-  //       }
-  //     } else {
-  //       _showNoPermissionSnackBar(context);
-  //       return;
-  //     }
-  //   } else if (poList[index].aprv2By == "" && poList[index].rjc2By == "") {
-  //     if (credentialState is CredentialsLoadSuccess) {
-  //       if (credentialState.credentials["APPROVALPR2"] == "Y") {
-  //         context.read<ApprovePrBloc>().add(
-  //           ApprovePrLoadEvent(prId: poList[index].prId, status: "approve"),
-  //         );
-  //       } else {
-  //         _showNoPermissionSnackBar(context);
-  //         return;
-  //       }
-  //     } else {
-  //       _showNoPermissionSnackBar(context);
-  //       return;
-  //     }
-  //   }
-
-  //   if (index >= poList.length) return;
-
-  //   context.read<ApprovalPrListBloc>().add(RemoveListIndex(index: index));
-  // }
-
-  // void _handleReject(
-  //   int index,
-  //   List<ApprovalPrFSunrise> poList,
-  //   BuildContext context,
-  // ) {
-  //   final credentialState = context.read<CredentialsBloc>().state;
-
-  //   if (poList[index].aprvBy == "" && poList[index].rjcBy == "") {
-  //     if (credentialState is CredentialsLoadSuccess) {
-  //       if (credentialState.credentials["APPROVALPR1"] == "Y") {
-  //         context.read<ApprovePrBloc>().add(
-  //           ApprovePrLoadEvent(prId: poList[index].prId, status: "reject"),
-  //         );
-  //       } else {
-  //         _showNoPermissionSnackBar(context);
-  //         return;
-  //       }
-  //     } else {
-  //       _showNoPermissionSnackBar(context);
-  //       return;
-  //     }
-  //   } else if (poList[index].aprv2By == "" && poList[index].rjcBy == "") {
-  //     if (credentialState is CredentialsLoadSuccess) {
-  //       if (credentialState.credentials["APPROVALPR2"] == "Y") {
-  //         context.read<ApprovePrBloc>().add(
-  //           ApprovePrLoadEvent(prId: poList[index].prId, status: "reject"),
-  //         );
-  //       } else {
-  //         _showNoPermissionSnackBar(context);
-  //         return;
-  //       }
-  //     } else {
-  //       _showNoPermissionSnackBar(context);
-  //       return;
-  //     }
-  //   }
-
-  //   if (index >= poList.length) return;
-
-  //   context.read<ApprovalPrListBloc>().add(RemoveListIndex(index: index));
-  // }
-
-  void _showNoPermissionSnackBar(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("Anda tidak memiliki permission untuk approve PR"),
+      ApprovePrLoadEvent(
+        prId: current.prId,
+        status: "reject",
+        entityId: widget.entityId.toLowerCase(),
       ),
     );
   }
+
+  // void _showNoPermissionSnackBar(BuildContext context) {
+  //   ScaffoldMessenger.of(context).showSnackBar(
+  //     const SnackBar(
+  //       content: Text("Anda tidak memiliki permission untuk approve PR"),
+  //     ),
+  //   );
+  // }
 
   ScrollController _getController(int index) {
     return _scrollControllers[index % 3];
@@ -192,7 +115,9 @@ class ApprovalPrScreenState extends State<ApprovalPrScreen> {
           create:
               (context) => ApprovalPrListBloc(
                 approvalPRRepository: context.read<ApprovalPRRepository>(),
-              )..add(GetApprovalPRListEvent()),
+              )..add(
+                GetApprovalPRListEvent(entityId: widget.entityId.toLowerCase()),
+              ),
         ),
         BlocProvider(
           create:
@@ -216,12 +141,31 @@ class ApprovalPrScreenState extends State<ApprovalPrScreen> {
             context.read<ApprovalPrListBloc>().add(
               RemoveListByPrId(prId: state.prId),
             );
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message),
-                backgroundColor: Colors.green,
-              ),
+
+            showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Text("Notifikasi"),
+                  content: Text(state.message),
+                  actions: <Widget>[
+                    TextButton(
+                      child: Text("Ok"),
+                      onPressed: () {
+                        Navigator.of(context).pop(); // Menutup dialog
+                      },
+                    ),
+                  ],
+                );
+              },
             );
+            // ScaffoldMessenger.of(context).showSnackBar(
+            //   SnackBar(
+            //     content: Text(state.message),
+            //     backgroundColor: Colors.green,
+            //   ),
+            // );
           }
 
           if (state is ApprovePrFailure) {
@@ -234,6 +178,7 @@ class ApprovalPrScreenState extends State<ApprovalPrScreen> {
           }
         },
         child: Scaffold(
+          backgroundColor: Colors.white,
           appBar: AppBar(
             title: Text(
               widget.title,
@@ -347,6 +292,18 @@ class ApprovalPrScreenState extends State<ApprovalPrScreen> {
 
                             setState(() => _isAnimated = false);
                           },
+                          onApprove:
+                              () => _handleApproval(
+                                _currentPage,
+                                state.data,
+                                context,
+                              ),
+                          onReject:
+                              () => _handleReject(
+                                _currentPage,
+                                state.data,
+                                context,
+                              ),
                         );
                       },
                     ),
@@ -356,72 +313,43 @@ class ApprovalPrScreenState extends State<ApprovalPrScreen> {
               },
             ),
           ),
-          bottomNavigationBar: BlocBuilder<
-            ApprovalPrListBloc,
-            ApprovalPrListState
-          >(
-            builder: (context, state) {
-              // log("This Work");
-              if (state is! ApprovalPrListSuccessState) {
-                log("A");
+          // bottomNavigationBar:
+          //     BlocBuilder<ApprovalPrListBloc, ApprovalPrListState>(
+          //       builder: (context, state) {
+          //         // log("This Work");
+          //         if (state is! ApprovalPrListSuccessState) {
+          //           log("A");
 
-                return SizedBox.shrink();
-              }
-              final poList = state.data;
+          //           return SizedBox.shrink();
+          //         }
+          //         final poList = state.data;
 
-              // 2. Jika list kosong → button disembunyikan
-              if (poList.isEmpty) {
-                log("List kosong → button disembunyikan");
-                return SizedBox.shrink();
-              }
+          //         // 2. Jika list kosong → button disembunyikan
+          //         if (poList.isEmpty) {
+          //           log("List kosong → button disembunyikan");
+          //           return SizedBox.shrink();
+          //         }
 
-              // 3. Cek apakah currentPage masih valid
-              if (_currentPage < 0 || _currentPage >= poList.length) {
-                log("Current page diluar range → button disembunyikan");
-                return SizedBox.shrink();
-              }
+          //         // 3. Cek apakah currentPage masih valid
+          //         if (_currentPage < 0 || _currentPage >= poList.length) {
+          //           log("Current page diluar range → button disembunyikan");
+          //           return SizedBox.shrink();
+          //         }
 
-              // final currentPr = poList[_currentPage];
-              log("B");
+          //         // final currentPr = poList[_currentPage];
+          //         log("B");
 
-              // final credentialState = context.read<CredentialsBloc>().state;
-              // final poList = state.data;
-
-              // if (_currentPage >= poList.length) return SizedBox.shrink();
-              // final currentPr = poList[_currentPage];
-              // log("B");
-
-              // bool canApprove = true;
-
-              // if (credentialState is CredentialsLoadSuccess) {
-              //   log("C");
-
-              //   if (currentPr.aprvBy == "" && currentPr.rjcBy == "") {
-              //     log("D");
-
-              //     canApprove = true;
-              //   } else if (currentPr.aprv2By == "" &&
-              //       currentPr.rjc2By == "") {
-              //     canApprove = true;
-              //     log("E");
-              //   }
-              //   // DUMMY
-              //   // canApprove = true;
-              // }
-
-              // if (!canApprove) return SizedBox.shrink();
-              // log("This Button Must Be Shown");
-
-              return ApprovalBottomBar(
-                isLoading: false,
-                onApprove:
-                    () => _handleApproval(_currentPage, state.data, context),
-                onReject:
-                    () => _handleReject(_currentPage, state.data, context),
-                canApprove: true,
-              );
-            },
-          ),
+          //         return ApprovalBottomBar(
+          //           isLoading: false,
+          //           onApprove:
+          //               () =>
+          //                   _handleApproval(_currentPage, state.data, context),
+          //           onReject:
+          //               () => _handleReject(_currentPage, state.data, context),
+          //           canApprove: true,
+          //         );
+          //       },
+          //     ),
         ),
       ),
     );

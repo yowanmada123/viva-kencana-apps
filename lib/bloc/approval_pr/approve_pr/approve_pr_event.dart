@@ -10,6 +10,11 @@ sealed class ApprovePrEvent extends Equatable {
 final class ApprovePrLoadEvent extends ApprovePrEvent {
   final String prId;
   final String status;
+  final String entityId;
 
-  const ApprovePrLoadEvent({required this.prId, required this.status});
+  const ApprovePrLoadEvent({
+    required this.entityId,
+    required this.prId,
+    required this.status,
+  });
 }

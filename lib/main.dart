@@ -66,7 +66,11 @@ void main() async {
     ..interceptors.addAll([DioRequestTokenInterceptor()]);
   final dioClient = Dio(Environment.dioBaseOptions)
     ..interceptors.addAll([DioRequestTokenInterceptor()]);
-  final devClient = Dio(Environment.dioBaseOptions)
+
+  final tesClient = Dio(Environment.dioBaseOptions)
+    // Aktifkan untuk Production
+    // final tesClient = Dio(DevEnvironment.dioBaseOptions)
+    // Aktifkan untuk Test Development
     ..interceptors.addAll([DioRequestTokenInterceptor()]);
 
   final authRest = AuthRest(authClient);
@@ -74,12 +78,7 @@ void main() async {
   final entityRest = EntityRest(dioClient);
   final authorizationRest = AuthorizationRest(authClient);
   final salesActivityRest = SalesActivityRest(dioClient);
-
-  // final approvalPrRest = ApprovalPRRest(dioClient);
-  // Production Server
-
-  final approvalPrRest = ApprovalPRRest(devClient);
-  // Development Server For Testing
+  final approvalPrRest = ApprovalPRRest(tesClient);
 
   final authRepository = AuthRepository(
     authRest: authRest,

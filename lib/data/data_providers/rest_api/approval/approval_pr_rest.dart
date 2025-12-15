@@ -53,30 +53,24 @@ class ApprovalPRRest {
     }
   }
 
-  Future<Either<CustomException, List<ApprovalPrFSunrise>>> getPRList(
-    // {
-    // required String departmentId,
-    // required String approveStatus,
-    // required String startDate,
-    // required String endDate,
-    // }
-  ) async {
+  Future<Either<CustomException, List<ApprovalPrFSunrise>>> getPRList({
+    required String entityId,
+  }) async {
     try {
       dio.options.headers['requiresToken'] = true;
-      log('Request to dios://api-fpi.kencana.org/api/fpi/prpo/getList (PRST)');
+      log(
+        'Request to ${dio.options.baseUrl}/api/$entityId/mobile/approval/getApprovalList (PRST)',
+      );
 
       final body = {"tr_type": "PR"};
 
       final response = await dio.post(
-        "api/srs/mobile/approval/getApprovalList",
+        "api/$entityId/mobile/approval/getApprovalList",
         data: body,
       );
 
       log(
-        "Full URL: ${dio.options.baseUrl}api/srs/mobile/approval/getApprovalList",
-      );
-      log(
-        'response from API: //api-fpi.kencana.org/api/fpi/prpo/getList (PRST): $response',
+        "Full URL: ${dio.options.baseUrl}api/$entityId/mobile/approval/getApprovalList: $response",
       );
 
       if (response.statusCode == 200) {
@@ -102,22 +96,24 @@ class ApprovalPRRest {
 
   Future<Either<CustomException, String>> approvalPR({
     required String prId, // prId
+    required String entityId,
   }) async {
     try {
       dio.options.headers['requiresToken'] = true;
+      log(prId);
       log(
-        'Request to http://10.65.65.222:8000/api/srs/mobile/approval/submitApprove (PRST)',
+        'Request to ${dio.options.baseUrl}/api/$entityId/mobile/approval/submitApprove (PRST)',
       );
 
-      final body = {"pr_id": prId, "approve_type": "approve"};
+      final body = {"id": prId, "approve_type": "approve"};
 
       final response = await dio.post(
-        "api/srs/mobile/approval/submitApprove",
+        "api/$entityId/mobile/approval/submitApprove",
         data: body,
       );
 
       log(
-        'Response from http://10.65.65.222:8000/api/srs/mobile/approval/submitApprove (PRST): $response',
+        'Response Approve From: ${dio.options.baseUrl}/api/$entityId/mobile/approval/submitApprove (PRST): $response',
       );
 
       if (response.statusCode == 200) {
@@ -136,20 +132,23 @@ class ApprovalPRRest {
 
   Future<Either<CustomException, String>> rejectPR({
     required String prId, // prId
+    required String entityId,
   }) async {
     try {
       dio.options.headers['requiresToken'] = true;
-      log('Request to dios://api-fpi.kencana.org/api/fpi/prpo/cancel (PRST)');
+      log(
+        'Request to ${dio.options.baseUrl}/api/$entityId/mobile/approval/submitApprove (PRST)',
+      );
 
-      final body = {"tr_id": prId, "type_aprv": "reject"};
+      final body = {"id": prId, "approve_type": "reject"};
 
       final response = await dio.post(
-        "api/srs/mobile/approval/submitApprove",
+        "api/$entityId/mobile/approval/submitApprove",
         data: body,
       );
 
       log(
-        'Response from http://10.65.65.222:8000/api/srs/mobile/approval/submitApprove (PRST): $response',
+        'Response Reject from ${dio.options.baseUrl}/api/$entityId/mobile/approval/submitApprove (PRST): $response',
       );
 
       if (response.statusCode == 200) {

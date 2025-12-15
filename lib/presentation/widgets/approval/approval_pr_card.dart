@@ -12,6 +12,9 @@ class ApprovalPrCard extends StatefulWidget {
   final ScrollController scrollController;
   final VoidCallback onReachBottom;
   final VoidCallback onReachTop;
+  final VoidCallback onApprove;
+  final VoidCallback onReject;
+  final bool isActionEnabled;
 
   const ApprovalPrCard({
     super.key,
@@ -19,6 +22,9 @@ class ApprovalPrCard extends StatefulWidget {
     required this.scrollController,
     required this.onReachBottom,
     required this.onReachTop,
+    required this.onApprove,
+    required this.onReject,
+    this.isActionEnabled = true,
   });
 
   @override
@@ -67,8 +73,16 @@ class _ApprovalPrCardState extends State<ApprovalPrCard> {
         padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.w),
         child: Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: const Color.fromARGB(255, 255, 255, 255),
             borderRadius: BorderRadius.circular(8.w),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.08),
+                blurRadius: 6,
+                spreadRadius: 0,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
           child: BlocBuilder<ApprovalPrListBloc, ApprovalPrListState>(
             builder: (context, state) {
@@ -85,17 +99,29 @@ class _ApprovalPrCardState extends State<ApprovalPrCard> {
                     Padding(
                       padding: EdgeInsets.fromLTRB(16.w, 8.w, 16.w, 8.w),
                       child: Text(
-                        widget.requests.typePr.isNotEmpty
-                            ? widget.requests.typePr
+                        widget.requests.trType.isNotEmpty
+                            ? widget.requests.trType
                             : '-',
 
                         style: TextStyle(fontSize: 14.sp),
                       ),
                     ),
                     _buildInfoRow(
+                      "ID",
+                      widget.requests.prId.isNotEmpty
+                          ? widget.requests.prId
+                          : '-',
+                    ),
+                    _buildInfoRow(
                       "Departement",
                       widget.requests.deptName.isNotEmpty
                           ? widget.requests.deptName
+                          : '-',
+                    ),
+                    _buildInfoRow(
+                      "PIC",
+                      widget.requests.picName.isNotEmpty
+                          ? widget.requests.picName
                           : '-',
                     ),
                     _buildInfoRow(
@@ -142,8 +168,7 @@ class _ApprovalPrCardState extends State<ApprovalPrCard> {
                               itemBuilder: (context, index) {
                                 final article = widget.requests.article[index];
 
-                                final String qty =
-                                    article.qty.removeTrailingZeros();
+                                final String qty = article.qty.toComma2();
 
                                 return Card(
                                   elevation: 2,
@@ -162,12 +187,17 @@ class _ApprovalPrCardState extends State<ApprovalPrCard> {
                                           CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          article.prId,
+                                          'Item No : ${article.prItem}',
                                           overflow: TextOverflow.ellipsis,
                                           style: TextStyle(
                                             fontSize: 14.sp,
                                             fontWeight: FontWeight.w600,
                                           ),
+                                        ),
+                                        SizedBox(height: 4.w),
+                                        Text(
+                                          "Article ID: ${article.articleId}",
+                                          style: TextStyle(fontSize: 14.sp),
                                         ),
                                         SizedBox(height: 4.w),
                                         Text(
@@ -180,6 +210,7 @@ class _ApprovalPrCardState extends State<ApprovalPrCard> {
                                         //   style: TextStyle(fontSize: 14.sp),
                                         // ),
                                         Text(
+                                          // "123.455".toComma2(),
                                           "Quantity: $qty ${article.unitMeas}",
                                           style: TextStyle(fontSize: 14.sp),
                                         ),
@@ -239,8 +270,50 @@ class _ApprovalPrCardState extends State<ApprovalPrCard> {
                         ],
                       ),
                     ),
+                    const SizedBox(height: 16),
+
+                    if (widget.isActionEnabled)
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: widget.onReject,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.red,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(
+                                    5,
+                                  ), // kotak
+                                ),
+                              ),
+                              child: const Text(
+                                "Reject",
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: 12),
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: widget.onApprove,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.green,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(
+                                    5,
+                                  ), // kotak
+                                ),
+                              ),
+                              child: const Text(
+                                "Approve",
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ///////////////  TER COMMENT SEMENTARA //////////////////
-                    SizedBox(height: 40.w),
+                    SizedBox(height: 60.w),
                   ],
                 );
               }

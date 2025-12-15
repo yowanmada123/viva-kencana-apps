@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -46,7 +47,7 @@ class WarehouseSelectView extends StatefulWidget {
 class _WarehouseSelectViewState extends State<WarehouseSelectView> {
   @override
   void initState() {
-    log('Access to lib/presentation/warehouse/warehouse_select_screen.dart'); 
+    log('Access to lib/presentation/warehouse/warehouse_select_screen.dart');
     // final authState = context.read<AuthenticationBloc>().state as Authenticated;
     // user = authState.user;
     context.read<BatchBloc>().add(LoadBatch(deliveryId: widget.batchID));
@@ -163,12 +164,12 @@ class _WarehouseSelectViewState extends State<WarehouseSelectView> {
                                 ),
                               ],
                             ),
-                            SizedBox(height: 8.w),
+                            SizedBox(height: 10.w),
                             Center(
                               child: Container(
                                 padding: EdgeInsets.symmetric(vertical: 8.w),
                                 decoration: BoxDecoration(
-                                  color: Color(0xff8AC8FA),
+                                  color: Color.fromARGB(255, 62, 161, 241),
                                   borderRadius: BorderRadius.circular(8),
                                   boxShadow: [
                                     BoxShadow(
@@ -188,7 +189,7 @@ class _WarehouseSelectViewState extends State<WarehouseSelectView> {
                                       child: Column(
                                         children: [
                                           Text(
-                                            "Delivery Order",
+                                            "Batch ID",
                                             style: TextStyle(
                                               fontSize: 12.w,
                                               fontFamily: "Poppins",
@@ -217,7 +218,18 @@ class _WarehouseSelectViewState extends State<WarehouseSelectView> {
                                     Padding(
                                       padding: EdgeInsets.only(right: 16.w),
                                       child: GestureDetector(
-                                        onTap: () {},
+                                        onTap: () {
+                                          copyToClipboard(widget.batchID);
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                "Batch ID Berhasil disalin.",
+                                              ),
+                                            ),
+                                          );
+                                        },
                                         child: Icon(
                                           Icons.copy,
                                           color: Theme.of(context).hintColor,
@@ -228,7 +240,7 @@ class _WarehouseSelectViewState extends State<WarehouseSelectView> {
                                 ),
                               ),
                             ),
-                            SizedBox(height: 8.w),
+                            SizedBox(height: 10.w),
                             Text(
                               "Silahkan Pilih Gudang",
                               style: TextStyle(
@@ -264,17 +276,70 @@ class _WarehouseSelectViewState extends State<WarehouseSelectView> {
                               title: Text(
                                 "${state.batch.warehouses[index].millID} - ${state.batch.warehouses[index].companyID}",
                                 style: TextStyle(
-                                  fontSize: 14.w,
+                                  fontSize: 12.w,
                                   color: Colors.black,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
-                              subtitle: Text(
-                                state.batch.warehouses[index].descr,
-                                style: TextStyle(
-                                  fontSize: 12.w,
-                                  color: Colors.black,
-                                ),
+                              subtitle: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    state.batch.warehouses[index].descr,
+                                    style: TextStyle(
+                                      fontSize: 12.w,
+                                      color: const Color.fromARGB(
+                                        255,
+                                        44,
+                                        44,
+                                        44,
+                                      ),
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  // Row(
+                                  //   children: [
+                                  //     Text(
+                                  //       state.batch.warehouses[index].delivID,
+                                  //       style: TextStyle(
+                                  //         fontSize: 14.w,
+                                  //         color: const Color.fromARGB(
+                                  //           255,
+                                  //           41,
+                                  //           41,
+                                  //           41,
+                                  //         ),
+                                  //       ),
+                                  //     ),
+                                  //     SizedBox(width: 10),
+                                  //     GestureDetector(
+                                  //       onTap: () {
+                                  //         copyToClipboard(
+                                  //           state
+                                  //               .batch
+                                  //               .warehouses[index]
+                                  //               .delivID,
+                                  //         );
+                                  //         ScaffoldMessenger.of(
+                                  //           context,
+                                  //         ).showSnackBar(
+                                  //           SnackBar(
+                                  //             content: Text(
+                                  //               "Deliv ID Berhasil disalin.",
+                                  //             ),
+                                  //           ),
+                                  //         );
+                                  //       },
+                                  //       child: Icon(
+                                  //         Icons.copy,
+                                  //         color: Colors.black,
+                                  //         size: 12.w,
+                                  //       ),
+                                  //     ),
+                                  //   ],
+                                  // ),
+                                ],
                               ),
                               trailing: ElevatedButton(
                                 onPressed: () async {
@@ -386,4 +451,8 @@ class _WarehouseSelectViewState extends State<WarehouseSelectView> {
       ),
     );
   }
+}
+
+void copyToClipboard(String text) {
+  Clipboard.setData(ClipboardData(text: text));
 }

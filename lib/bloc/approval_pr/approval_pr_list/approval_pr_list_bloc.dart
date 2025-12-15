@@ -22,7 +22,7 @@ class ApprovalPrListBloc
     Emitter<ApprovalPrListState> emit,
   ) async {
     emit(ApprovalPrListLoadingState());
-    final result = await approvalPRRepository.getPRList();
+    final result = await approvalPRRepository.getPRList(event.entityId);
     result.fold(
       (failure) => emit(
         ApprovalPrListFailureState(message: failure.message!, error: failure),
