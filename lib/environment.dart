@@ -1,5 +1,27 @@
 import 'package:dio/dio.dart';
 
+class AndroidKencanaEnvironment {
+  static const apiPath = 'https://android.kencana.org/';
+  // static const apiPath = 'http://10.0.2.2:8000/';
+  static BaseOptions dioBaseOptions = BaseOptions(
+    baseUrl: apiPath,
+    connectTimeout: Duration(milliseconds: 10000),
+    receiveTimeout: Duration(milliseconds: 10000),
+    contentType: 'application/json',
+  );
+}
+
+class KmbEnvironment {
+  static const apiPath = 'https://api-kmb.kencana.org/';
+  // static const apiPath = 'http://10.0.2.2:8000/';
+  static BaseOptions dioBaseOptions = BaseOptions(
+    baseUrl: apiPath,
+    connectTimeout: Duration(milliseconds: 10000),
+    receiveTimeout: Duration(milliseconds: 10000),
+    contentType: 'application/json',
+  );
+}
+
 class Environment {
   static const apiPath = 'https://v2.kencana.org/';
   // static const apiPath = 'http://10.0.2.2:8000/';

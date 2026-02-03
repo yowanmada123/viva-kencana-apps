@@ -18,6 +18,7 @@ import '../../models/errors/custom_exception.dart';
 import '../../models/menu.dart';
 import '../../utils/strict_location.dart';
 import '../qr_code/qr_code_screen.dart';
+import '../stock_opname/stock_opname_qr/qr_code_opname_screen.dart';
 import '../sales_activity/sales_activity_dashboard_screen.dart';
 import '../approval/approval_sr_menu_screen.dart';
 
@@ -85,6 +86,14 @@ class _MyGridLayoutState extends State<MyGridLayout> {
     Future<void> Function()? routeAction;
 
     switch (menuId) {
+      case 'mnuGenQrFg':
+        routeAction = () async {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => QrCodeOpnameScreen()),
+          );
+        };
+        break;
       case 'confirmLoading':
         routeAction = () async {
           Navigator.push(
@@ -170,7 +179,6 @@ class _MyGridLayoutState extends State<MyGridLayout> {
             ),
           );
         };
-
         break;
       default:
         routeAction = null;
@@ -195,7 +203,6 @@ class _MyGridLayoutState extends State<MyGridLayout> {
             );
           },
         );
-
       case 'mnuSalesActivity':
         return submenu.copyWith(
           action: () async {
@@ -277,6 +284,15 @@ class _MyGridLayoutState extends State<MyGridLayout> {
             );
           },
         );
+      case 'mnuGenQrFg':
+        return submenu.copyWith(
+          action: () async {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => QrCodeOpnameScreen()),
+            );
+          },
+        );
       default:
         return submenu.copyWith(action: null);
     }
@@ -286,8 +302,12 @@ class _MyGridLayoutState extends State<MyGridLayout> {
     switch (menuId) {
       case 'confirmLoading':
         return Icons.local_shipping;
+      case 'mnuApprovalList':
+        return Icons.approval;
       case 'mnuSalesActivity':
         return Icons.location_searching;
+      case 'mnuGenQrFg':
+        return Icons.inventory;
       default:
         return Icons.menu;
     }
@@ -299,7 +319,6 @@ class _MyGridLayoutState extends State<MyGridLayout> {
     bool isLoading,
   ) async {
     if (isLoading) return;
-
     if (submenu.action == null) {
       ScaffoldMessenger.of(
         context,
@@ -452,7 +471,6 @@ class _MyGridLayoutState extends State<MyGridLayout> {
                                     ),
                           ),
                           SizedBox(width: 12.w),
-
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,

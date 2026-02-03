@@ -20,11 +20,11 @@ class AuthorizationRest {
       dio.options.headers['requiresToken'] = true;
       final data = {"entity_id": entityId, "appl_id": applId};
       final response = await dio.post("api/mobile/getMenu", data: data);
-      log('Request to https://v3.kencana.org/api/mobile/getMenu (Post)');
+      log('Request to ${dio.options.baseUrl}api/mobile/getMenu (Post)');
       if (response.statusCode == 200) {
         final body = response.data;
         log(
-          'Response "https://v3.kencana.org/api/mobile/getMenu (Post)" : ${body.toString()}',
+          'Response "${dio.options.baseUrl}api/mobile/getMenu (Post)" : ${body.toString()}',
         );
         final menu = List<Menu>.from(
           body['data'].map((e) {

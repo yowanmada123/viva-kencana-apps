@@ -14,7 +14,7 @@ class QrCodeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    log('Access to lib/presentation/qr_code/qr_code_screen.dart'); 
+    log('Access to lib/presentation/qr_code/qr_code_screen.dart');
     return const QrCodeView();
   }
 }
