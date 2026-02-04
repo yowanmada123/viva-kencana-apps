@@ -219,7 +219,7 @@ void main() async {
             lazy: false,
             create:
                 (context) => StockOpnameDtlBloc(
-                  opnameStockDtlRepository: opnameStockDtlRepository,
+                  opnamestockdtlrepository: opnameStockDtlRepository,
                 ),
           ),
         ],

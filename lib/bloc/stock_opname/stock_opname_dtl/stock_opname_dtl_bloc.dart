@@ -9,31 +9,109 @@ part 'stock_opname_dtl_state.dart';
 
 class StockOpnameDtlBloc
     extends Bloc<StockOpnameDtlEvent, StockOpnameDtlState> {
-  final OpnameStockDtlRepository opnameStockDtlRepository;
+  final OpnameStockDtlRepository opnamestockdtlrepository;
 
-  StockOpnameDtlBloc({required this.opnameStockDtlRepository})
+  StockOpnameDtlBloc({required this.opnamestockdtlrepository})
     : super(StockOpnameDtlInitial()) {
     on<LoadStockOpnameDtl>(_onLoad);
+    on<SearchStockOpnameDtl>(_onSearch);
+    on<FilterBinBatchStockOpnameDtl>(_onFilterBinBatch);
   }
 
+  /// ================= LOAD BACKEND
   Future<void> _onLoad(
     LoadStockOpnameDtl event,
     Emitter<StockOpnameDtlState> emit,
   ) async {
     emit(StockOpnameDtlLoading());
 
-    final result = await opnameStockDtlRepository.getOpnameDetail(
+    final result = await opnamestockdtlrepository.getOpnameDetail(
       trId: event.trId,
       millId: event.millId,
       whId: event.whId,
-      binId: event.binId,
-      batchId: event.batchId,
-      search: event.search,
     );
 
-    result.fold(
-      (l) => emit(StockOpnameDtlError(l.message!)),
-      (r) => emit(StockOpnameDtlLoaded(r)),
+    result.fold((l) => emit(StockOpnameDtlError(l.message!)), (r) {
+      final binBatchMap = _buildBinBatchMap(r);
+
+      emit(
+        StockOpnameDtlLoaded(
+          allData: r,
+          filteredData: r,
+          binBatchMap: binBatchMap,
+        ),
+      );
+    });
+  }
+
+  /// ================= SEARCH LOCAL
+  void _onSearch(
+    SearchStockOpnameDtl event,
+    Emitter<StockOpnameDtlState> emit,
+  ) {
+    final state = this.state;
+    if (state is! StockOpnameDtlLoaded) return;
+
+    final keyword = event.keyword.toLowerCase();
+
+    final filtered =
+        keyword.isEmpty
+            ? state.allData
+            : state.allData
+                .where(
+                  (e) =>
+                      e.namaBarang.toLowerCase().contains(keyword) ||
+                      e.prodCode.toLowerCase().contains(keyword),
+                )
+                .toList();
+
+    emit(
+      StockOpnameDtlLoaded(
+        allData: state.allData,
+        filteredData: filtered,
+        binBatchMap: state.binBatchMap,
+      ),
     );
+  }
+
+  /// ================= FILTER BIN & BATCH
+  void _onFilterBinBatch(
+    FilterBinBatchStockOpnameDtl event,
+    Emitter<StockOpnameDtlState> emit,
+  ) {
+    final state = this.state;
+    if (state is! StockOpnameDtlLoaded) return;
+
+    final filtered =
+        state.allData.where((e) {
+          if (event.binId != null && e.binId != event.binId) return false;
+          if (event.batchId != null && e.batchId != event.batchId) return false;
+          return true;
+        }).toList();
+
+    emit(
+      StockOpnameDtlLoaded(
+        allData: state.allData,
+        filteredData: filtered,
+        binBatchMap: state.binBatchMap,
+      ),
+    );
+  }
+
+  /// ================= BUILD BIN → BATCH MAP
+  Map<String, Set<String>> _buildBinBatchMap(List<StockOpnameDtl> data) {
+    final map = <String, Set<String>>{};
+
+    for (final e in data) {
+      if (e.binId.isEmpty) continue;
+
+      map.putIfAbsent(e.binId, () => <String>{});
+
+      if (e.batchId.isNotEmpty) {
+        map[e.binId]!.add(e.batchId);
+      }
+    }
+
+    return map;
   }
 }

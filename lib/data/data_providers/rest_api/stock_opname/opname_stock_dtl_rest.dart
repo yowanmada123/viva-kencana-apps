@@ -18,13 +18,10 @@ class OpnameStockDtlRest {
     required String whId,
     String? binId,
     String? batchId,
-    String? search,
   }) async {
     try {
       dio.options.headers['requiresToken'] = true;
 
-      log('Request to ${dio.options.baseUrl}api/getOpnameDetail');
-      log('$trId, $millId, $whId, $binId, $batchId, $search,');
       final response = await dio.post(
         'api/getOpnameDetail',
         data: {
@@ -33,11 +30,11 @@ class OpnameStockDtlRest {
           'wh_id': whId,
           'bin_id': binId,
           'batch_id': batchId,
-          'search': search,
         },
       );
-
-      log('Opname DTL response: ${response.data}');
+      log(
+        'Response From ${dio.options.baseUrl}api/getOpnameDetail : $response',
+      );
 
       if (response.statusCode == 200) {
         final List list = response.data['data']['data'];

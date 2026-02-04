@@ -15,7 +15,6 @@ class OpnameStockDtlRepository {
     required String whId,
     String? binId,
     String? batchId,
-    String? search,
   }) {
     return rest.getOpnameDetail(
       trId: trId,
@@ -23,7 +22,6 @@ class OpnameStockDtlRepository {
       whId: whId,
       binId: binId,
       batchId: batchId,
-      search: search,
     );
   }
 }
