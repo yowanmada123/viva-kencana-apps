@@ -15,6 +15,7 @@ import 'package:vivakencanaapp/bloc/approval_pr/approval_pr_department/approval_
 import 'package:vivakencanaapp/bloc/approval_pr/approval_pr_list/approval_pr_list_bloc.dart';
 import 'package:vivakencanaapp/bloc/approval_pr/approve_pr/approve_pr_bloc.dart';
 import 'package:vivakencanaapp/bloc/stock_opname/mill/mill_bloc.dart';
+import 'package:vivakencanaapp/bloc/stock_opname/prod_master/prod_master_bloc.dart';
 import 'package:vivakencanaapp/data/data_providers/rest_api/approval/approval_pr_rest.dart';
 
 import 'package:vivakencanaapp/bloc/authorization/credentials/credentials_bloc.dart';
@@ -30,6 +31,7 @@ import 'bloc/sales_activity/history_visit/history_visit_detail/sales_activity_hi
 import 'bloc/sales_activity/history_visit/history_visit_detail/upload_image/sales_activity_history_visit_upload_image_bloc.dart';
 import 'bloc/sales_activity/history_visit/sales_activity_history_visit_bloc.dart';
 import 'bloc/sales_activity/sales_activity_form_bloc.dart';
+import 'bloc/stock_opname/barang_jadi_list/barang_jadi_bloc.dart';
 import 'bloc/stock_opname/stock_opname_dtl/stock_opname_dtl_bloc.dart';
 import 'bloc/stock_opname/stock_opname_hdr/stock_opname_hdr_bloc.dart';
 import 'bloc/update/update_bloc.dart';
@@ -38,6 +40,8 @@ import 'data/data_providers/rest_api/authorization_rest/authorization_rest.dart'
 import 'data/data_providers/rest_api/batch_rest/batch_rest.dart';
 import 'data/data_providers/rest_api/entity_rest/entity_rest.dart';
 import 'data/data_providers/rest_api/sales_activity_rest/sales_activity_rest.dart';
+import 'data/data_providers/rest_api/stock_opname/barang_jadi_rest.dart';
+import 'data/data_providers/rest_api/stock_opname/master_prod_rest.dart';
 import 'data/data_providers/rest_api/stock_opname/mill_rest.dart';
 import 'data/data_providers/rest_api/stock_opname/opname_stock_dtl_rest.dart';
 import 'data/data_providers/rest_api/stock_opname/opname_stock_hdr_rest.dart';
@@ -48,7 +52,9 @@ import 'data/repository/authorization_repository.dart';
 import 'data/repository/batch_repository.dart';
 import 'data/repository/entity_repository.dart';
 import 'data/repository/sales_repository.dart';
+import 'data/repository/stock_opname/barang_jadi_repository.dart';
 import 'data/repository/stock_opname/opname_stock_hdr_repository.dart';
+import 'data/repository/stock_opname/prod_master_repository.dart';
 import 'environment.dart';
 import 'presentation/entity/entity_screen.dart';
 import 'presentation/login/login_form_screen.dart';
@@ -95,6 +101,8 @@ void main() async {
   final millRest = MillRest(kmbClient);
   final opnameStockHdrRest = OpnameStockHdrRest(androidKencanaClient);
   final opnameStockDtlRest = OpnameStockDtlRest(androidKencanaClient);
+  final prodMasterRest = ProdMasterRest(kmbClient);
+  final barangJadiRest = BarangJadiRest(kmbClient);
 
   final authRepository = AuthRepository(
     authRest: authRest,
@@ -114,6 +122,8 @@ void main() async {
   final millRepository = MillRepository(millRest: millRest);
   final opnameStockHdrRepository = OpnameStockHdrRepository(opnameStockHdrRest);
   final opnameStockDtlRepository = OpnameStockDtlRepository(opnameStockDtlRest);
+  final prodMasterRepository = ProdMasterRepository(prodMasterRest);
+  final barangJadiRepository = BarangJadiRepository(barangJadiRest);
 
   runApp(
     MultiRepositoryProvider(
@@ -127,6 +137,8 @@ void main() async {
         RepositoryProvider.value(value: millRepository),
         RepositoryProvider.value(value: opnameStockHdrRepository),
         RepositoryProvider.value(value: opnameStockDtlRepository),
+        RepositoryProvider.value(value: prodMasterRepository),
+        RepositoryProvider.value(value: barangJadiRepository),
       ],
       child: MultiBlocProvider(
         providers: [
@@ -221,6 +233,18 @@ void main() async {
                 (context) => StockOpnameDtlBloc(
                   opnamestockdtlrepository: opnameStockDtlRepository,
                 ),
+          ),
+          BlocProvider(
+            lazy: false,
+            create:
+                (context) =>
+                    ProdMasterBloc(prodMasterRepository: prodMasterRepository),
+          ),
+          BlocProvider(
+            lazy: false,
+            create:
+                (context) =>
+                    BarangJadiBloc(barangJadiRepository: barangJadiRepository),
           ),
         ],
         child: const MyApp(),

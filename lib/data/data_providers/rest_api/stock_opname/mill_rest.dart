@@ -18,7 +18,7 @@ class MillRest {
       log('Request to ${dio.options.baseUrl}api/kmb/master/mill (POST)');
       final response = await dio.post("api/kmb/master/mill", data: {});
       if (response.statusCode == 200) {
-        log('Response body: ${response.data}');
+        // log('Response body: ${response.data}');
         final body = response.data;
         final mill = List<Mill>.from(
           body['data'].map((e) {
