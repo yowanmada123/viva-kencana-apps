@@ -247,7 +247,7 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
                       (v) => context.read<StockOpnameDtlBloc>().add(
                         SearchStockOpnameDtl(v),
                       ),
-                  style: const TextStyle(fontSize: 10),
+                  style: const TextStyle(fontSize: 12),
                   decoration: InputDecoration(
                     isDense: true,
                     prefixIcon: const Icon(Icons.search, size: 14),
