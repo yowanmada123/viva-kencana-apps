@@ -15,10 +15,10 @@ class ProdMasterRest {
   Future<Either<CustomException, List<ProdAdd>>> getProdAdd() async {
     try {
       dio.options.headers['requiresToken'] = true;
-      log('Request to: ${dio.options.baseUrl}api/getListProdAdd');
+      log('Request to: ${dio.options.baseUrl}api/kmb/warehouse/getListProdAdd');
 
       final response = await dio.post('api/kmb/warehouse/getListProdAdd');
-      log('Response body ADD ID: ${response.data}');
+      // log('Response body ADD ID: ${response.data}');
       if (response.statusCode == 200) {
         final List list = response.data['data'];
         return Right(list.map((e) => ProdAdd.fromMap(e)).toList());
@@ -39,8 +39,10 @@ class ProdMasterRest {
     try {
       dio.options.headers['requiresToken'] = true;
 
+      log('Request to: ${dio.options.baseUrl}api/kmb/warehouse/getListProdTor');
+
       final response = await dio.post('api/kmb/warehouse/getListProdTor');
-      log('Response body PROD ID: ${response.data}');
+      // log('Response body PROD ID: ${response.data}');
       if (response.statusCode == 200) {
         final List list = response.data['data'];
         return Right(list.map((e) => ProdTor.fromMap(e)).toList());

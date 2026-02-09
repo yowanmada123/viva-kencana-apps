@@ -21,6 +21,7 @@ import 'package:vivakencanaapp/data/data_providers/rest_api/approval/approval_pr
 import 'package:vivakencanaapp/bloc/authorization/credentials/credentials_bloc.dart';
 import 'package:vivakencanaapp/data/repository/approval_pr_repository.dart';
 import 'package:vivakencanaapp/data/repository/stock_opname/mill_repository.dart';
+import 'package:vivakencanaapp/data/repository/stock_opname/opname_repository.dart';
 import 'package:vivakencanaapp/data/repository/stock_opname/opname_stock_dtl_repository.dart';
 import 'package:vivakencanaapp/models/stock_opname/stock_opname_hdr.dart';
 
@@ -32,6 +33,7 @@ import 'bloc/sales_activity/history_visit/history_visit_detail/upload_image/sale
 import 'bloc/sales_activity/history_visit/sales_activity_history_visit_bloc.dart';
 import 'bloc/sales_activity/sales_activity_form_bloc.dart';
 import 'bloc/stock_opname/barang_jadi_list/barang_jadi_bloc.dart';
+import 'bloc/stock_opname/opname_update/opname_update_bloc.dart';
 import 'bloc/stock_opname/stock_opname_dtl/stock_opname_dtl_bloc.dart';
 import 'bloc/stock_opname/stock_opname_hdr/stock_opname_hdr_bloc.dart';
 import 'bloc/update/update_bloc.dart';
@@ -45,6 +47,7 @@ import 'data/data_providers/rest_api/stock_opname/master_prod_rest.dart';
 import 'data/data_providers/rest_api/stock_opname/mill_rest.dart';
 import 'data/data_providers/rest_api/stock_opname/opname_stock_dtl_rest.dart';
 import 'data/data_providers/rest_api/stock_opname/opname_stock_hdr_rest.dart';
+import 'data/data_providers/rest_api/stock_opname/opname_update.dart';
 import 'data/data_providers/shared-preferences/shared_preferences_key.dart';
 import 'data/data_providers/shared-preferences/shared_preferences_manager.dart';
 import 'data/repository/auth_repository.dart';
@@ -101,6 +104,7 @@ void main() async {
   final millRest = MillRest(kmbClient);
   final opnameStockHdrRest = OpnameStockHdrRest(androidKencanaClient);
   final opnameStockDtlRest = OpnameStockDtlRest(androidKencanaClient);
+  final opnameUpdateRest = OpnameRest(androidKencanaClient);
   final prodMasterRest = ProdMasterRest(kmbClient);
   final barangJadiRest = BarangJadiRest(kmbClient);
 
@@ -124,6 +128,7 @@ void main() async {
   final opnameStockDtlRepository = OpnameStockDtlRepository(opnameStockDtlRest);
   final prodMasterRepository = ProdMasterRepository(prodMasterRest);
   final barangJadiRepository = BarangJadiRepository(barangJadiRest);
+  final opnameRepository = OpnameRepository(opnameUpdateRest);
 
   runApp(
     MultiRepositoryProvider(
@@ -139,6 +144,7 @@ void main() async {
         RepositoryProvider.value(value: opnameStockDtlRepository),
         RepositoryProvider.value(value: prodMasterRepository),
         RepositoryProvider.value(value: barangJadiRepository),
+        RepositoryProvider.value(value: opnameRepository),
       ],
       child: MultiBlocProvider(
         providers: [
@@ -245,6 +251,10 @@ void main() async {
             create:
                 (context) =>
                     BarangJadiBloc(barangJadiRepository: barangJadiRepository),
+          ),
+          BlocProvider(
+            lazy: false,
+            create: (_) => OpnameBloc(opnameRepository: opnameRepository),
           ),
         ],
         child: const MyApp(),

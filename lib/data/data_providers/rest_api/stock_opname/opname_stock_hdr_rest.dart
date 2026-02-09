@@ -20,16 +20,16 @@ class OpnameStockHdrRest {
     try {
       dio.options.headers['requiresToken'] = true;
       log(
-        'Request to ${dio.options.baseUrl}api/getOpenOpnameHdrByMillAndPeriod (POST)',
+        'Request to ${dio.options.baseUrl}api/getOpenOpnameHdrByMillAndPeriod',
       );
 
       final response = await dio.post(
         'api/getOpenOpnameHdrByMillAndPeriod',
         data: {'mill_id': millId, 'wh_id': whId, 'bin_id': binId},
       );
-      log(
-        'Response From ${dio.options.baseUrl}api/getOpenOpnameHdrByMillAndPeriod : $response',
-      );
+      // log(
+      //   'Response From ${dio.options.baseUrl}api/getOpenOpnameHdrByMillAndPeriod : $response',
+      // );
 
       if (response.statusCode == 200) {
         final List list = response.data['data']['data'];

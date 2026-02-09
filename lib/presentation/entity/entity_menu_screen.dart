@@ -35,7 +35,7 @@ class EntityMenuScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     log('Access to presentation/entity/entitiy_menu_screen.dart');
-    log(entityId);
+    // log(entityId);
 
     final authRepository = context.read<AuthRepository>();
     final authorizationRepository = context.read<AuthorizationRepository>();

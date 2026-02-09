@@ -252,7 +252,7 @@ class _OpnameStockHdrViewState extends State<OpnameStockHdrView> {
                                           size: 20,
                                         ),
                                         onPressed: () {
-                                          print(e);
+                                          // print(e);
                                           // NAVIGATE TO DTL
                                           Navigator.push(
                                             context,

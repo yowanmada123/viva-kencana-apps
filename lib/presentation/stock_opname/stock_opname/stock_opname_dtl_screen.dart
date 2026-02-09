@@ -12,6 +12,9 @@ import 'package:vivakencanaapp/bloc/stock_opname/prod_master/prod_master_bloc.da
 import 'package:vivakencanaapp/bloc/stock_opname/stock_opname_dtl/stock_opname_dtl_bloc.dart';
 import 'package:vivakencanaapp/models/stock_opname/stock_opname_dtl.dart';
 
+import '../../../bloc/stock_opname/opname_update/opname_update_bloc.dart';
+import '../../../data/data_providers/shared-preferences/shared_preferences_manager.dart';
+
 /// ================= POPUP MODE =================
 enum OpnamePopupMode { fromList, fromScan, addNew }
 
@@ -81,6 +84,7 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
   final TextEditingController batchCtrl = TextEditingController();
   final TextEditingController panjangCtrl = TextEditingController();
   final TextEditingController qtyCtrl = TextEditingController();
+  final TextEditingController remarkCtrl = TextEditingController();
 
   /// ================= POPUP STATE =================
   String addId = '';
@@ -88,6 +92,7 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
   String acpId = '';
   // String qualityId = '';
   String ordFlag = 'N';
+  String userId = '';
 
   /// ================= UI =================
   final OutlineInputBorder border = OutlineInputBorder(
@@ -103,80 +108,118 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
     batchCtrl.dispose();
     panjangCtrl.dispose();
     qtyCtrl.dispose();
+    remarkCtrl.dispose();
     qrController?.dispose();
     super.dispose();
+  }
+
+  @override
+  void initState() {
+    // log('Access to presentation/entity/entitiy_screen.dart');
+    loadUserData();
+    super.initState();
   }
 
   /// ================= BUILD =================
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).primaryColor,
-        iconTheme: const IconThemeData(color: Colors.white),
-        title: Text(
-          'Opname Detail',
-          style: TextStyle(
-            fontFamily: 'Poppins',
-            color: Colors.white,
-            fontWeight: FontWeight.w600,
-            fontSize: 18.w,
-          ),
-        ),
-      ),
+    return BlocListener<OpnameBloc, OpnameState>(
+      listener: (context, state) {
+        if (state is OpnameSuccess) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Opname berhasil disimpan')),
+          );
 
-      /// ================= FAB =================
-      floatingActionButton: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          FloatingActionButton(
-            heroTag: 'scan',
-            onPressed: _openScanner,
-            child: const Icon(Icons.qr_code_scanner),
-          ),
-          const SizedBox(height: 10),
-          FloatingActionButton(
-            heroTag: 'add',
-            onPressed: () {
-              _openForm(mode: OpnamePopupMode.addNew);
-            },
-            child: const Icon(Icons.add),
-          ),
-        ],
-      ),
+          // reload list
+          context.read<StockOpnameDtlBloc>().add(
+            LoadStockOpnameDtl(
+              trId: widget.trId,
+              millId: widget.millId,
+              whId: widget.whId,
+            ),
+          );
+        }
 
-      /// ================= BODY =================
-      body: Column(
-        children: [
-          _filterSection(),
-          Expanded(
-            child: BlocBuilder<StockOpnameDtlBloc, StockOpnameDtlState>(
-              builder: (context, state) {
-                if (state is StockOpnameDtlLoading) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                if (state is StockOpnameDtlError) {
-                  return Center(child: Text(state.message));
-                }
-                if (state is StockOpnameDtlLoaded) {
-                  return ListView.builder(
-                    itemCount: state.filteredData.length,
-                    itemBuilder: (_, i) {
-                      final item = state.filteredData[i];
-                      return InkWell(
-                        onTap: () {
-                          _openForm(mode: OpnamePopupMode.fromList, data: item);
-                        },
-                        child: _item(item),
-                      );
-                    },
-                  );
-                }
-                return const SizedBox();
-              },
+        if (state is OpnameError) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(state.message)));
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Theme.of(context).primaryColor,
+          iconTheme: const IconThemeData(color: Colors.white),
+          title: Text(
+            'Opname Detail',
+            style: TextStyle(
+              fontFamily: 'Poppins',
+              color: Colors.white,
+              fontWeight: FontWeight.w600,
+              fontSize: 18.w,
             ),
           ),
-        ],
+        ),
+
+        /// ================= FAB =================
+        floatingActionButton: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            FloatingActionButton(
+              heroTag: 'scan',
+              onPressed: () {
+                context.read<BarangJadiBloc>().add(ClearBarangJadi());
+                _openScanner();
+              },
+              child: const Icon(Icons.qr_code_scanner),
+            ),
+            const SizedBox(height: 10),
+            FloatingActionButton(
+              heroTag: 'add',
+              onPressed: () {
+                _openForm(mode: OpnamePopupMode.addNew);
+              },
+              child: const Icon(Icons.add),
+            ),
+          ],
+        ),
+
+        /// ================= BODY =================
+        body: Column(
+          children: [
+            _filterSection(),
+            Expanded(
+              child: BlocBuilder<StockOpnameDtlBloc, StockOpnameDtlState>(
+                builder: (context, state) {
+                  if (state is StockOpnameDtlLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  if (state is StockOpnameDtlError) {
+                    return Center(child: Text(state.message));
+                  }
+                  if (state is StockOpnameDtlLoaded) {
+                    return ListView.builder(
+                      itemCount: state.filteredData.length,
+                      itemBuilder: (_, i) {
+                        final item = state.filteredData[i];
+                        return InkWell(
+                          onTap: () {
+                            _openForm(
+                              mode: OpnamePopupMode.fromList,
+                              data: item,
+                            );
+                          },
+                          child: _item(item),
+                        );
+                      },
+                    );
+                  }
+                  return const SizedBox();
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -416,17 +459,19 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
       batchCtrl.text = data.batchId;
       panjangCtrl.text = data.panjang.toString();
       qtyCtrl.text = data.qtyOpname.toString();
+      remarkCtrl.text = data.remark.toString();
       addId = data.addId;
       torId = data.torId;
+      binId = data.binId;
     }
 
-    if (mode == OpnamePopupMode.fromScan && scanResult != null) {
-      prodCodeCtrl.text = scanResult['prod_code'] ?? '';
-      batchCtrl.text = scanResult['batch_id'] ?? '';
-      panjangCtrl.text = scanResult['panjang']?.toString() ?? '';
-      qualityId.text = scanResult['quality_id'] ?? '';
-      ordFlag = scanResult['ord_flag'] ?? 'N';
-    }
+    // if (mode == OpnamePopupMode.fromScan && scanResult != null) {
+    //   prodCodeCtrl.text = scanResult['prod_code'] ?? '';
+    //   batchCtrl.text = scanResult['batch_id'] ?? '';
+    //   panjangCtrl.text = scanResult['panjang']?.toString() ?? '';
+    //   qualityId.text = scanResult['quality_id'] ?? '';
+    //   ordFlag = scanResult['ord_flag'] ?? 'N';
+    // }
 
     showDialog(
       context: context,
@@ -466,7 +511,17 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
         children: [
           Expanded(
             child: OutlinedButton(
-              onPressed: () => Navigator.pop(context),
+              onPressed: () {
+                namaBarangCtrl.clear();
+                prodCodeCtrl.clear();
+                qtyCtrl.clear();
+                qualityId.clear();
+                qtyCtrl.clear();
+                panjangCtrl.clear();
+                remarkCtrl.clear();
+                Navigator.pop(context);
+                context.read<BarangJadiBloc>().add(ClearBarangJadi());
+              },
               child: const Text('Cancel'),
             ),
           ),
@@ -474,10 +529,12 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
           Expanded(
             child: ElevatedButton(
               onPressed: () {
-                mode == OpnamePopupMode.addNew
-                    ? _addOpname(qtyCtrl.text)
-                    : _updateOpname(qtyCtrl.text);
+                _submitOpname();
                 Navigator.pop(context);
+                // mode == OpnamePopupMode.addNew
+                //     ? _addOpname(qtyCtrl.text)
+                //     : _updateOpname(qtyCtrl.text);
+                // Navigator.pop(context);
               },
               child: Text(mode == OpnamePopupMode.addNew ? 'Tambah' : 'Update'),
             ),
@@ -506,6 +563,7 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
                 labelText: 'Nama Barang*',
                 isDense: true,
                 border: border,
+                labelStyle: TextStyle(fontSize: 12),
               ),
             ),
           ),
@@ -567,7 +625,7 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
         /// ================= ADD ID =================
         BlocBuilder<ProdMasterBloc, ProdMasterState>(
           builder: (context, state) {
-            log('STATE PROD MASTER = $state');
+            // log('STATE PROD MASTER = $state');
             if (state is ProdMasterLoading) {
               return const Padding(
                 padding: EdgeInsets.all(8),
@@ -660,12 +718,44 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
         _editable('Qty Opname*', qtyCtrl),
         _editableLong('Panjang', panjangCtrl),
         _editable('Batch', batchCtrl),
+        _editable('Remark', remarkCtrl),
 
         const SizedBox(height: 8),
         _readonly('TR ID', widget.trId),
         _readonly('WH ID', widget.whId),
         _readonly('BIN ID', binId ?? '-'),
       ],
+    );
+  }
+
+  void _submitOpname() {
+    // print("mill_id : ${widget.millId}");
+    // print("whId : ${widget.whId}");
+    // print("binId : $binId");
+    // print("trId : ${widget.trId}");
+    // print("prodCode : ${prodCodeCtrl.text}");
+    // print("addId : $addId");
+    // print("torId : $torId");
+    // print("panjang : ${panjangCtrl.text}");
+    // print("batchId : ${batchCtrl.text}");
+    // print("remark : ${remarkCtrl.text}");
+    // print("qtyOpname : ${qtyCtrl.text}");
+    // print("userId2 : $userId");
+    context.read<OpnameBloc>().add(
+      SubmitOpnameUpdate(
+        millId: widget.millId,
+        whId: widget.whId,
+        binId: binId ?? '',
+        trId: widget.trId,
+        prodCode: prodCodeCtrl.text,
+        addId: addId,
+        torId: torId,
+        panjang: panjangCtrl.text,
+        batchId: batchCtrl.text,
+        remark: remarkCtrl.text,
+        qtyOpname: qtyCtrl.text,
+        userId2: userId,
+      ),
     );
   }
 
@@ -681,6 +771,8 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
         _readonly('Tor ID', torId),
         _editableLong('Panjang', panjangCtrl),
         _editable('Batch', batchCtrl),
+        _editable('Remark', remarkCtrl),
+
         const SizedBox(height: 8),
         _readonly('TR ID', widget.trId),
         _readonly('WH ID', widget.whId),
@@ -734,7 +826,7 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: SizedBox(
-        height: 30,
+        height: 40,
         child: TextField(
           controller: TextEditingController(text: value),
           readOnly: true,
@@ -790,5 +882,22 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
       ),
       trailing: Text('Opn: ${e.qtyOpname}'),
     );
+  }
+
+  Future<void> loadUserData() async {
+    final SharedPreferencesManager authSharedPref = SharedPreferencesManager(
+      key: 'auth',
+    );
+    final dataString = await authSharedPref.read();
+
+    if (dataString != null) {
+      final Map<String, dynamic> data = json.decode(dataString);
+      final user = data['user'];
+      // print(user);
+      setState(() {
+        userId = user['user_id2'] ?? '-';
+        // dept = user['dept_id'].trim() == "" ? '-' : user['dept_id'].trim();
+      });
+    }
   }
 }
