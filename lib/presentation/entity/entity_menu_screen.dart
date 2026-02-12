@@ -416,6 +416,8 @@ class _MyGridLayoutState extends State<MyGridLayout> {
                     submenus[submenuIndex],
                     widget.entityId,
                   );
+
+                  print("SUB MENU: $submenus");
                   final iconCode =
                       int.tryParse(submenu.icon) ?? Icons.help.codePoint;
                   final isLoading = _loadingMenuId == submenu.menuId;

@@ -31,6 +31,9 @@ class AuthRest {
         return Left(NetUtils.parseErrorResponse(response: response.data));
       }
     } on DioException catch (e) {
+      log('DIO ERROR STATUS : ${e.response?.statusCode}');
+      log('DIO ERROR DATA   : ${e.response?.data}');
+      log('DIO ERROR MSG    : ${e.message}');
       return Left(NetUtils.parseDioException(e));
     } on Exception catch (e) {
       return Future.value(Left(CustomException(message: e.toString())));
@@ -50,6 +53,9 @@ class AuthRest {
         return Left(NetUtils.parseErrorResponse(response: response.data));
       }
     } on DioException catch (e) {
+      log('DIO ERROR STATUS : ${e.response?.statusCode}');
+      log('DIO ERROR DATA   : ${e.response?.data}');
+      log('DIO ERROR MSG    : ${e.message}');
       return Left(NetUtils.parseDioException(e));
     } on Exception catch (e) {
       if (e is DioException) {

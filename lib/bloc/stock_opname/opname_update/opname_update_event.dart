@@ -11,6 +11,7 @@ class SubmitOpnameUpdate extends OpnameEvent {
   final String addId;
   final String torId;
   final String panjang;
+  final String qualityId;
   final String batchId;
   final String remark;
   final String qtyOpname;
@@ -25,6 +26,7 @@ class SubmitOpnameUpdate extends OpnameEvent {
     required this.addId,
     required this.torId,
     required this.panjang,
+    required this.qualityId,
     required this.batchId,
     required this.remark,
     required this.qtyOpname,

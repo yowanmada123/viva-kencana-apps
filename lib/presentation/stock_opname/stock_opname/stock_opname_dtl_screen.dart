@@ -10,6 +10,8 @@ import 'package:qr_code_scanner_plus/qr_code_scanner_plus.dart';
 import 'package:vivakencanaapp/bloc/stock_opname/barang_jadi_list/barang_jadi_bloc.dart';
 import 'package:vivakencanaapp/bloc/stock_opname/prod_master/prod_master_bloc.dart';
 import 'package:vivakencanaapp/bloc/stock_opname/stock_opname_dtl/stock_opname_dtl_bloc.dart';
+import 'package:vivakencanaapp/bloc/stock_opname/wh_bin/wh_bin_bloc.dart';
+import 'package:vivakencanaapp/data/data_providers/rest_api/stock_opname/bin_rest.dart';
 import 'package:vivakencanaapp/models/stock_opname/stock_opname_dtl.dart';
 
 import '../../../bloc/stock_opname/opname_update/opname_update_bloc.dart';
@@ -45,6 +47,11 @@ class OpnameStockDtlScreen extends StatelessWidget {
         BlocProvider.value(
           value: context.read<ProdMasterBloc>()..add(LoadProdMaster()),
         ),
+        BlocProvider.value(
+          value:
+              context.read<WHBinBloc>()
+                ..add(LoadWHBin(millId: millId, whId: whId)),
+        ),
       ],
       child: OpnameStockDtlView(trId: trId, millId: millId, whId: whId),
     );
@@ -72,6 +79,7 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
   final TextEditingController _searchCtrl = TextEditingController();
   String? binId;
   String? batchId;
+  bool isFromScan = false;
 
   /// ================= SCANNER =================
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
@@ -187,7 +195,10 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
         /// ================= BODY =================
         body: Column(
           children: [
+            /// ================= FILTER SECTION =================
             _filterSection(),
+
+            /// ================= LIST SECTION =================
             Expanded(
               child: BlocBuilder<StockOpnameDtlBloc, StockOpnameDtlState>(
                 builder: (context, state) {
@@ -198,6 +209,15 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
                     return Center(child: Text(state.message));
                   }
                   if (state is StockOpnameDtlLoaded) {
+                    if (state.filteredData.isEmpty) {
+                      return const Center(
+                        child: Text(
+                          'Data opname tidak ditemukan',
+                          style: TextStyle(fontSize: 12),
+                        ),
+                      );
+                    }
+
                     return ListView.builder(
                       itemCount: state.filteredData.length,
                       itemBuilder: (_, i) {
@@ -232,9 +252,11 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
         builder: (context, state) {
           if (state is! StockOpnameDtlLoaded) return const SizedBox();
 
-          final bins = state.binBatchMap.keys.toList()..sort();
+          // final bins = state.binBatchMap.keys.toList()..sort();
           final batches =
-              binId == null ? <String>[] : state.binBatchMap[binId!]!.toList()
+              binId == null
+                    ? <String>[]
+                    : (state.binBatchMap[binId] ?? <String>{}).toList()
                 ..sort();
 
           return Column(
@@ -261,44 +283,104 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
                 height: 40,
                 child: Row(
                   children: [
-                    Expanded(
-                      child: DropdownButtonFormField<String>(
-                        value: binId,
-                        style: TextStyle(fontSize: 12, color: Colors.black),
-                        decoration: InputDecoration(
-                          labelText: 'BIN',
-                          labelStyle: TextStyle(fontSize: 12),
-                          isDense: true,
-                          border: border,
-                        ),
-                        items:
-                            bins
-                                .map(
-                                  (e) => DropdownMenuItem(
-                                    value: e,
-                                    child: Text(
-                                      e,
-                                      style: const TextStyle(fontSize: 10),
-                                    ),
-                                  ),
-                                )
-                                .toList(),
-                        onChanged: (v) {
-                          setState(() {
-                            binId = v;
-                            batchId = null;
-                          });
-                          context.read<StockOpnameDtlBloc>().add(
-                            FilterBinBatchStockOpnameDtl(binId: binId),
+                    BlocBuilder<WHBinBloc, WHBinState>(
+                      builder: (context, binState) {
+                        if (binState is WHBinLoading) {
+                          return const SizedBox(height: 40);
+                        }
+
+                        if (binState is WHBinError) {
+                          return Expanded(
+                            child: Text(
+                              binState.message,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(fontSize: 12),
+                            ),
                           );
-                        },
-                      ),
+                        }
+
+                        if (binState is WHBinLoaded) {
+                          final bins = binState.data;
+
+                          return Expanded(
+                            child: DropdownButtonFormField<String>(
+                              value: binId,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: Colors.black,
+                              ),
+                              decoration: InputDecoration(
+                                labelText: 'BIN',
+                                labelStyle: const TextStyle(fontSize: 12),
+                                isDense: true,
+                                border: border,
+                              ),
+                              items:
+                                  bins.map((e) {
+                                    return DropdownMenuItem<String>(
+                                      value: e.binId,
+                                      child: Text(
+                                        e.binId,
+                                        style: const TextStyle(fontSize: 10),
+                                      ),
+                                    );
+                                  }).toList(),
+                              onChanged: (v) {
+                                setState(() {
+                                  binId = v;
+                                  batchId = null;
+                                });
+
+                                context.read<StockOpnameDtlBloc>().add(
+                                  FilterBinBatchStockOpnameDtl(binId: binId),
+                                );
+                              },
+                            ),
+                          );
+                        }
+                        return Container();
+                      },
                     ),
+
+                    // Expanded(
+                    //   child: DropdownButtonFormField<String>(
+                    //     value: binId,
+                    //     style: TextStyle(fontSize: 12, color: Colors.black),
+                    //     decoration: InputDecoration(
+                    //       labelText: 'BIN',
+                    //       labelStyle: TextStyle(fontSize: 12),
+                    //       isDense: true,
+                    //       border: border,
+                    //     ),
+                    //     items:
+                    //         bins
+                    //             .map(
+                    //               (e) => DropdownMenuItem(
+                    //                 value: e,
+                    //                 child: Text(
+                    //                   e,
+                    //                   style: const TextStyle(fontSize: 10),
+                    //                 ),
+                    //               ),
+                    //             )
+                    //             .toList(),
+                    //     onChanged: (v) {
+                    //       setState(() {
+                    //         binId = v;
+                    //         batchId = null;
+                    //       });
+                    //       context.read<StockOpnameDtlBloc>().add(
+                    //         FilterBinBatchStockOpnameDtl(binId: binId),
+                    //       );
+                    //     },
+                    //   ),
+                    // ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: DropdownButtonFormField<String>(
                         value: batchId,
-                        style: TextStyle(fontSize: 12),
+                        style: TextStyle(fontSize: 12, color: Colors.black),
                         decoration: InputDecoration(
                           labelText: 'Batch',
                           labelStyle: TextStyle(fontSize: 12),
@@ -370,6 +452,7 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
   }
 
   void _openFormFromScan({required Map<String, dynamic> scanResult}) {
+    isFromScan = true;
     // ===== RESET STATE FORM =====
     context.read<BarangJadiBloc>().add(ClearBarangJadi());
 
@@ -414,6 +497,10 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
             listener: (context, state) {
               if (state is BarangJadiLoaded && state.selected != null) {
                 namaBarangCtrl.text = state.selected!.namaBarang;
+                prodCodeCtrl.text = state.selected!.barangJadiId;
+                qualityId.text = state.selected!.grade;
+
+                context.read<BarangJadiBloc>().add(ClearBarangJadi());
               }
             },
             child: AlertDialog(
@@ -723,6 +810,120 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
         const SizedBox(height: 8),
         _readonly('TR ID', widget.trId),
         _readonly('WH ID', widget.whId),
+        _binDropdown(),
+      ],
+    );
+  }
+
+  /// ================= UPDATE FORM =================
+  Widget _popupContent() {
+    return Column(
+      children: [
+        _readonlyCtrl('Nama Barang', namaBarangCtrl),
+        _readonlyCtrl('Product Code', prodCodeCtrl),
+        _editable('Qty Opname*', qtyCtrl),
+        _readonly('Quality ID', qualityId.text),
+
+        /// ================= ADD ID =================
+        BlocBuilder<ProdMasterBloc, ProdMasterState>(
+          builder: (context, state) {
+            // log('STATE PROD MASTER = $state');
+            if (state is ProdMasterLoading) {
+              return const Padding(
+                padding: EdgeInsets.all(8),
+                child: LinearProgressIndicator(),
+              );
+            }
+
+            if (state is ProdMasterError) {
+              return Text(state.message);
+            }
+
+            if (state is! ProdMasterLoaded) {
+              return const SizedBox();
+            }
+
+            return SizedBox(
+              height: 40,
+              child: DropdownButtonFormField<String>(
+                style: TextStyle(fontSize: 12, color: Colors.black),
+                isExpanded: true, // ⬅️ WAJIB DITAMBAHKAN
+                value: addId.isEmpty ? null : addId,
+                decoration: InputDecoration(
+                  labelText: 'Add ID',
+                  border: border,
+                  isDense: true,
+                  labelStyle: TextStyle(fontSize: 12),
+                ),
+                items:
+                    state.prodAdd.map((e) {
+                      return DropdownMenuItem(
+                        value: e.addId,
+                        child: Text(
+                          '${e.addId} - ${e.descr}',
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      );
+                    }).toList(),
+                onChanged: (v) {
+                  setState(() {
+                    addId = v ?? '';
+                  });
+                },
+              ),
+            );
+          },
+        ),
+
+        const SizedBox(height: 8),
+
+        /// ================= TOR ID =================
+        BlocBuilder<ProdMasterBloc, ProdMasterState>(
+          builder: (context, state) {
+            if (state is! ProdMasterLoaded) return const SizedBox();
+
+            return SizedBox(
+              height: 40,
+              child: DropdownButtonFormField<String>(
+                style: TextStyle(fontSize: 12, color: Colors.black),
+                isExpanded: true, // ⬅️ WAJIB
+                value: torId.isEmpty ? null : torId,
+                decoration: InputDecoration(
+                  labelText: 'Tor ID',
+                  border: border,
+                  isDense: true,
+                  labelStyle: TextStyle(fontSize: 12),
+                ),
+                items:
+                    state.prodTor.map((e) {
+                      return DropdownMenuItem(
+                        value: e.torId,
+                        child: Text(
+                          '${e.torId} - ${e.descr}',
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      );
+                    }).toList(),
+                onChanged: (v) {
+                  setState(() {
+                    torId = v ?? '';
+                  });
+                },
+              ),
+            );
+          },
+        ),
+        const SizedBox(height: 8),
+
+        // _readonly('Add ID', addId),
+        // _readonly('Tor ID', torId),
+        _editableLong('Panjang', panjangCtrl),
+        _editable('Batch', batchCtrl),
+        _editable('Remark', remarkCtrl),
+
+        const SizedBox(height: 8),
+        _readonly('TR ID', widget.trId),
+        _readonly('WH ID', widget.whId),
         _readonly('BIN ID', binId ?? '-'),
       ],
     );
@@ -751,33 +952,12 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
         addId: addId,
         torId: torId,
         panjang: panjangCtrl.text,
+        qualityId: qualityId.text,
         batchId: batchCtrl.text,
         remark: remarkCtrl.text,
         qtyOpname: qtyCtrl.text,
         userId2: userId,
       ),
-    );
-  }
-
-  /// ================= UPDATE FORM =================
-  Widget _popupContent() {
-    return Column(
-      children: [
-        _readonlyCtrl('Nama Barang', namaBarangCtrl),
-        _readonlyCtrl('Product Code', prodCodeCtrl),
-        _editable('Qty Opname*', qtyCtrl),
-        _readonly('Quality ID', qualityId.text),
-        _readonly('Add ID', addId),
-        _readonly('Tor ID', torId),
-        _editableLong('Panjang', panjangCtrl),
-        _editable('Batch', batchCtrl),
-        _editable('Remark', remarkCtrl),
-
-        const SizedBox(height: 8),
-        _readonly('TR ID', widget.trId),
-        _readonly('WH ID', widget.whId),
-        _readonly('BIN ID', binId ?? '-'),
-      ],
     );
   }
 
@@ -822,6 +1002,51 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
     );
   }
 
+  Widget _binDropdown() {
+    return BlocBuilder<WHBinBloc, WHBinState>(
+      builder: (context, state) {
+        if (state is WHBinLoading) {
+          return const SizedBox(height: 40);
+        }
+
+        if (state is WHBinError) {
+          return Text(state.message, style: const TextStyle(fontSize: 12));
+        }
+
+        if (state is! WHBinLoaded) {
+          return const SizedBox();
+        }
+
+        return SizedBox(
+          height: 40,
+          child: DropdownButtonFormField<String>(
+            value: binId,
+            isExpanded: true,
+            style: const TextStyle(fontSize: 12, color: Colors.black),
+            decoration: InputDecoration(
+              labelText: 'BIN ID',
+              isDense: true,
+              border: border,
+              labelStyle: const TextStyle(fontSize: 12),
+            ),
+            items:
+                state.data.map((e) {
+                  return DropdownMenuItem<String>(
+                    value: e.binId,
+                    child: Text(e.binId, style: const TextStyle(fontSize: 10)),
+                  );
+                }).toList(),
+            onChanged: (v) {
+              setState(() {
+                binId = v;
+              });
+            },
+          ),
+        );
+      },
+    );
+  }
+
   Widget _readonly(String label, String value) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
@@ -858,15 +1083,6 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
         ),
       ),
     );
-  }
-
-  /// ================= API STUB =================
-  void _updateOpname(String qty) {
-    debugPrint('UPDATE $qty');
-  }
-
-  void _addOpname(String qty) {
-    debugPrint('ADD $qty');
   }
 
   /// ================= LIST ITEM =================

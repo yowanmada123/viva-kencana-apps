@@ -15,7 +15,7 @@ class OpnameRest {
     try {
       dio.options.headers['requiresToken'] = true;
       // log('Req URL: ${dio.options.baseUrl}api/updateOpnameItemByScan');
-      // log('Payload body: $payload');
+      log('Payload body: $payload');
 
       final response = await dio.post(
         'api/updateOpnameItemByScan',

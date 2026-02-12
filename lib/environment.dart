@@ -5,8 +5,8 @@ class AndroidKencanaEnvironment {
   // static const apiPath = 'http://10.0.2.2:8000/';
   static BaseOptions dioBaseOptions = BaseOptions(
     baseUrl: apiPath,
-    connectTimeout: Duration(milliseconds: 10000),
-    receiveTimeout: Duration(milliseconds: 10000),
+    connectTimeout: Duration(milliseconds: 20000),
+    receiveTimeout: Duration(milliseconds: 20000),
     contentType: 'application/json',
   );
 }
@@ -16,8 +16,8 @@ class KmbEnvironment {
   // static const apiPath = 'http://10.0.2.2:8000/';
   static BaseOptions dioBaseOptions = BaseOptions(
     baseUrl: apiPath,
-    connectTimeout: Duration(milliseconds: 10000),
-    receiveTimeout: Duration(milliseconds: 10000),
+    connectTimeout: Duration(milliseconds: 20000),
+    receiveTimeout: Duration(milliseconds: 20000),
     contentType: 'application/json',
   );
 }
@@ -27,8 +27,8 @@ class Environment {
   // static const apiPath = 'http://10.0.2.2:8000/';
   static BaseOptions dioBaseOptions = BaseOptions(
     baseUrl: apiPath,
-    connectTimeout: Duration(milliseconds: 10000),
-    receiveTimeout: Duration(milliseconds: 10000),
+    connectTimeout: Duration(milliseconds: 20000),
+    receiveTimeout: Duration(milliseconds: 20000),
     contentType: 'application/json',
   );
 }
@@ -38,8 +38,8 @@ class AuthEnvironment {
   // static const apiPath = 'http://10.0.2.2:8000/';
   static BaseOptions dioBaseOptions = BaseOptions(
     baseUrl: apiPath,
-    connectTimeout: Duration(milliseconds: 10000),
-    receiveTimeout: Duration(milliseconds: 10000),
+    connectTimeout: Duration(milliseconds: 20000),
+    receiveTimeout: Duration(milliseconds: 20000),
     contentType: 'application/json',
   );
 }
@@ -49,8 +49,8 @@ class DevEnvironment {
   // static const apiPath = 'http://10.0.2.2:8000/';
   static BaseOptions dioBaseOptions = BaseOptions(
     baseUrl: apiPath,
-    connectTimeout: Duration(milliseconds: 10000),
-    receiveTimeout: Duration(milliseconds: 10000),
+    connectTimeout: Duration(milliseconds: 20000),
+    receiveTimeout: Duration(milliseconds: 20000),
     contentType: 'application/json',
   );
 }

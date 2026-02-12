@@ -16,13 +16,16 @@ import 'package:vivakencanaapp/bloc/approval_pr/approval_pr_list/approval_pr_lis
 import 'package:vivakencanaapp/bloc/approval_pr/approve_pr/approve_pr_bloc.dart';
 import 'package:vivakencanaapp/bloc/stock_opname/mill/mill_bloc.dart';
 import 'package:vivakencanaapp/bloc/stock_opname/prod_master/prod_master_bloc.dart';
+import 'package:vivakencanaapp/bloc/stock_opname/wh_bin/wh_bin_bloc.dart';
 import 'package:vivakencanaapp/data/data_providers/rest_api/approval/approval_pr_rest.dart';
 
 import 'package:vivakencanaapp/bloc/authorization/credentials/credentials_bloc.dart';
+import 'package:vivakencanaapp/data/data_providers/rest_api/stock_opname/bin_rest.dart';
 import 'package:vivakencanaapp/data/repository/approval_pr_repository.dart';
 import 'package:vivakencanaapp/data/repository/stock_opname/mill_repository.dart';
 import 'package:vivakencanaapp/data/repository/stock_opname/opname_repository.dart';
 import 'package:vivakencanaapp/data/repository/stock_opname/opname_stock_dtl_repository.dart';
+import 'package:vivakencanaapp/data/repository/stock_opname/wh_bin_repository.dart';
 import 'package:vivakencanaapp/models/stock_opname/stock_opname_hdr.dart';
 
 import 'bloc/auth/authentication/authentication_bloc.dart';
@@ -107,6 +110,7 @@ void main() async {
   final opnameUpdateRest = OpnameRest(androidKencanaClient);
   final prodMasterRest = ProdMasterRest(kmbClient);
   final barangJadiRest = BarangJadiRest(kmbClient);
+  final whBinRest = WHBinRest(androidKencanaClient);
 
   final authRepository = AuthRepository(
     authRest: authRest,
@@ -123,12 +127,14 @@ void main() async {
   final approvalPrRepository = ApprovalPRRepository(
     approvalPRRest: approvalPrRest,
   );
+
   final millRepository = MillRepository(millRest: millRest);
   final opnameStockHdrRepository = OpnameStockHdrRepository(opnameStockHdrRest);
   final opnameStockDtlRepository = OpnameStockDtlRepository(opnameStockDtlRest);
   final prodMasterRepository = ProdMasterRepository(prodMasterRest);
   final barangJadiRepository = BarangJadiRepository(barangJadiRest);
   final opnameRepository = OpnameRepository(opnameUpdateRest);
+  final binRepository = WHBinRepository(whBinRest);
 
   runApp(
     MultiRepositoryProvider(
@@ -145,6 +151,7 @@ void main() async {
         RepositoryProvider.value(value: prodMasterRepository),
         RepositoryProvider.value(value: barangJadiRepository),
         RepositoryProvider.value(value: opnameRepository),
+        RepositoryProvider.value(value: binRepository),
       ],
       child: MultiBlocProvider(
         providers: [
@@ -255,6 +262,10 @@ void main() async {
           BlocProvider(
             lazy: false,
             create: (_) => OpnameBloc(opnameRepository: opnameRepository),
+          ),
+          BlocProvider(
+            lazy: false,
+            create: (_) => WHBinBloc(whBinRepository: binRepository),
           ),
         ],
         child: const MyApp(),
