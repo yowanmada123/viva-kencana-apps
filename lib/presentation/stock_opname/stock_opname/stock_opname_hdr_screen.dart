@@ -235,7 +235,7 @@ class _OpnameStockHdrViewState extends State<OpnameStockHdrView> {
 
                             // _header('BIN'),
                             _header('TR ID'),
-                            _header('Open Date'),
+                            _header('Date'),
                             // _header('Prod'),
                             // _header('Batch'),
                             _header('Action'),
