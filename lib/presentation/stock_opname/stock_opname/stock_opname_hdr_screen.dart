@@ -8,6 +8,7 @@ import 'package:vivakencanaapp/bloc/stock_opname/stock_opname_hdr/stock_opname_h
 import 'package:vivakencanaapp/bloc/stock_opname/stock_opname_hdr/stock_opname_hdr_state.dart';
 import 'package:vivakencanaapp/models/mill.dart';
 import 'package:vivakencanaapp/presentation/stock_opname/stock_opname/stock_opname_dtl_screen.dart';
+import 'package:vivakencanaapp/utils/datetime_convertion.dart';
 
 class OpnameStockHdrScreen extends StatelessWidget {
   final Mill mill;
@@ -100,14 +101,13 @@ class _OpnameStockHdrViewState extends State<OpnameStockHdrView> {
                 }
 
                 final whList = data.map((e) => e.whId).toSet().toList();
-                final binList = data.map((e) => e.binId).toSet().toList();
+                // final binList = data.map((e) => e.binId).toSet().toList();
 
                 final filteredData =
                     data.where((e) {
                       final whMatch =
                           selectedWh == null || e.whId == selectedWh;
-                      final binMatch =
-                          selectedBin == null || e.binId == selectedBin;
+                      final binMatch = selectedBin == null;
                       return whMatch && binMatch;
                     }).toList();
 
@@ -177,7 +177,7 @@ class _OpnameStockHdrViewState extends State<OpnameStockHdrView> {
                             vertical: 10.h,
                           ),
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
                               _summaryItem(
                                 label: 'Total Data',
@@ -189,11 +189,11 @@ class _OpnameStockHdrViewState extends State<OpnameStockHdrView> {
                                 value: whList.length.toString(),
                                 icon: Icons.warehouse,
                               ),
-                              _summaryItem(
-                                label: 'Bin',
-                                value: binList.length.toString(),
-                                icon: Icons.inventory_2,
-                              ),
+                              // _summaryItem(
+                              //   label: 'Bin',
+                              //   value: binList.length.toString(),
+                              //   icon: Icons.inventory_2,
+                              // ),
                             ],
                           ),
                         ),
@@ -203,20 +203,17 @@ class _OpnameStockHdrViewState extends State<OpnameStockHdrView> {
                     const SizedBox(height: 8),
 
                     /// 🔹 SECTION TITLE
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 8.w),
-                      child: Row(
-                        children: [
-                          const SizedBox(width: 6),
-                          Text(
-                            'Opname Data',
-                            style: TextStyle(
-                              fontSize: 13.w,
-                              fontWeight: FontWeight.w600,
-                            ),
+                    Row(
+                      children: [
+                        const SizedBox(width: 6),
+                        Text(
+                          'Opname Data',
+                          style: TextStyle(
+                            fontSize: 13.w,
+                            fontWeight: FontWeight.w600,
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
 
                     const SizedBox(height: 6),
@@ -225,19 +222,24 @@ class _OpnameStockHdrViewState extends State<OpnameStockHdrView> {
                     Expanded(
                       child: SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
+
                         child: DataTable(
+                          horizontalMargin: 0,
                           headingRowHeight: 36,
-                          dataRowHeight: 40,
+                          // dataRowHeight: 40,
                           columnSpacing: 10,
                           columns: [
-                            _header('Action'),
+                            _header('Category'),
 
                             _header('WH'),
-                            _header('BIN'),
 
+                            // _header('BIN'),
                             _header('TR ID'),
-                            _header('Prod'),
-                            _header('Batch'),
+                            _header('Open Date'),
+                            // _header('Prod'),
+                            // _header('Batch'),
+                            _header('Action'),
+
                             // _header('Qty Awal'),
                             // _header('Qty Opname'),
                           ],
@@ -245,6 +247,18 @@ class _OpnameStockHdrViewState extends State<OpnameStockHdrView> {
                               filteredData.map((e) {
                                 return DataRow(
                                   cells: [
+                                    _cell(e.catDesc),
+                                    _cell(e.whId),
+
+                                    // _cell(e.binId),
+                                    _cell(e.trId),
+                                    _cell(
+                                      e.trDate != null
+                                          ? formatDateDMY(e.trDate)
+                                          : '',
+                                    ),
+                                    // _cell(e.prodCode),
+                                    // _cell(e.batchId),
                                     DataCell(
                                       IconButton(
                                         icon: const Icon(
@@ -268,12 +282,6 @@ class _OpnameStockHdrViewState extends State<OpnameStockHdrView> {
                                         },
                                       ),
                                     ),
-                                    _cell(e.whId),
-                                    _cell(e.binId),
-
-                                    _cell(e.trId),
-                                    _cell(e.prodCode),
-                                    _cell(e.batchId),
 
                                     // _cell(e.qtyAwal.toStringAsFixed(2)),
                                     // _cell(e.qtyOpname.toStringAsFixed(2)),

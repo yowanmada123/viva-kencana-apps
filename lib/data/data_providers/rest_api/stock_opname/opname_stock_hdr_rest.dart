@@ -27,9 +27,9 @@ class OpnameStockHdrRest {
         'api/getOpenOpnameHdrByMillAndPeriod',
         data: {'mill_id': millId, 'wh_id': whId, 'bin_id': binId},
       );
-      // log(
-      //   'Response From ${dio.options.baseUrl}api/getOpenOpnameHdrByMillAndPeriod : $response',
-      // );
+      log(
+        'Response From ${dio.options.baseUrl}api/getOpenOpnameHdrByMillAndPeriod : $response',
+      );
 
       if (response.statusCode == 200) {
         final List list = response.data['data']['data'];

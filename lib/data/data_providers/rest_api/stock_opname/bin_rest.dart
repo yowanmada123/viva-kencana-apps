@@ -12,12 +12,13 @@ class WHBinRest {
     required String millId,
     required String whId,
   }) async {
-    log('payload : $millId & $whId');
+    // log('payload : $millId & $whId');
+    log('Request to : api/listWHBinKMB');
     final res = await dio.post(
       'api/listWHBinKMB',
       queryParameters: {'mill_id': millId, 'wh_id': whId},
     );
-    log('Reseponse listWHBinKMB : $res');
+    // log('Reseponse listWHBinKMB : $res');
 
     final List data = res.data['data'];
     return data.map((e) => WHBin.fromMap(e)).toList();

@@ -195,8 +195,51 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
         /// ================= BODY =================
         body: Column(
           children: [
+            Row(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 8.0, top: 8.0),
+                  child: Text(
+                    'TR ID: ${widget.trId}',
+                    style: TextStyle(
+                      fontSize: 16.w,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 8.0, top: 2.0),
+              child: Row(
+                children: [
+                  Icon(Icons.cabin, size: 18, color: Colors.grey.shade700),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Warehouse ID: ${widget.whId}',
+                    style: TextStyle(fontSize: 12.w, color: Colors.grey),
+                  ),
+                ],
+              ),
+            ),
+
             /// ================= FILTER SECTION =================
             _filterSection(),
+            Row(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 8.0, top: 4.0),
+                  child: Text(
+                    'Stock Opname List',
+                    style: TextStyle(
+                      fontSize: 14.w,
+                      fontWeight: FontWeight.w600,
+                      color: const Color.fromARGB(255, 100, 100, 100),
+                    ),
+                  ),
+                ),
+              ],
+            ),
 
             /// ================= LIST SECTION =================
             Expanded(
@@ -635,6 +678,9 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
   Widget _addFormContent() {
     return Column(
       children: [
+        /// ================= PRODUCT CODE =================
+        _readonlyCtrl('Product Code', prodCodeCtrl),
+
         /// ================= NAMA BARANG =================
         Padding(
           padding: EdgeInsets.only(bottom: 8.0),
@@ -655,8 +701,6 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
             ),
           ),
         ),
-
-        /// ================= SEARCH RESULT =================
         BlocBuilder<BarangJadiBloc, BarangJadiState>(
           builder: (context, state) {
             if (state is BarangJadiLoading) {
@@ -706,8 +750,45 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
           },
         ),
 
-        _readonlyCtrl('Product Code', prodCodeCtrl),
-        _readonlyCtrl('Quality ID', qualityId),
+        _editableLong('Panjang', panjangCtrl),
+
+        BlocBuilder<ProdMasterBloc, ProdMasterState>(
+          builder: (context, state) {
+            if (state is! ProdMasterLoaded) return const SizedBox();
+
+            return SizedBox(
+              height: 40,
+              child: DropdownButtonFormField<String>(
+                style: TextStyle(fontSize: 12, color: Colors.black),
+                isExpanded: true, // ⬅️ WAJIB
+                value: torId.isEmpty ? null : torId,
+                decoration: InputDecoration(
+                  labelText: 'Tor ID',
+                  border: border,
+                  isDense: true,
+                  labelStyle: TextStyle(fontSize: 12),
+                ),
+                items:
+                    state.prodTor.map((e) {
+                      return DropdownMenuItem(
+                        value: e.torId,
+                        child: Text(
+                          '${e.torId} - ${e.descr}',
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      );
+                    }).toList(),
+                onChanged: (v) {
+                  setState(() {
+                    torId = v ?? '';
+                  });
+                },
+              ),
+            );
+          },
+        ),
+
+        const SizedBox(height: 8),
 
         /// ================= ADD ID =================
         BlocBuilder<ProdMasterBloc, ProdMasterState>(
@@ -762,54 +843,18 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
 
         const SizedBox(height: 8),
 
-        /// ================= TOR ID =================
-        BlocBuilder<ProdMasterBloc, ProdMasterState>(
-          builder: (context, state) {
-            if (state is! ProdMasterLoaded) return const SizedBox();
-
-            return SizedBox(
-              height: 40,
-              child: DropdownButtonFormField<String>(
-                style: TextStyle(fontSize: 12, color: Colors.black),
-                isExpanded: true, // ⬅️ WAJIB
-                value: torId.isEmpty ? null : torId,
-                decoration: InputDecoration(
-                  labelText: 'Tor ID',
-                  border: border,
-                  isDense: true,
-                  labelStyle: TextStyle(fontSize: 12),
-                ),
-                items:
-                    state.prodTor.map((e) {
-                      return DropdownMenuItem(
-                        value: e.torId,
-                        child: Text(
-                          '${e.torId} - ${e.descr}',
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      );
-                    }).toList(),
-                onChanged: (v) {
-                  setState(() {
-                    torId = v ?? '';
-                  });
-                },
-              ),
-            );
-          },
-        ),
-
-        const SizedBox(height: 8),
-
+        /// ================= SEARCH RESULT =================
         /// ================= INPUT LAIN =================
-        _editable('Qty Opname*', qtyCtrl),
-        _editableLong('Panjang', panjangCtrl),
         _editable('Batch', batchCtrl),
-        _editable('Remark', remarkCtrl),
+        _editable('Qty Opname*', qtyCtrl),
 
+        /// ================= TOR ID =================
+
+        // _readonlyCtrl('Quality ID', qualityId),
+        // _editable('Remark', remarkCtrl),
         const SizedBox(height: 8),
-        _readonly('TR ID', widget.trId),
-        _readonly('WH ID', widget.whId),
+        // _readonly('TR ID', widget.trId),
+        // _readonly('WH ID', widget.whId),
         _binDropdown(),
       ],
     );
@@ -819,10 +864,9 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
   Widget _popupContent() {
     return Column(
       children: [
-        _readonlyCtrl('Nama Barang', namaBarangCtrl),
         _readonlyCtrl('Product Code', prodCodeCtrl),
-        _editable('Qty Opname*', qtyCtrl),
-        _readonly('Quality ID', qualityId.text),
+        _readonlyCtrl('Nama Barang', namaBarangCtrl),
+        _editableLong('Panjang', panjangCtrl),
 
         /// ================= ADD ID =================
         BlocBuilder<ProdMasterBloc, ProdMasterState>(
@@ -915,16 +959,18 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
         ),
         const SizedBox(height: 8),
 
+        _editable('Batch', batchCtrl),
+        _editable('Qty Opname*', qtyCtrl),
+        // _editable('Remark', remarkCtrl),
+
+        // _readonly('Quality ID', qualityId.text),
+
         // _readonly('Add ID', addId),
         // _readonly('Tor ID', torId),
-        _editableLong('Panjang', panjangCtrl),
-        _editable('Batch', batchCtrl),
-        _editable('Remark', remarkCtrl),
-
-        const SizedBox(height: 8),
-        _readonly('TR ID', widget.trId),
-        _readonly('WH ID', widget.whId),
-        _readonly('BIN ID', binId ?? '-'),
+        // const SizedBox(height: 8),
+        // _readonly('TR ID', widget.trId),
+        // _readonly('WH ID', widget.whId),
+        // _readonly('BIN ID', binId ?? '-'),
       ],
     );
   }
@@ -1070,7 +1116,7 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: SizedBox(
-        height: 40,
+        height: 45,
         child: TextField(
           controller: ctrl,
           readOnly: true,

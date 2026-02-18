@@ -1,163 +1,143 @@
 import 'dart:convert';
 
 class StockOpnameHdr {
-  final String trId;
   final String millId;
-  final String prodCode;
-  final String addId;
-  final String torId;
-  final double panjang;
-  final String batchId;
+  final String trId;
+  final DateTime trDate;
   final String whId;
-  final String binId;
-  final double qtyAwal;
-  final double qtyOpname;
+  final String categoryId;
+  final String catDesc; // 🔥 hasil join barangjadi_mst_cat
   final String remark;
-  final DateTime? dtCek;
+  final DateTime? dtFinish;
+  final String stat;
   final DateTime? dtModified;
   final String userId;
-  final String coilId;
+  final String trType;
+  final DateTime? dtCek;
 
   StockOpnameHdr({
-    required this.trId,
     required this.millId,
-    required this.prodCode,
-    required this.addId,
-    required this.torId,
-    required this.panjang,
-    required this.batchId,
+    required this.trId,
+    required this.trDate,
     required this.whId,
-    required this.binId,
-    required this.qtyAwal,
-    required this.qtyOpname,
+    required this.categoryId,
+    required this.catDesc,
     required this.remark,
-    required this.dtCek,
+    required this.dtFinish,
+    required this.stat,
     required this.dtModified,
     required this.userId,
-    required this.coilId,
+    required this.trType,
+    required this.dtCek,
   });
 
-  /// =======================
-  /// COPY WITH
-  /// =======================
+  // =======================
+  // COPY WITH
+  // =======================
   StockOpnameHdr copyWith({
-    String? trId,
     String? millId,
-    String? prodCode,
-    String? addId,
-    String? torId,
-    double? panjang,
-    String? batchId,
+    String? trId,
+    DateTime? trDate,
     String? whId,
-    String? binId,
-    double? qtyAwal,
-    double? qtyOpname,
+    String? categoryId,
+    String? catDesc,
     String? remark,
-    DateTime? dtCek,
+    DateTime? dtFinish,
+    String? stat,
     DateTime? dtModified,
     String? userId,
-    String? coilId,
+    String? trType,
+    DateTime? dtCek,
   }) {
     return StockOpnameHdr(
-      trId: trId ?? this.trId,
       millId: millId ?? this.millId,
-      prodCode: prodCode ?? this.prodCode,
-      addId: addId ?? this.addId,
-      torId: torId ?? this.torId,
-      panjang: panjang ?? this.panjang,
-      batchId: batchId ?? this.batchId,
+      trId: trId ?? this.trId,
+      trDate: trDate ?? this.trDate,
       whId: whId ?? this.whId,
-      binId: binId ?? this.binId,
-      qtyAwal: qtyAwal ?? this.qtyAwal,
-      qtyOpname: qtyOpname ?? this.qtyOpname,
+      categoryId: categoryId ?? this.categoryId,
+      catDesc: catDesc ?? this.catDesc,
       remark: remark ?? this.remark,
-      dtCek: dtCek ?? this.dtCek,
+      dtFinish: dtFinish ?? this.dtFinish,
+      stat: stat ?? this.stat,
       dtModified: dtModified ?? this.dtModified,
       userId: userId ?? this.userId,
-      coilId: coilId ?? this.coilId,
+      trType: trType ?? this.trType,
+      dtCek: dtCek ?? this.dtCek,
     );
   }
 
-  /// =======================
-  /// TO MAP
-  /// =======================
+  // =======================
+  // TO MAP (REQUEST / LOCAL)
+  // =======================
   Map<String, dynamic> toMap() {
     return {
-      'tr_id': trId,
       'mill_id': millId,
-      'prod_code': prodCode,
-      'add_id': addId,
-      'tor_id': torId,
-      'panjang': panjang,
-      'batch_id': batchId,
+      'tr_id': trId,
+      'tr_date': trDate.toIso8601String(),
       'wh_id': whId,
-      'bin_id': binId,
-      'qty_awal': qtyAwal,
-      'qty_opname': qtyOpname,
+      'category_id': categoryId,
+      'cat_desc': catDesc,
       'remark': remark,
-      'dt_cek': dtCek?.toIso8601String(),
+      'dt_finish': dtFinish?.toIso8601String(),
+      'stat': stat,
       'dt_modified': dtModified?.toIso8601String(),
       'user_id': userId,
-      'coil_id': coilId,
+      'tr_type': trType,
+      'dt_cek': dtCek?.toIso8601String(),
     };
   }
 
-  /// =======================
-  /// FROM MAP (API RESPONSE)
-  /// =======================
+  // =======================
+  // FROM MAP (API RESPONSE)
+  // =======================
   factory StockOpnameHdr.fromMap(Map<String, dynamic> map) {
     return StockOpnameHdr(
-      trId: map['tr_id'] ?? '',
       millId: map['mill_id'] ?? '',
-      prodCode: map['prod_code'] ?? '',
-      addId: map['add_id'] ?? '',
-      torId: map['tor_id'] ?? '',
-      panjang: (map['panjang'] ?? 0).toDouble(),
-      batchId: map['batch_id'] ?? '',
+      trId: map['tr_id'] ?? '',
+      trDate:
+          map['tr_date'] != null
+              ? DateTime.parse(map['tr_date'])
+              : DateTime.now(),
       whId: map['wh_id'] ?? '',
-      binId: map['bin_id'] ?? '',
-      qtyAwal: (map['qty_awal'] ?? 0).toDouble(),
-      qtyOpname: (map['qty_opname'] ?? 0).toDouble(),
+      categoryId: map['category_id'] ?? '',
+      catDesc: map['cat_desc'] ?? '',
       remark: map['remark'] ?? '',
-      dtCek: map['dt_cek'] != null ? DateTime.parse(map['dt_cek']) : null,
+      dtFinish:
+          map['dt_finish'] != null &&
+                  !map['dt_finish'].toString().startsWith('1900')
+              ? DateTime.parse(map['dt_finish'])
+              : null,
+      stat: map['stat'] ?? '',
       dtModified:
           map['dt_modified'] != null
               ? DateTime.parse(map['dt_modified'])
               : null,
       userId: map['user_id'] ?? '',
-      coilId: map['coil_id'] ?? '',
+      trType: map['tr_type'] ?? '',
+      dtCek: map['dt_cek'] != null ? DateTime.parse(map['dt_cek']) : null,
     );
   }
 
-  /// =======================
-  /// JSON
-  /// =======================
+  // =======================
+  // JSON
+  // =======================
   String toJson() => json.encode(toMap());
 
   factory StockOpnameHdr.fromJson(String source) =>
       StockOpnameHdr.fromMap(json.decode(source));
 
   @override
-  String toString() {
-    return 'StockOpnameHdr(tr_id: $trId, mill_id: $millId, prod_code: $prodCode, qty_opname: $qtyOpname)';
-  }
-
-  @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
 
     return other is StockOpnameHdr &&
-        other.trId == trId &&
         other.millId == millId &&
-        other.prodCode == prodCode &&
-        other.batchId == batchId;
+        other.trId == trId &&
+        other.categoryId == categoryId;
   }
 
   @override
   int get hashCode {
-    return trId.hashCode ^
-        millId.hashCode ^
-        prodCode.hashCode ^
-        batchId.hashCode;
+    return millId.hashCode ^ trId.hashCode ^ categoryId.hashCode;
   }
 }
