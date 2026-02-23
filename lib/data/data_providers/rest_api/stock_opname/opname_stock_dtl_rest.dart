@@ -32,9 +32,9 @@ class OpnameStockDtlRest {
           'batch_id': batchId,
         },
       );
-      // log(
-      //   'Response From ${dio.options.baseUrl}api/getOpnameDetail : $response',
-      // );
+      log(
+        'Response From ${dio.options.baseUrl}api/getOpnameDetail : $response',
+      );
 
       if (response.statusCode == 200) {
         final List list = response.data['data']['data'];

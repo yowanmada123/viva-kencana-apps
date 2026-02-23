@@ -24,11 +24,13 @@ class OpnameRest {
       // log('response body: $response');
 
       if (response.statusCode == 200) {
+        log('Response: $response');
         return Right(response.data['data']);
       }
 
       return Left(NetUtils.parseErrorResponse(response: response.data));
     } on DioException catch (e) {
+      log('DIO ERROR STATUS : ${e.response}');
       log('DIO ERROR STATUS : ${e.response?.statusCode}');
       log('DIO ERROR DATA   : ${e.response?.data}');
       log('DIO ERROR MSG    : ${e.message}');

@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -11,8 +10,8 @@ import 'package:vivakencanaapp/bloc/stock_opname/barang_jadi_list/barang_jadi_bl
 import 'package:vivakencanaapp/bloc/stock_opname/prod_master/prod_master_bloc.dart';
 import 'package:vivakencanaapp/bloc/stock_opname/stock_opname_dtl/stock_opname_dtl_bloc.dart';
 import 'package:vivakencanaapp/bloc/stock_opname/wh_bin/wh_bin_bloc.dart';
-import 'package:vivakencanaapp/data/data_providers/rest_api/stock_opname/bin_rest.dart';
 import 'package:vivakencanaapp/models/stock_opname/stock_opname_dtl.dart';
+import 'package:vivakencanaapp/models/stock_opname/stock_opname_hdr.dart';
 
 import '../../../bloc/stock_opname/opname_update/opname_update_bloc.dart';
 import '../../../data/data_providers/shared-preferences/shared_preferences_manager.dart';
@@ -20,55 +19,35 @@ import '../../../data/data_providers/shared-preferences/shared_preferences_manag
 /// ================= POPUP MODE =================
 enum OpnamePopupMode { fromList, fromScan, addNew }
 
-class OpnameStockDtlScreen extends StatelessWidget {
-  final String trId;
-  final String millId;
-  final String whId;
+enum OpnameUpdateMode { overwrite, add }
 
-  const OpnameStockDtlScreen({
-    super.key,
-    required this.trId,
-    required this.millId,
-    required this.whId,
-  });
+class OpnameStockDtlScreen extends StatelessWidget {
+  final StockOpnameHdr e;
+
+  const OpnameStockDtlScreen({super.key, required this.e});
 
   @override
   Widget build(BuildContext context) {
-    log('Access OpnameStockDtlScreen');
-
     return MultiBlocProvider(
       providers: [
-        BlocProvider.value(
-          value:
-              context.read<StockOpnameDtlBloc>()..add(
-                LoadStockOpnameDtl(trId: trId, millId: millId, whId: whId),
-              ),
-        ),
         BlocProvider.value(
           value: context.read<ProdMasterBloc>()..add(LoadProdMaster()),
         ),
         BlocProvider.value(
           value:
               context.read<WHBinBloc>()
-                ..add(LoadWHBin(millId: millId, whId: whId)),
+                ..add(LoadWHBin(millId: e.millId, whId: e.whId)),
         ),
       ],
-      child: OpnameStockDtlView(trId: trId, millId: millId, whId: whId),
+      child: OpnameStockDtlView(e: e),
     );
   }
 }
 
 class OpnameStockDtlView extends StatefulWidget {
-  final String trId;
-  final String millId;
-  final String whId;
+  final StockOpnameHdr e;
 
-  const OpnameStockDtlView({
-    super.key,
-    required this.trId,
-    required this.millId,
-    required this.whId,
-  });
+  const OpnameStockDtlView({super.key, required this.e});
 
   @override
   State<OpnameStockDtlView> createState() => _OpnameStockDtlViewState();
@@ -78,12 +57,15 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
   /// ================= LIST =================
   final TextEditingController _searchCtrl = TextEditingController();
   String? binId;
-  String? batchId;
+  // String? batchId;
   bool isFromScan = false;
+  StockOpnameDtl? _selectedItem;
 
   /// ================= SCANNER =================
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
   QRViewController? qrController;
+  bool _shouldApplyBinFilter = false;
+  List<StockOpnameDtl> _binFilteredData = [];
 
   /// ================= POPUP CONTROLLERS =================
   final TextEditingController namaBarangCtrl = TextEditingController();
@@ -131,29 +113,63 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
   /// ================= BUILD =================
   @override
   Widget build(BuildContext context) {
-    return BlocListener<OpnameBloc, OpnameState>(
-      listener: (context, state) {
-        if (state is OpnameSuccess) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Opname berhasil disimpan')),
-          );
+    return MultiBlocListener(
+      listeners: [
+        /// ✅ FIX 1: FILTER DIJALANKAN SETELAH DATA LOADED
+        BlocListener<StockOpnameDtlBloc, StockOpnameDtlState>(
+          listener: (context, state) {
+            if (state is StockOpnameDtlLoaded &&
+                _shouldApplyBinFilter &&
+                binId != null) {
+              _shouldApplyBinFilter = false;
 
-          // reload list
-          context.read<StockOpnameDtlBloc>().add(
-            LoadStockOpnameDtl(
-              trId: widget.trId,
-              millId: widget.millId,
-              whId: widget.whId,
-            ),
-          );
-        }
+              final filtered =
+                  state.allData.where((e) => e.binId == binId).toList();
 
-        if (state is OpnameError) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text(state.message)));
-        }
-      },
+              setState(() {
+                _binFilteredData = filtered;
+              });
+
+              context.read<StockOpnameDtlBloc>().add(
+                FilterBinBatchStockOpnameDtl(binId: binId),
+              );
+            }
+          },
+        ),
+
+        BlocListener<OpnameBloc, OpnameState>(
+          listener: (context, state) {
+            if (state is OpnameSuccess) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Opname berhasil disimpan')),
+              );
+
+              _searchCtrl.clear();
+
+              // 🔥 RESET SELECTED ITEM
+              _selectedItem = null;
+
+              // 🔥 FORCE RELOAD LIST OPNAME
+              if (binId != null) {
+                context.read<StockOpnameDtlBloc>().add(
+                  LoadStockOpnameDtl(
+                    trId: widget.e.trId,
+                    millId: widget.e.millId,
+                    whId: widget.e.whId,
+                    binId: binId!,
+                  ),
+                );
+              }
+            }
+
+            if (state is OpnameError) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Gagal Opname, ${state.message}')),
+              );
+            }
+          },
+        ),
+      ],
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: Theme.of(context).primaryColor,
@@ -200,7 +216,7 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
                 Padding(
                   padding: const EdgeInsets.only(left: 8.0, top: 8.0),
                   child: Text(
-                    'TR ID: ${widget.trId}',
+                    'TR ID: ${widget.e.trId}',
                     style: TextStyle(
                       fontSize: 16.w,
                       fontWeight: FontWeight.w600,
@@ -210,14 +226,28 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
               ],
             ),
             Padding(
-              padding: const EdgeInsets.only(left: 8.0, top: 2.0),
+              padding: const EdgeInsets.only(left: 8.0, top: 4.0),
               child: Row(
                 children: [
                   Icon(Icons.cabin, size: 18, color: Colors.grey.shade700),
                   const SizedBox(width: 8),
                   Text(
-                    'Warehouse ID: ${widget.whId}',
+                    'Warehouse ID: ${widget.e.whId}',
                     style: TextStyle(fontSize: 12.w, color: Colors.grey),
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 8.0, top: 4.0),
+              child: Row(
+                children: [
+                  Text(
+                    'Category: ${widget.e.catDesc}',
+                    style: TextStyle(
+                      fontSize: 12.w,
+                      color: const Color.fromARGB(255, 15, 15, 15),
+                    ),
                   ),
                 ],
               ),
@@ -243,43 +273,54 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
 
             /// ================= LIST SECTION =================
             Expanded(
-              child: BlocBuilder<StockOpnameDtlBloc, StockOpnameDtlState>(
-                builder: (context, state) {
-                  if (state is StockOpnameDtlLoading) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-                  if (state is StockOpnameDtlError) {
-                    return Center(child: Text(state.message));
-                  }
-                  if (state is StockOpnameDtlLoaded) {
-                    if (state.filteredData.isEmpty) {
-                      return const Center(
+              child:
+                  binId == null
+                      ? const Center(
                         child: Text(
-                          'Data opname tidak ditemukan',
+                          'Silakan pilih BIN terlebih dahulu',
                           style: TextStyle(fontSize: 12),
                         ),
-                      );
-                    }
-
-                    return ListView.builder(
-                      itemCount: state.filteredData.length,
-                      itemBuilder: (_, i) {
-                        final item = state.filteredData[i];
-                        return InkWell(
-                          onTap: () {
-                            _openForm(
-                              mode: OpnamePopupMode.fromList,
-                              data: item,
+                      )
+                      : BlocBuilder<StockOpnameDtlBloc, StockOpnameDtlState>(
+                        builder: (context, state) {
+                          if (state is StockOpnameDtlLoading) {
+                            return const Center(
+                              child: CircularProgressIndicator(),
                             );
-                          },
-                          child: _item(item),
-                        );
-                      },
-                    );
-                  }
-                  return const SizedBox();
-                },
-              ),
+                          }
+                          if (state is StockOpnameDtlError) {
+                            return Center(child: Text(state.message));
+                          }
+                          if (state is StockOpnameDtlLoaded) {
+                            if (state.filteredData.isEmpty) {
+                              return const Center(
+                                child: Text(
+                                  'Data opname tidak ditemukan',
+                                  style: TextStyle(fontSize: 12),
+                                ),
+                              );
+                            }
+
+                            return ListView.builder(
+                              itemCount: state.filteredData.length,
+                              itemBuilder: (_, i) {
+                                final item = state.filteredData[i];
+                                return InkWell(
+                                  onTap: () {
+                                    _selectedItem = item;
+                                    _openForm(
+                                      mode: OpnamePopupMode.fromList,
+                                      data: item,
+                                    );
+                                  },
+                                  child: _item(item),
+                                );
+                              },
+                            );
+                          }
+                          return const SizedBox();
+                        },
+                      ),
             ),
           ],
         ),
@@ -291,177 +332,128 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
   Widget _filterSection() {
     return Padding(
       padding: const EdgeInsets.all(8),
-      child: BlocBuilder<StockOpnameDtlBloc, StockOpnameDtlState>(
-        builder: (context, state) {
-          if (state is! StockOpnameDtlLoaded) return const SizedBox();
+      child: Row(
+        children: [
+          /// SEARCH — 3/4 WIDTH
+          Expanded(
+            flex: 3,
+            child: SizedBox(
+              height: 40,
+              child: TextField(
+                controller: _searchCtrl,
+                enabled: binId != null,
+                onChanged: (v) {
+                  if (binId == null) return;
 
-          // final bins = state.binBatchMap.keys.toList()..sort();
-          final batches =
-              binId == null
-                    ? <String>[]
-                    : (state.binBatchMap[binId] ?? <String>{}).toList()
-                ..sort();
+                  final keyword = v.toLowerCase();
 
-          return Column(
-            children: [
-              SizedBox(
-                height: 40,
-                child: TextField(
-                  controller: _searchCtrl,
-                  onChanged:
-                      (v) => context.read<StockOpnameDtlBloc>().add(
-                        SearchStockOpnameDtl(v),
-                      ),
-                  style: const TextStyle(fontSize: 12),
-                  decoration: InputDecoration(
-                    isDense: true,
-                    prefixIcon: const Icon(Icons.search, size: 14),
-                    hintText: 'Cari Nama Barang / Kode',
-                    border: border,
-                  ),
+                  final result =
+                      keyword.isEmpty
+                          ? _binFilteredData
+                          : _binFilteredData
+                              .where(
+                                (e) =>
+                                    e.namaBarang.toLowerCase().contains(
+                                      keyword,
+                                    ) ||
+                                    e.prodCode.toLowerCase().contains(keyword),
+                              )
+                              .toList();
+
+                  context.read<StockOpnameDtlBloc>().emit(
+                    StockOpnameDtlLoaded(
+                      allData: _binFilteredData,
+                      filteredData: result,
+                      binBatchMap: {},
+                    ),
+                  );
+                },
+                style: const TextStyle(fontSize: 12),
+                decoration: InputDecoration(
+                  isDense: true,
+                  prefixIcon: const Icon(Icons.search, size: 14),
+                  hintText: 'Cari Nama Barang / Kode',
+                  border: border,
                 ),
               ),
-              const SizedBox(height: 8),
-              SizedBox(
-                height: 40,
-                child: Row(
-                  children: [
-                    BlocBuilder<WHBinBloc, WHBinState>(
-                      builder: (context, binState) {
-                        if (binState is WHBinLoading) {
-                          return const SizedBox(height: 40);
-                        }
+            ),
+          ),
 
-                        if (binState is WHBinError) {
-                          return Expanded(
-                            child: Text(
-                              binState.message,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(fontSize: 12),
-                            ),
-                          );
-                        }
+          const SizedBox(width: 8),
 
-                        if (binState is WHBinLoaded) {
-                          final bins = binState.data;
+          /// BIN — 1/4 WIDTH
+          Expanded(
+            flex: 1,
+            child: SizedBox(
+              height: 40,
+              child: BlocBuilder<WHBinBloc, WHBinState>(
+                builder: (context, binState) {
+                  if (binState is WHBinLoading) {
+                    return const SizedBox();
+                  }
 
-                          return Expanded(
-                            child: DropdownButtonFormField<String>(
-                              value: binId,
-                              style: const TextStyle(
-                                fontSize: 12,
-                                color: Colors.black,
-                              ),
-                              decoration: InputDecoration(
-                                labelText: 'BIN',
-                                labelStyle: const TextStyle(fontSize: 12),
-                                isDense: true,
-                                border: border,
-                              ),
-                              items:
-                                  bins.map((e) {
-                                    return DropdownMenuItem<String>(
-                                      value: e.binId,
-                                      child: Text(
-                                        e.binId,
-                                        style: const TextStyle(fontSize: 10),
-                                      ),
-                                    );
-                                  }).toList(),
-                              onChanged: (v) {
-                                setState(() {
-                                  binId = v;
-                                  batchId = null;
-                                });
+                  if (binState is WHBinError) {
+                    return Text(
+                      binState.message,
+                      style: const TextStyle(fontSize: 12),
+                    );
+                  }
 
-                                context.read<StockOpnameDtlBloc>().add(
-                                  FilterBinBatchStockOpnameDtl(binId: binId),
-                                );
-                              },
-                            ),
-                          );
-                        }
-                        return Container();
-                      },
+                  if (binState is! WHBinLoaded) {
+                    return const SizedBox();
+                  }
+
+                  return DropdownButtonFormField<String>(
+                    value: binId,
+                    isExpanded: true,
+                    style: const TextStyle(fontSize: 12, color: Colors.black),
+                    decoration: InputDecoration(
+                      isDense: true,
+                      // prefixIcon: const Icon(Icons.warehouse, size: 14),
+                      labelText: 'BIN',
+                      labelStyle: const TextStyle(fontSize: 8),
+                      border: border,
                     ),
+                    items:
+                        binState.data
+                            .map(
+                              (e) => DropdownMenuItem(
+                                value: e.binId,
+                                child: Text(
+                                  e.binId,
+                                  style: const TextStyle(fontSize: 10),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            )
+                            .toList(),
+                    onChanged: (v) {
+                      if (v == null) return;
 
-                    // Expanded(
-                    //   child: DropdownButtonFormField<String>(
-                    //     value: binId,
-                    //     style: TextStyle(fontSize: 12, color: Colors.black),
-                    //     decoration: InputDecoration(
-                    //       labelText: 'BIN',
-                    //       labelStyle: TextStyle(fontSize: 12),
-                    //       isDense: true,
-                    //       border: border,
-                    //     ),
-                    //     items:
-                    //         bins
-                    //             .map(
-                    //               (e) => DropdownMenuItem(
-                    //                 value: e,
-                    //                 child: Text(
-                    //                   e,
-                    //                   style: const TextStyle(fontSize: 10),
-                    //                 ),
-                    //               ),
-                    //             )
-                    //             .toList(),
-                    //     onChanged: (v) {
-                    //       setState(() {
-                    //         binId = v;
-                    //         batchId = null;
-                    //       });
-                    //       context.read<StockOpnameDtlBloc>().add(
-                    //         FilterBinBatchStockOpnameDtl(binId: binId),
-                    //       );
-                    //     },
-                    //   ),
-                    // ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: DropdownButtonFormField<String>(
-                        value: batchId,
-                        style: TextStyle(fontSize: 12, color: Colors.black),
-                        decoration: InputDecoration(
-                          labelText: 'Batch',
-                          labelStyle: TextStyle(fontSize: 12),
-                          isDense: true,
-                          border: border,
+                      setState(() {
+                        binId = v;
+                        _shouldApplyBinFilter = true;
+                      });
+
+                      context.read<StockOpnameDtlBloc>().add(
+                        LoadStockOpnameDtl(
+                          trId: widget.e.trId,
+                          millId: widget.e.millId,
+                          whId: widget.e.whId,
+                          binId: v,
                         ),
-                        items:
-                            batches
-                                .map(
-                                  (e) => DropdownMenuItem(
-                                    value: e,
-                                    child: Text(
-                                      e,
-                                      style: const TextStyle(fontSize: 10),
-                                    ),
-                                  ),
-                                )
-                                .toList(),
-                        onChanged:
-                            batches.isEmpty
-                                ? null
-                                : (v) {
-                                  setState(() => batchId = v);
-                                  context.read<StockOpnameDtlBloc>().add(
-                                    FilterBinBatchStockOpnameDtl(
-                                      binId: binId,
-                                      batchId: batchId,
-                                    ),
-                                  );
-                                },
-                      ),
-                    ),
-                  ],
-                ),
+                      );
+
+                      context.read<StockOpnameDtlBloc>().add(
+                        FilterBinBatchStockOpnameDtl(binId: v),
+                      );
+                    },
+                  );
+                },
               ),
-            ],
-          );
-        },
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -595,14 +587,6 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
       binId = data.binId;
     }
 
-    // if (mode == OpnamePopupMode.fromScan && scanResult != null) {
-    //   prodCodeCtrl.text = scanResult['prod_code'] ?? '';
-    //   batchCtrl.text = scanResult['batch_id'] ?? '';
-    //   panjangCtrl.text = scanResult['panjang']?.toString() ?? '';
-    //   qualityId.text = scanResult['quality_id'] ?? '';
-    //   ordFlag = scanResult['ord_flag'] ?? 'N';
-    // }
-
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -659,14 +643,9 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
           Expanded(
             child: ElevatedButton(
               onPressed: () {
-                _submitOpname();
-                Navigator.pop(context);
-                // mode == OpnamePopupMode.addNew
-                //     ? _addOpname(qtyCtrl.text)
-                //     : _updateOpname(qtyCtrl.text);
-                // Navigator.pop(context);
+                _handleSubmitWithCheck();
               },
-              child: Text(mode == OpnamePopupMode.addNew ? 'Tambah' : 'Update'),
+              child: Text('Simpan'),
             ),
           ),
         ],
@@ -787,10 +766,7 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
             );
           },
         ),
-
         const SizedBox(height: 8),
-
-        /// ================= ADD ID =================
         BlocBuilder<ProdMasterBloc, ProdMasterState>(
           builder: (context, state) {
             // log('STATE PROD MASTER = $state');
@@ -840,21 +816,10 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
             );
           },
         ),
-
         const SizedBox(height: 8),
-
-        /// ================= SEARCH RESULT =================
-        /// ================= INPUT LAIN =================
-        _editable('Batch', batchCtrl),
-        _editable('Qty Opname*', qtyCtrl),
-
-        /// ================= TOR ID =================
-
-        // _readonlyCtrl('Quality ID', qualityId),
-        // _editable('Remark', remarkCtrl),
+        // _editable('Batch', batchCtrl),
+        _qtytable('Qty Opname*', qtyCtrl),
         const SizedBox(height: 8),
-        // _readonly('TR ID', widget.trId),
-        // _readonly('WH ID', widget.whId),
         _binDropdown(),
       ],
     );
@@ -867,8 +832,6 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
         _readonlyCtrl('Product Code', prodCodeCtrl),
         _readonlyCtrl('Nama Barang', namaBarangCtrl),
         _editableLong('Panjang', panjangCtrl),
-
-        /// ================= ADD ID =================
         BlocBuilder<ProdMasterBloc, ProdMasterState>(
           builder: (context, state) {
             // log('STATE PROD MASTER = $state');
@@ -918,10 +881,7 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
             );
           },
         ),
-
         const SizedBox(height: 8),
-
-        /// ================= TOR ID =================
         BlocBuilder<ProdMasterBloc, ProdMasterState>(
           builder: (context, state) {
             if (state is! ProdMasterLoaded) return const SizedBox();
@@ -958,19 +918,8 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
           },
         ),
         const SizedBox(height: 8),
-
-        _editable('Batch', batchCtrl),
-        _editable('Qty Opname*', qtyCtrl),
-        // _editable('Remark', remarkCtrl),
-
-        // _readonly('Quality ID', qualityId.text),
-
-        // _readonly('Add ID', addId),
-        // _readonly('Tor ID', torId),
-        // const SizedBox(height: 8),
-        // _readonly('TR ID', widget.trId),
-        // _readonly('WH ID', widget.whId),
-        // _readonly('BIN ID', binId ?? '-'),
+        // _editable('Batch', batchCtrl),
+        _qtytable('Qty Opname*', qtyCtrl),
       ],
     );
   }
@@ -990,10 +939,10 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
     // print("userId2 : $userId");
     context.read<OpnameBloc>().add(
       SubmitOpnameUpdate(
-        millId: widget.millId,
-        whId: widget.whId,
+        millId: widget.e.millId,
+        whId: widget.e.whId,
         binId: binId ?? '',
-        trId: widget.trId,
+        trId: widget.e.trId,
         prodCode: prodCodeCtrl.text,
         addId: addId,
         torId: torId,
@@ -1007,19 +956,30 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
     );
   }
 
-  /// ================= FIELD HELPERS =================
-  Widget _editable(String label, TextEditingController ctrl) {
+  Widget _qtytable(String label, TextEditingController ctrl) {
+    OutlineInputBorder greenBorder = OutlineInputBorder(
+      borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 1),
+    );
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: SizedBox(
         height: 40,
         child: TextField(
           controller: ctrl,
-          style: const TextStyle(fontSize: 12),
+          style: TextStyle(fontSize: 12, color: Theme.of(context).primaryColor),
           decoration: InputDecoration(
             labelText: label,
-            border: border,
-            labelStyle: TextStyle(fontSize: 12),
+            labelStyle: TextStyle(
+              fontSize: 12,
+              color: Theme.of(context).primaryColor,
+            ),
+            enabledBorder: greenBorder,
+            focusedBorder: greenBorder,
+            disabledBorder: greenBorder,
+            errorBorder: greenBorder,
+            focusedErrorBorder: greenBorder,
+            border: greenBorder,
           ),
         ),
       ),
@@ -1144,6 +1104,80 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
       ),
       trailing: Text('Opn: ${e.qtyOpname}'),
     );
+  }
+
+  void _showOverwriteDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) {
+        return AlertDialog(
+          title: const Text(
+            'Konfirmasi Opname',
+            style: TextStyle(fontSize: 14),
+          ),
+          content: const Text(
+            'Barang telah di opname.\n\n'
+            'Apakah ingin overwrite atau menambahkan quantity dengan data yang sudah ada?',
+            style: TextStyle(fontSize: 12),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // tutup dialog
+              },
+              child: const Text('Batal'),
+            ),
+            TextButton(
+              onPressed: () {
+                // OVERWRITE
+                Navigator.pop(context);
+                _submitOpname();
+                Navigator.pop(context); // tutup popup form
+              },
+              child: const Text('Overwrite'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                // TAMBAH QTY
+                final existingQty = _selectedItem?.qtyOpname ?? 0;
+                final inputQty = double.tryParse(qtyCtrl.text) ?? 0;
+
+                qtyCtrl.text = (existingQty + inputQty).toString();
+
+                Navigator.pop(context);
+                _submitOpname();
+                Navigator.pop(context);
+              },
+              child: const Text('Tambah Qty'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _handleSubmitWithCheck() {
+    if (_selectedItem == null || _selectedItem!.dtCek == null) {
+      _submitOpname();
+      Navigator.pop(context);
+      return;
+    }
+
+    final dtCek = _selectedItem!.dtCek!;
+
+    // 🔴 DEFAULT TANGGAL BELUM OPNAME
+    final isDefaultDate =
+        dtCek.year == 1900 && dtCek.month == 1 && dtCek.day == 1;
+
+    if (isDefaultDate) {
+      // BELUM PERNAH OPNAME → LANGSUNG SIMPAN
+      _submitOpname();
+      Navigator.pop(context);
+    } else {
+      // SUDAH PERNAH OPNAME → MUNCUL KONFIRMASI
+      _showOverwriteDialog();
+    }
   }
 
   Future<void> loadUserData() async {

@@ -273,9 +273,7 @@ class _OpnameStockHdrViewState extends State<OpnameStockHdrView> {
                                             MaterialPageRoute(
                                               builder:
                                                   (_) => OpnameStockDtlScreen(
-                                                    trId: e.trId,
-                                                    millId: e.millId,
-                                                    whId: e.whId,
+                                                    e: e,
                                                   ),
                                             ),
                                           );

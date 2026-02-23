@@ -85,7 +85,7 @@ class StockOpnameDtlBloc
     final filtered =
         state.allData.where((e) {
           if (event.binId != null && e.binId != event.binId) return false;
-          if (event.batchId != null && e.batchId != event.batchId) return false;
+          // if (event.batchId != null && e.batchId != event.batchId) return false;
           return true;
         }).toList();
 

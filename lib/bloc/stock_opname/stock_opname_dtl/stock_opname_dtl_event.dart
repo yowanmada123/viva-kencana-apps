@@ -39,10 +39,16 @@ class SearchStockOpnameDtl extends StockOpnameDtlEvent {
 
 class FilterBinBatchStockOpnameDtl extends StockOpnameDtlEvent {
   final String? binId;
-  final String? batchId;
+  // final String? batchId;
 
-  const FilterBinBatchStockOpnameDtl({this.binId, this.batchId});
+  const FilterBinBatchStockOpnameDtl({
+    this.binId,
+    // this.batchId
+  });
 
   @override
-  List<Object?> get props => [binId, batchId];
+  List<Object?> get props => [
+    binId,
+    // batchId
+  ];
 }
