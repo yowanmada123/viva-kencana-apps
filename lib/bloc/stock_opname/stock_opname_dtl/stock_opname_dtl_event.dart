@@ -7,6 +7,9 @@ abstract class StockOpnameDtlEvent extends Equatable {
   List<Object?> get props => [];
 }
 
+/// 🔥 CLEAR STATE
+class ClearStockOpnameDtl extends StockOpnameDtlEvent {}
+
 /// ================= LOAD (BACKEND)
 class LoadStockOpnameDtl extends StockOpnameDtlEvent {
   final String trId;
@@ -37,18 +40,12 @@ class SearchStockOpnameDtl extends StockOpnameDtlEvent {
   List<Object?> get props => [keyword];
 }
 
+/// ================= FILTER BIN
 class FilterBinBatchStockOpnameDtl extends StockOpnameDtlEvent {
   final String? binId;
-  // final String? batchId;
 
-  const FilterBinBatchStockOpnameDtl({
-    this.binId,
-    // this.batchId
-  });
+  const FilterBinBatchStockOpnameDtl({this.binId});
 
   @override
-  List<Object?> get props => [
-    binId,
-    // batchId
-  ];
+  List<Object?> get props => [binId];
 }

@@ -121,6 +121,7 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
             if (state is StockOpnameDtlLoaded &&
                 _shouldApplyBinFilter &&
                 binId != null) {
+              _searchCtrl.clear();
               _shouldApplyBinFilter = false;
 
               final filtered =
@@ -145,12 +146,10 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
               );
 
               _searchCtrl.clear();
-
-              // 🔥 RESET SELECTED ITEM
               _selectedItem = null;
 
-              // 🔥 FORCE RELOAD LIST OPNAME
               if (binId != null) {
+                // 🔴 FORCE FULL RELOAD
                 context.read<StockOpnameDtlBloc>().add(
                   LoadStockOpnameDtl(
                     trId: widget.e.trId,
@@ -158,6 +157,11 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
                     whId: widget.e.whId,
                     binId: binId!,
                   ),
+                );
+
+                // 🔴 REAPPLY FILTER (INI YANG SEBELUMNYA HILANG)
+                context.read<StockOpnameDtlBloc>().add(
+                  FilterBinBatchStockOpnameDtl(binId: binId!),
                 );
               }
             }
@@ -1158,26 +1162,47 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
   }
 
   void _handleSubmitWithCheck() {
+    // KASUS ADD BARU (tidak pilih item lama)
     if (_selectedItem == null || _selectedItem!.dtCek == null) {
       _submitOpname();
       Navigator.pop(context);
       return;
     }
 
-    final dtCek = _selectedItem!.dtCek!;
+    final old = _selectedItem!;
 
-    // 🔴 DEFAULT TANGGAL BELUM OPNAME
+    // ================= CEK DEFAULT DATE (BELUM PERNAH OPNAME)
+    final dtCek = old.dtCek!;
     final isDefaultDate =
         dtCek.year == 1900 && dtCek.month == 1 && dtCek.day == 1;
 
     if (isDefaultDate) {
-      // BELUM PERNAH OPNAME → LANGSUNG SIMPAN
       _submitOpname();
       Navigator.pop(context);
-    } else {
-      // SUDAH PERNAH OPNAME → MUNCUL KONFIRMASI
-      _showOverwriteDialog();
+      return;
     }
+
+    // ================= CEK APAKAH BARANG MASIH "SAMA"
+    final isSameItem =
+        old.prodCode == prodCodeCtrl.text &&
+        old.addId == addId &&
+        old.torId == torId &&
+        old.panjang.toString() == panjangCtrl.text &&
+        old.binId == binId;
+
+    // 🔴 JIKA BEDA IDENTITAS BARANG → ANGGAP BARANG BARU
+    if (!isSameItem) {
+      _submitOpname();
+      Navigator.pop(context);
+      return;
+    }
+
+    // ================= HANYA DI SINI POPUP MUNCUL
+    // Artinya:
+    // - Barang sama
+    // - Sudah pernah opname
+    // - User hanya ubah QTY
+    _showOverwriteDialog();
   }
 
   Future<void> loadUserData() async {

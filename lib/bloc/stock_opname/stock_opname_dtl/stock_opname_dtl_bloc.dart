@@ -13,9 +13,15 @@ class StockOpnameDtlBloc
 
   StockOpnameDtlBloc({required this.opnamestockdtlrepository})
     : super(StockOpnameDtlInitial()) {
+    on<ClearStockOpnameDtl>(_onClear); // 🔥 WAJIB
     on<LoadStockOpnameDtl>(_onLoad);
     on<SearchStockOpnameDtl>(_onSearch);
     on<FilterBinBatchStockOpnameDtl>(_onFilterBinBatch);
+  }
+
+  /// ================= CLEAR STATE (FORCE REBUILD)
+  void _onClear(ClearStockOpnameDtl event, Emitter<StockOpnameDtlState> emit) {
+    emit(StockOpnameDtlLoading());
   }
 
   /// ================= LOAD BACKEND
@@ -74,7 +80,7 @@ class StockOpnameDtlBloc
     );
   }
 
-  /// ================= FILTER BIN & BATCH
+  /// ================= FILTER BIN
   void _onFilterBinBatch(
     FilterBinBatchStockOpnameDtl event,
     Emitter<StockOpnameDtlState> emit,
@@ -85,7 +91,6 @@ class StockOpnameDtlBloc
     final filtered =
         state.allData.where((e) {
           if (event.binId != null && e.binId != event.binId) return false;
-          // if (event.batchId != null && e.batchId != event.batchId) return false;
           return true;
         }).toList();
 
