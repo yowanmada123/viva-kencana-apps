@@ -190,27 +190,30 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
         ),
 
         /// ================= FAB =================
-        floatingActionButton: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            FloatingActionButton(
-              heroTag: 'scan',
-              onPressed: () {
-                context.read<BarangJadiBloc>().add(ClearBarangJadi());
-                _openScanner();
-              },
-              child: const Icon(Icons.qr_code_scanner),
-            ),
-            const SizedBox(height: 10),
-            FloatingActionButton(
-              heroTag: 'add',
-              onPressed: () {
-                _openForm(mode: OpnamePopupMode.addNew);
-              },
-              child: const Icon(Icons.add),
-            ),
-          ],
-        ),
+        floatingActionButton:
+            binId == null
+                ? null
+                : Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    FloatingActionButton(
+                      heroTag: 'scan',
+                      onPressed: () {
+                        context.read<BarangJadiBloc>().add(ClearBarangJadi());
+                        _openScanner();
+                      },
+                      child: const Icon(Icons.qr_code_scanner),
+                    ),
+                    const SizedBox(height: 10),
+                    FloatingActionButton(
+                      heroTag: 'add',
+                      onPressed: () {
+                        _openForm(mode: OpnamePopupMode.addNew);
+                      },
+                      child: const Icon(Icons.add),
+                    ),
+                  ],
+                ),
 
         /// ================= BODY =================
         body: Column(
