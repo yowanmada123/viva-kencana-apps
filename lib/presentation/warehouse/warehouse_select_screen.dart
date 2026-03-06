@@ -71,23 +71,23 @@ class _WarehouseSelectViewState extends State<WarehouseSelectView> {
       ),
       backgroundColor: Theme.of(context).hintColor,
       body: SafeArea(
-        child: BlocConsumer<BatchBloc, BatchState>(
-          listener: (context, state) {
-            if (state is BatchFailure) {
-              if (state.exception is UnauthorizedException) {
-                context.read<AuthenticationBloc>().add(
-                  SetAuthenticationStatus(isAuthenticated: false),
-                );
-                Navigator.of(context).popUntil((route) => route.isFirst);
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text("Unknown error, please contact admin"),
-                  ),
-                );
-              }
-            }
-          },
+        child: BlocBuilder<BatchBloc, BatchState>(
+          // listener: (context, state) {
+          //   if (state is BatchFailure) {
+          //     if (state.exception is UnauthorizedException) {
+          //       context.read<AuthenticationBloc>().add(
+          //         SetAuthenticationStatus(isAuthenticated: false),
+          //       );
+          //       Navigator.of(context).popUntil((route) => route.isFirst);
+          //     } else {
+          //       ScaffoldMessenger.of(context).showSnackBar(
+          //         SnackBar(
+          //           content: Text("Unknown error, please contact admin"),
+          //         ),
+          //       );
+          //     }
+          //   }
+          // },
           builder: (context, state) {
             if (state is BatchLoading) {
               return Center(child: CircularProgressIndicator());

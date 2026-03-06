@@ -124,22 +124,7 @@ class _WareHouseContentListState extends State<WareHouseContentListView> {
       ),
       backgroundColor: Theme.of(context).hintColor,
       body: SafeArea(
-        child: BlocConsumer<DeliveryDetailBloc, DeliveryDetailState>(
-          listener: (context, state) {
-            if (state is DeliveryDetailFailure) {
-              if (state.exception is UnauthorizedException) {
-                context.read<AuthenticationBloc>().add(
-                  SetAuthenticationStatus(isAuthenticated: false),
-                );
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text("Unknown error, please contact admin"),
-                  ),
-                );
-              }
-            }
-          },
+        child: BlocBuilder<DeliveryDetailBloc, DeliveryDetailState>(
           builder: (context, state) {
             if (state is DeliveryDetailLoading) {
               return Center(child: CircularProgressIndicator());
