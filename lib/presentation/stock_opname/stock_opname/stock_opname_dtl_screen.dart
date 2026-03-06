@@ -65,6 +65,7 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
   QRViewController? qrController;
   bool _shouldApplyBinFilter = false;
+  List<StockOpnameDtl> _allBinData = [];
   List<StockOpnameDtl> _binFilteredData = [];
 
   /// ================= POPUP CONTROLLERS =================
@@ -118,22 +119,19 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
         /// ✅ FIX 1: FILTER DIJALANKAN SETELAH DATA LOADED
         BlocListener<StockOpnameDtlBloc, StockOpnameDtlState>(
           listener: (context, state) {
-            if (state is StockOpnameDtlLoaded &&
-                _shouldApplyBinFilter &&
-                binId != null) {
-              _searchCtrl.clear();
-              _shouldApplyBinFilter = false;
-
+            if (state is StockOpnameDtlLoaded && binId != null) {
               final filtered =
                   state.allData.where((e) => e.binId == binId).toList();
 
               setState(() {
+                _allBinData = filtered;
                 _binFilteredData = filtered;
               });
 
-              context.read<StockOpnameDtlBloc>().add(
-                FilterBinBatchStockOpnameDtl(binId: binId),
-              );
+              if (_shouldApplyBinFilter) {
+                _searchCtrl.clear();
+                _shouldApplyBinFilter = false;
+              }
             }
           },
         ),
@@ -148,8 +146,16 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
               _searchCtrl.clear();
               _selectedItem = null;
 
+              _searchCtrl.clear();
+
+              setState(() {
+                _binFilteredData = _allBinData;
+              });
+
+              /// reset cache list supaya scan berikutnya pakai data baru
+              // _binFilteredData.clear();
+
               if (binId != null) {
-                // 🔴 FORCE FULL RELOAD
                 context.read<StockOpnameDtlBloc>().add(
                   LoadStockOpnameDtl(
                     trId: widget.e.trId,
@@ -159,7 +165,6 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
                   ),
                 );
 
-                // 🔴 REAPPLY FILTER (INI YANG SEBELUMNYA HILANG)
                 context.read<StockOpnameDtlBloc>().add(
                   FilterBinBatchStockOpnameDtl(binId: binId!),
                 );
@@ -309,9 +314,9 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
                             }
 
                             return ListView.builder(
-                              itemCount: state.filteredData.length,
+                              itemCount: _binFilteredData.length,
                               itemBuilder: (_, i) {
-                                final item = state.filteredData[i];
+                                final item = _binFilteredData[i];
                                 return InkWell(
                                   onTap: () {
                                     _selectedItem = item;
@@ -356,8 +361,8 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
 
                   final result =
                       keyword.isEmpty
-                          ? _binFilteredData
-                          : _binFilteredData
+                          ? _allBinData
+                          : _allBinData
                               .where(
                                 (e) =>
                                     e.namaBarang.toLowerCase().contains(
@@ -367,13 +372,9 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
                               )
                               .toList();
 
-                  context.read<StockOpnameDtlBloc>().emit(
-                    StockOpnameDtlLoaded(
-                      allData: _binFilteredData,
-                      filteredData: result,
-                      binBatchMap: {},
-                    ),
-                  );
+                  setState(() {
+                    _binFilteredData = result;
+                  });
                 },
                 style: const TextStyle(fontSize: 12),
                 decoration: InputDecoration(
@@ -493,9 +494,32 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
     });
   }
 
+  StockOpnameDtl? _findExistingItem({
+    required String prodCode,
+    required String panjang,
+  }) {
+    final prod = prodCode.trim();
+    final panjangScan = double.tryParse(panjang) ?? 0;
+
+    final state = context.read<StockOpnameDtlBloc>().state;
+
+    if (state is! StockOpnameDtlLoaded) return null;
+
+    try {
+      return state.filteredData.firstWhere(
+        (e) =>
+            e.prodCode.trim() == prod &&
+            e.binId == binId &&
+            (e.panjang - panjangScan).abs() < 0.001,
+      );
+    } catch (_) {
+      return null;
+    }
+  }
+
   void _openFormFromScan({required Map<String, dynamic> scanResult}) {
     isFromScan = true;
-    // ===== RESET STATE FORM =====
+
     context.read<BarangJadiBloc>().add(ClearBarangJadi());
 
     namaBarangCtrl.clear();
@@ -510,19 +534,54 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
     acpId = '';
     ordFlag = 'N';
 
-    // ===== ISI DARI QR =====
-    final prodCode = scanResult['prod_code'] ?? '';
+    /// ================= DATA DARI QR =================
+    final prodCode = (scanResult['prod_code'] ?? '').toString().trim();
+    final batchId = (scanResult['batch_id'] ?? '').toString().trim();
+    final panjang = (scanResult['panjang'] ?? '').toString().trim();
+    final quality = (scanResult['quality_id'] ?? '').toString().trim();
+    final ord = (scanResult['ord_flag'] ?? 'N').toString().trim();
 
     prodCodeCtrl.text = prodCode;
-    batchCtrl.text = scanResult['batch_id'] ?? '';
-    panjangCtrl.text = scanResult['panjang']?.toString() ?? '';
-    qualityId.text = scanResult['quality_id'] ?? '';
-    ordFlag = scanResult['ord_flag'] ?? 'N';
+    batchCtrl.text = batchId;
+    panjangCtrl.text = panjang;
+    qualityId.text = quality;
+    ordFlag = ord;
 
-    // ===== TRIGGER AUTO SEARCH BARANG =====
+    print("SCAN PROD: $prodCode");
+    print("SCAN PANJANG: $panjang");
+
+    for (var e in _binFilteredData) {
+      print("LIST ITEM: ${e.prodCode} ${e.panjang}");
+    }
+
+    /// ================= CEK DATA EXISTING =================
+    final existingItem = _findExistingItem(
+      prodCode: prodCode,
+      panjang: panjang,
+    );
+
+    if (existingItem != null) {
+      /// Barang sudah ada di list
+      _selectedItem = existingItem;
+
+      addId = existingItem.addId;
+      torId = existingItem.torId;
+
+      namaBarangCtrl.text = existingItem.namaBarang;
+      prodCodeCtrl.text = existingItem.prodCode;
+      panjangCtrl.text = existingItem.panjang.toString();
+
+      /// penting → ambil qty lama
+      qtyCtrl.text = existingItem.qtyOpname.toString();
+    } else {
+      /// Barang baru
+      _selectedItem = null;
+    }
+
+    /// ================= SEARCH MASTER BARANG =================
     context.read<BarangJadiBloc>().add(SearchBarangJadiFromScan(prodCode));
 
-    // ===== OPEN DIALOG =====
+    /// ================= OPEN FORM =================
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -546,14 +605,21 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
               }
             },
             child: AlertDialog(
-              title: const Text(
-                'Tambah Barang (Scan)',
-                style: TextStyle(fontSize: 14),
+              title: Text(
+                existingItem == null
+                    ? 'Tambah Barang (Scan)'
+                    : 'Update Quantity (Scan)',
+                style: const TextStyle(fontSize: 14),
               ),
               content: SingleChildScrollView(
-                child: _addFormContent(), // reuse existing form UI
+                child:
+                    existingItem == null ? _addFormContent() : _popupContent(),
               ),
-              actions: _dialogActions(OpnamePopupMode.addNew),
+              actions: _dialogActions(
+                existingItem == null
+                    ? OpnamePopupMode.addNew
+                    : OpnamePopupMode.fromList,
+              ),
             ),
           ),
         );
@@ -1147,10 +1213,11 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
             ElevatedButton(
               onPressed: () {
                 // TAMBAH QTY
-                final existingQty = _selectedItem?.qtyOpname ?? 0;
+                final existingQty = _selectedItem!.qtyOpname;
                 final inputQty = double.tryParse(qtyCtrl.text) ?? 0;
 
-                qtyCtrl.text = (existingQty + inputQty).toString();
+                final newQty = existingQty + inputQty;
+                qtyCtrl.text = newQty.toString();
 
                 Navigator.pop(context);
                 _submitOpname();
