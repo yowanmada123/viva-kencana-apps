@@ -137,7 +137,7 @@ class _MillDropdownSectionState extends State<_MillDropdownSection> {
           value: selectedMill,
           isExpanded: true,
           decoration: const InputDecoration(
-            labelText: 'Pilih Mill',
+            labelText: 'Pilih Office',
             border: OutlineInputBorder(),
           ),
           items:
