@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:vivakencanaapp/bloc/authorization/credentials/credentials_bloc.dart';
 import 'package:vivakencanaapp/presentation/approval/approval_pr_screen.dart';
+import 'package:vivakencanaapp/presentation/stock_opname/stock_opname_qr/mill_selector_screen.dart';
 
 import '../../bloc/auth/authentication/authentication_bloc.dart';
 import '../../bloc/auth/logout/logout_bloc.dart';
@@ -90,7 +91,7 @@ class _MyGridLayoutState extends State<MyGridLayout> {
         routeAction = () async {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => QrCodeOpnameScreen()),
+            MaterialPageRoute(builder: (_) => MillSelectorScreen()),
           );
         };
         break;
@@ -289,7 +290,7 @@ class _MyGridLayoutState extends State<MyGridLayout> {
           action: () async {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (_) => QrCodeOpnameScreen()),
+              MaterialPageRoute(builder: (_) => MillSelectorScreen()),
             );
           },
         );
