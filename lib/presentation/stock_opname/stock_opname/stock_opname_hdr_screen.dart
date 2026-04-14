@@ -221,71 +221,92 @@ class _OpnameStockHdrViewState extends State<OpnameStockHdrView> {
                     /// 🔹 TABLE (NO SELECT)
                     Expanded(
                       child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
 
-                        child: DataTable(
-                          horizontalMargin: 0,
-                          headingRowHeight: 36,
-                          // dataRowHeight: 40,
-                          columnSpacing: 10,
-                          columns: [
-                            _header('Category'),
+                          child: DataTable(
+                            showCheckboxColumn: false,
+                            horizontalMargin: 0,
+                            headingRowHeight: 38,
+                            // dataRowHeight: 40,
+                            columnSpacing: 10,
+                            columns: [
+                              _header('No'),
+                              _header('Category'),
 
-                            _header('WH'),
+                              _header('WH'),
 
-                            // _header('BIN'),
-                            _header('TR ID'),
-                            _header('Date'),
-                            // _header('Prod'),
-                            // _header('Batch'),
-                            _header('Action'),
+                              // _header('BIN'),
+                              _header('TR ID'),
+                              _header('Date'),
+                              // _header('Prod'),
+                              // _header('Batch'),
+                              // _header('Action'),
 
-                            // _header('Qty Awal'),
-                            // _header('Qty Opname'),
-                          ],
-                          rows:
-                              filteredData.map((e) {
-                                return DataRow(
-                                  cells: [
-                                    _cell(e.catDesc),
-                                    _cell(e.whId),
-
-                                    // _cell(e.binId),
-                                    _cell(e.trId),
-                                    _cell(
-                                      e.trDate != null
-                                          ? formatDateDMY(e.trDate)
-                                          : '',
-                                    ),
-                                    // _cell(e.prodCode),
-                                    // _cell(e.batchId),
-                                    DataCell(
-                                      IconButton(
-                                        icon: const Icon(
-                                          Icons.visibility,
-                                          size: 20,
+                              // _header('Qty Awal'),
+                              // _header('Qty Opname'),
+                            ],
+                            rows:
+                                filteredData.asMap().entries.map((entry) {
+                                  final i = entry.key;
+                                  final e = entry.value;
+                                  return DataRow(
+                                    onSelectChanged: (_) {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder:
+                                              (_) => OpnameStockDtlScreen(
+                                                e: e,
+                                                millName: widget.mill.millName,
+                                              ),
                                         ),
-                                        onPressed: () {
-                                          // print(e);
-                                          // NAVIGATE TO DTL
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder:
-                                                  (_) => OpnameStockDtlScreen(
-                                                    e: e,
-                                                  ),
-                                            ),
-                                          );
-                                        },
-                                      ),
-                                    ),
+                                      );
+                                    },
+                                    cells: [
+                                      _cellIndex(i),
+                                      _cell(e.catDesc),
+                                      _cell(e.whId),
 
-                                    // _cell(e.qtyAwal.toStringAsFixed(2)),
-                                    // _cell(e.qtyOpname.toStringAsFixed(2)),
-                                  ],
-                                );
-                              }).toList(),
+                                      // _cell(e.binId),
+                                      _cell(e.trId),
+                                      _cell(
+                                        e.trDate != null
+                                            ? formatDateDMY(e.trDate)
+                                            : '',
+                                      ),
+                                      // _cell(e.prodCode),
+                                      // _cell(e.batchId),
+                                      // DataCell(
+                                      //   IconButton(
+                                      //     icon: const Icon(
+                                      //       Icons.visibility,
+                                      //       size: 20,
+                                      //     ),
+                                      //     onPressed: () {
+                                      //       // print(e);
+                                      //       // NAVIGATE TO DTL
+                                      //       Navigator.push(
+                                      //         context,
+                                      //         MaterialPageRoute(
+                                      //           builder:
+                                      //               (_) => OpnameStockDtlScreen(
+                                      //                 e: e,
+                                      //                 millName:
+                                      //                     widget.mill.millName,
+                                      //               ),
+                                      //         ),
+                                      //       );
+                                      //     },
+                                      //   ),
+                                      // ),
+
+                                      // _cell(e.qtyAwal.toStringAsFixed(2)),
+                                      // _cell(e.qtyOpname.toStringAsFixed(2)),
+                                    ],
+                                  );
+                                }).toList(),
+                          ),
                         ),
                       ),
                     ),
@@ -330,5 +351,27 @@ class _OpnameStockHdrViewState extends State<OpnameStockHdrView> {
 
   DataCell _cell(String text) {
     return DataCell(Text(text, style: TextStyle(fontSize: 11.w)));
+  }
+
+  DataCell _cellIndex(int index) {
+    return DataCell(
+      Container(
+        width: 18,
+        height: 18,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: Theme.of(context).primaryColor,
+          borderRadius: BorderRadius.circular(6),
+        ),
+        child: Text(
+          '${index + 1}',
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 8,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+    );
   }
 }

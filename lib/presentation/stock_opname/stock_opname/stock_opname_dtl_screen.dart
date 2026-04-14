@@ -23,8 +23,13 @@ enum OpnameUpdateMode { overwrite, add }
 
 class OpnameStockDtlScreen extends StatelessWidget {
   final StockOpnameHdr e;
+  final String millName;
 
-  const OpnameStockDtlScreen({super.key, required this.e});
+  const OpnameStockDtlScreen({
+    super.key,
+    required this.e,
+    required this.millName,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -39,15 +44,20 @@ class OpnameStockDtlScreen extends StatelessWidget {
                 ..add(LoadWHBin(millId: e.millId, whId: e.whId)),
         ),
       ],
-      child: OpnameStockDtlView(e: e),
+      child: OpnameStockDtlView(e: e, millName: millName),
     );
   }
 }
 
 class OpnameStockDtlView extends StatefulWidget {
   final StockOpnameHdr e;
+  final String millName;
 
-  const OpnameStockDtlView({super.key, required this.e});
+  const OpnameStockDtlView({
+    super.key,
+    required this.e,
+    required this.millName,
+  });
 
   @override
   State<OpnameStockDtlView> createState() => _OpnameStockDtlViewState();
@@ -223,16 +233,28 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
         /// ================= BODY =================
         body: Column(
           children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 8.0, top: 4.0),
+              child: Row(
+                children: [
+                  Text(
+                    widget.millName,
+                    style: TextStyle(
+                      fontSize: 14.w,
+                      color: const Color.fromARGB(255, 0, 0, 0),
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
             Row(
               children: [
                 Padding(
-                  padding: const EdgeInsets.only(left: 8.0, top: 8.0),
+                  padding: const EdgeInsets.only(left: 8.0, top: 2.0),
                   child: Text(
-                    'TR ID: ${widget.e.trId}',
-                    style: TextStyle(
-                      fontSize: 16.w,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    'Tr ID: ${widget.e.trId}',
+                    style: TextStyle(fontSize: 12.w),
                   ),
                 ),
               ],
@@ -241,11 +263,12 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
               padding: const EdgeInsets.only(left: 8.0, top: 4.0),
               child: Row(
                 children: [
-                  Icon(Icons.cabin, size: 18, color: Colors.grey.shade700),
-                  const SizedBox(width: 8),
                   Text(
                     'Warehouse ID: ${widget.e.whId}',
-                    style: TextStyle(fontSize: 12.w, color: Colors.grey),
+                    style: TextStyle(
+                      fontSize: 12.w,
+                      color: const Color.fromARGB(255, 15, 15, 15),
+                    ),
                   ),
                 ],
               ),
@@ -272,7 +295,7 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
                 Padding(
                   padding: const EdgeInsets.only(left: 8.0, top: 4.0),
                   child: Text(
-                    'Stock Opname List',
+                    'Stock Opname List (${_binFilteredData.length} item)',
                     style: TextStyle(
                       fontSize: 14.w,
                       fontWeight: FontWeight.w600,
@@ -325,7 +348,7 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
                                       data: item,
                                     );
                                   },
-                                  child: _item(item),
+                                  child: _item(item, i),
                                 );
                               },
                             );
@@ -337,6 +360,96 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
           ],
         ),
       ),
+    );
+  }
+
+  void _openBarangSearch({String keyword = ''}) {
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        final TextEditingController searchCtrl = TextEditingController(
+          text: keyword,
+        );
+
+        if (keyword.isNotEmpty) {
+          context.read<BarangJadiBloc>().add(SearchBarangJadi(keyword));
+        }
+
+        return AlertDialog(
+          title: const Text('Cari Barang', style: TextStyle(fontSize: 14)),
+          content: SizedBox(
+            width: 350,
+            height: 400,
+            child: Column(
+              children: [
+                TextField(
+                  controller: searchCtrl,
+                  autofocus: true,
+                  style: const TextStyle(fontSize: 12),
+                  onChanged: (v) {
+                    context.read<BarangJadiBloc>().add(SearchBarangJadi(v));
+                  },
+                  decoration: InputDecoration(
+                    hintText: 'Ketik nama barang...',
+                    border: border,
+                    isDense: true,
+                  ),
+                ),
+                const SizedBox(height: 10),
+
+                Expanded(
+                  child: BlocBuilder<BarangJadiBloc, BarangJadiState>(
+                    builder: (context, state) {
+                      if (state is BarangJadiLoading) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+
+                      if (state is BarangJadiLoaded && state.data.isNotEmpty) {
+                        return ListView.builder(
+                          itemCount: state.data.length,
+                          itemBuilder: (_, i) {
+                            final item = state.data[i];
+
+                            return ListTile(
+                              dense: true,
+                              title: Text(
+                                item.namaBarang,
+                                style: const TextStyle(fontSize: 12),
+                              ),
+                              subtitle: Text(
+                                item.barangJadiId,
+                                style: const TextStyle(fontSize: 10),
+                              ),
+                              onTap: () {
+                                namaBarangCtrl.text = item.namaBarang;
+                                prodCodeCtrl.text = item.barangJadiId;
+                                qualityId.text = item.grade;
+
+                                Navigator.pop(context);
+
+                                context.read<BarangJadiBloc>().add(
+                                  ClearBarangJadi(),
+                                );
+                              },
+                            );
+                          },
+                        );
+                      }
+
+                      return const Center(
+                        child: Text(
+                          'Barang tidak ditemukan',
+                          style: TextStyle(fontSize: 12),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -497,19 +610,20 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
   StockOpnameDtl? _findExistingItem({
     required String prodCode,
     required String panjang,
+    required String torId,
+    required String addId,
   }) {
-    final prod = prodCode.trim();
+    final prod = prodCode.trim().toUpperCase();
     final panjangScan = double.tryParse(panjang) ?? 0;
-
-    final state = context.read<StockOpnameDtlBloc>().state;
-
-    if (state is! StockOpnameDtlLoaded) return null;
+    print("CHECK LIST");
+    for (var e in _binFilteredData) {
+      print("${e.prodCode} | TOR:${e.torId} | ADD:${e.addId} | P:${e.panjang}");
+    }
 
     try {
-      return state.filteredData.firstWhere(
+      return _binFilteredData.firstWhere(
         (e) =>
-            e.prodCode.trim() == prod &&
-            e.binId == binId &&
+            e.prodCode.trim().toUpperCase() == prod &&
             (e.panjang - panjangScan).abs() < 0.001,
       );
     } catch (_) {
@@ -517,7 +631,7 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
     }
   }
 
-  void _openFormFromScan({required Map<String, dynamic> scanResult}) {
+  void _openFormFromScan({required Map<String, dynamic> scanResult}) async {
     isFromScan = true;
 
     context.read<BarangJadiBloc>().add(ClearBarangJadi());
@@ -558,10 +672,16 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
     final existingItem = _findExistingItem(
       prodCode: prodCode,
       panjang: panjang,
+      torId: torId,
+      addId: addId,
     );
 
     if (existingItem != null) {
-      /// Barang sudah ada di list
+      print(
+        "MATCH FOUND: ${existingItem.prodCode} | P:${existingItem.panjang}",
+      );
+
+      /// Barang sudah ada di list opname
       _selectedItem = existingItem;
 
       addId = existingItem.addId;
@@ -570,16 +690,55 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
       namaBarangCtrl.text = existingItem.namaBarang;
       prodCodeCtrl.text = existingItem.prodCode;
       panjangCtrl.text = existingItem.panjang.toString();
-
-      /// penting → ambil qty lama
       qtyCtrl.text = existingItem.qtyOpname.toString();
     } else {
-      /// Barang baru
-      _selectedItem = null;
-    }
+      print("MATCH NOT FOUND IN SESSION");
 
-    /// ================= SEARCH MASTER BARANG =================
-    context.read<BarangJadiBloc>().add(SearchBarangJadiFromScan(prodCode));
+      /// 🔴 Barang tidak ada di sesi opname
+      final confirm = await showDialog<bool>(
+        context: context,
+        builder: (ctx) {
+          return AlertDialog(
+            title: const Text('Barang tidak ditemukan'),
+            content: const Text(
+              'Barang yang anda scan tidak termasuk dalam sesi opname.\n\n'
+              'Apakah ingin menambahkan barang baru?',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx, false),
+                child: const Text('Tidak'),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(ctx, true),
+                child: const Text('Ya'),
+              ),
+            ],
+          );
+        },
+      );
+
+      if (confirm != true) {
+        qrController?.resumeCamera();
+        return;
+      }
+
+      /// lanjutkan sebagai barang baru
+      namaBarangCtrl.text = prodCode;
+      prodCodeCtrl.text = prodCode;
+      panjangCtrl.text = panjang;
+      qtyCtrl.text = '0';
+
+      _selectedItem = null;
+
+      /// buka search otomatis setelah popup muncul
+      Future.microtask(() {
+        _openBarangSearch(keyword: prodCode);
+      });
+
+      /// ================= SEARCH MASTER BARANG =================
+      context.read<BarangJadiBloc>().add(SearchBarangJadiFromScan(prodCode));
+    }
 
     /// ================= OPEN FORM =================
     showDialog(
@@ -596,7 +755,10 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
           ],
           child: BlocListener<BarangJadiBloc, BarangJadiState>(
             listener: (context, state) {
-              if (state is BarangJadiLoaded && state.selected != null) {
+              /// hanya isi dari master jika barang benar-benar baru
+              if (state is BarangJadiLoaded &&
+                  state.selected != null &&
+                  _selectedItem == null) {
                 namaBarangCtrl.text = state.selected!.namaBarang;
                 prodCodeCtrl.text = state.selected!.barangJadiId;
                 qualityId.text = state.selected!.grade;
@@ -609,7 +771,10 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
                 existingItem == null
                     ? 'Tambah Barang (Scan)'
                     : 'Update Quantity (Scan)',
-                style: const TextStyle(fontSize: 14),
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
               content: SingleChildScrollView(
                 child:
@@ -675,9 +840,9 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
           child: AlertDialog(
             title: Text(
               mode == OpnamePopupMode.addNew
-                  ? 'Tambah Barang'
+                  ? 'Tambah Barang Baru'
                   : 'Update Quantity',
-              style: const TextStyle(fontSize: 14),
+              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
             ),
             content: SingleChildScrollView(
               child:
@@ -740,15 +905,15 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
             height: 40,
             child: TextField(
               controller: namaBarangCtrl,
-              style: TextStyle(fontSize: 12),
-              onChanged:
-                  (v) =>
-                      context.read<BarangJadiBloc>().add(SearchBarangJadi(v)),
+              readOnly: true,
+              style: const TextStyle(fontSize: 12),
+              onTap: () => _openBarangSearch(),
               decoration: InputDecoration(
                 labelText: 'Nama Barang*',
                 isDense: true,
                 border: border,
-                labelStyle: TextStyle(fontSize: 12),
+                labelStyle: const TextStyle(fontSize: 12),
+                suffixIcon: const Icon(Icons.search, size: 16),
               ),
             ),
           ),
@@ -1126,24 +1291,24 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
     );
   }
 
-  Widget _readonly(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: SizedBox(
-        height: 40,
-        child: TextField(
-          controller: TextEditingController(text: value),
-          readOnly: true,
-          style: const TextStyle(fontSize: 12),
-          decoration: InputDecoration(
-            labelText: label,
-            border: border,
-            labelStyle: TextStyle(fontSize: 12),
-          ),
-        ),
-      ),
-    );
-  }
+  // Widget _readonly(String label, String value) {
+  //   return Padding(
+  //     padding: const EdgeInsets.only(bottom: 10),
+  //     child: SizedBox(
+  //       height: 40,
+  //       child: TextField(
+  //         controller: TextEditingController(text: value),
+  //         readOnly: true,
+  //         style: const TextStyle(fontSize: 12),
+  //         decoration: InputDecoration(
+  //           labelText: label,
+  //           border: border,
+  //           labelStyle: TextStyle(fontSize: 12),
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
 
   Widget _readonlyCtrl(String label, TextEditingController ctrl) {
     return Padding(
@@ -1165,8 +1330,25 @@ class _OpnameStockDtlViewState extends State<OpnameStockDtlView> {
   }
 
   /// ================= LIST ITEM =================
-  Widget _item(StockOpnameDtl e) {
+  Widget _item(StockOpnameDtl e, int index) {
     return ListTile(
+      leading: Container(
+        width: 22,
+        height: 22,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: Theme.of(context).primaryColor,
+          borderRadius: BorderRadius.circular(6),
+        ),
+        child: Text(
+          '${index + 1}',
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 10,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
       title: Text(
         e.namaBarang,
         style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
