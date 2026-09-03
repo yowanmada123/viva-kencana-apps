@@ -18,23 +18,24 @@ import 'sales_activity_history_detail_images_screen.dart';
 
 class SalesActivityHistoryDetailScreen extends StatefulWidget {
   final HistoryVisit visit;
-  const SalesActivityHistoryDetailScreen({
-    super.key,
-    required this.visit,
-  });
+  const SalesActivityHistoryDetailScreen({super.key, required this.visit});
 
   @override
   State<SalesActivityHistoryDetailScreen> createState() =>
       _SalesActivityHistoryDetailScreenState();
 }
 
-class _SalesActivityHistoryDetailScreenState extends State<SalesActivityHistoryDetailScreen> {
-
+class _SalesActivityHistoryDetailScreenState
+    extends State<SalesActivityHistoryDetailScreen> {
   @override
   void initState() {
-    log('Access to lib/presentation/sales_activity/sales_activity_history_detail_screen.dart');
+    log(
+      'Access to lib/presentation/sales_activity/sales_activity_history_detail_screen.dart',
+    );
     super.initState();
-    context.read<SalesActivityHistoryVisitDetailBloc>().add(LoadHistoryDetail(widget.visit.trId));
+    context.read<SalesActivityHistoryVisitDetailBloc>().add(
+      LoadHistoryDetail(widget.visit.trId),
+    );
   }
 
   @override
@@ -56,7 +57,10 @@ class _SalesActivityHistoryDetailScreenState extends State<SalesActivityHistoryD
       ),
       body: Padding(
         padding: EdgeInsets.all(16.w),
-        child: BlocBuilder<SalesActivityHistoryVisitDetailBloc, SalesActivityHistoryVisitDetailState>(
+        child: BlocBuilder<
+          SalesActivityHistoryVisitDetailBloc,
+          SalesActivityHistoryVisitDetailState
+        >(
           builder: (context, state) {
             if (state is HistoryDetailLoading) {
               return const Center(child: CircularProgressIndicator());
@@ -79,11 +83,13 @@ class _SalesActivityHistoryDetailScreenState extends State<SalesActivityHistoryD
                   Padding(
                     padding: EdgeInsets.only(bottom: 8.w, left: 4.w),
                     child: Text(
-                      DateFormat('dd/MM/yyyy').format(DateTime.parse(widget.visit.trDate)),
+                      DateFormat(
+                        'dd/MM/yyyy',
+                      ).format(DateTime.parse(widget.visit.trDate)),
                       style: TextStyle(
                         fontSize: 14.sp,
                         fontWeight: FontWeight.w500,
-                        color: Colors.black.withValues(alpha: 0.7)
+                        color: Colors.black.withValues(alpha: 0.7),
                       ),
                     ),
                   ),
@@ -92,11 +98,14 @@ class _SalesActivityHistoryDetailScreenState extends State<SalesActivityHistoryD
                       itemCount: details.length,
                       itemBuilder: (context, index) {
                         final d = details[index];
-                        final Color mainColor = d.startEndPoint == 'OS'
-                          ? Colors.green.shade400
-                          : Colors.red.shade400;
-                        final latitude = double.tryParse(d.latitude) ?? -7.250445;
-                        final longitude = double.tryParse(d.longitude) ?? 112.768845;
+                        final Color mainColor =
+                            d.startEndPoint == 'OS'
+                                ? Colors.green.shade400
+                                : Colors.red.shade400;
+                        final latitude =
+                            double.tryParse(d.latitude) ?? -7.250445;
+                        final longitude =
+                            double.tryParse(d.longitude) ?? 112.768845;
                         final MapController mapController = MapController();
                         Map<String, dynamic> activities = {
                           "product_offer": d.productOffer,
@@ -104,15 +113,12 @@ class _SalesActivityHistoryDetailScreenState extends State<SalesActivityHistoryD
                           "promo_info": d.promoInfo,
                           "penagihan": d.penagihan,
                           "customer_visit": d.customerVisit,
-                          "customer_new": d.customerNew
+                          "customer_new": d.customerNew,
                         };
                         WidgetsBinding.instance.addPostFrameCallback((_) {
                           if (mounted) {
                             mapController.move(
-                              LatLng(
-                                latitude,
-                                longitude,
-                              ),
+                              LatLng(latitude, longitude),
                               17.0,
                             );
                           }
@@ -139,12 +145,17 @@ class _SalesActivityHistoryDetailScreenState extends State<SalesActivityHistoryD
                                 ),
                                 Expanded(
                                   child: Padding(
-                                    padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.w),
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 12.w,
+                                      vertical: 8.w,
+                                    ),
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
                                           children: [
                                             SizedBox(
                                               width: 216.w,
@@ -166,48 +177,65 @@ class _SalesActivityHistoryDetailScreenState extends State<SalesActivityHistoryD
                                                     Navigator.push(
                                                       context,
                                                       MaterialPageRoute(
-                                                        builder: (_) => SalesActivityHistoryDetailImagesScreen(
-                                                          historyDetail: d,
-                                                        ),
+                                                        builder:
+                                                            (_) =>
+                                                                SalesActivityHistoryDetailImagesScreen(
+                                                                  historyDetail:
+                                                                      d,
+                                                                ),
                                                       ),
                                                     );
                                                     break;
                                                   case 'add_image':
-                                                    _showAddImageDialog(context, d.seqId, d);
+                                                    _showAddImageDialog(
+                                                      context,
+                                                      d.seqId,
+                                                      d,
+                                                    );
                                                     break;
                                                 }
                                               },
-                                              itemBuilder: (context) => [
-                                                const PopupMenuItem(
-                                                  value: 'add_image',
-                                                  child: Row(
-                                                    children: [
-                                                      Icon(Icons.camera_alt, size: 20),
-                                                      SizedBox(width: 8),
-                                                      Text("Add Image"),
-                                                    ],
-                                                  ),
-                                                ),
-                                                const PopupMenuItem(
-                                                  value: 'show',
-                                                  child: Row(
-                                                    children: [
-                                                      Icon(Icons.add_a_photo, size: 20),
-                                                      SizedBox(width: 8),
-                                                      Text("Show Images"),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ],
+                                              itemBuilder:
+                                                  (context) => [
+                                                    const PopupMenuItem(
+                                                      value: 'add_image',
+                                                      child: Row(
+                                                        children: [
+                                                          Icon(
+                                                            Icons.camera_alt,
+                                                            size: 20,
+                                                          ),
+                                                          SizedBox(width: 8),
+                                                          Text("Add Image"),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    const PopupMenuItem(
+                                                      value: 'show',
+                                                      child: Row(
+                                                        children: [
+                                                          Icon(
+                                                            Icons.add_a_photo,
+                                                            size: 20,
+                                                          ),
+                                                          SizedBox(width: 8),
+                                                          Text("Show Images"),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ],
                                             ),
                                           ],
                                         ),
                                         Text(
-                                          DateFormat('hh:mm a').format(DateTime.parse(d.trDate)),
+                                          DateFormat(
+                                            'hh:mm a',
+                                          ).format(DateTime.parse(d.trDate)),
                                           style: TextStyle(
                                             fontWeight: FontWeight.w600,
                                             fontSize: 15.sp,
-                                            color: Theme.of(context).primaryColor
+                                            color:
+                                                Theme.of(context).primaryColor,
                                           ),
                                           overflow: TextOverflow.ellipsis,
                                           maxLines: 1,
@@ -217,48 +245,69 @@ class _SalesActivityHistoryDetailScreenState extends State<SalesActivityHistoryD
                                           "${d.customerName} - ${d.customerCity}",
                                           overflow: TextOverflow.ellipsis,
                                           maxLines: 1,
-                                          style: TextStyle(
-                                            fontSize: 16.sp,
-                                          ),
+                                          style: TextStyle(fontSize: 16.sp),
                                         ),
                                         Text(
-                                          d.gpsAddress == "" ? '-' : d.gpsAddress,
-                                          style: TextStyle(fontSize: 13.sp, color: Colors.grey),
+                                          d.gpsAddress == ""
+                                              ? '-'
+                                              : d.gpsAddress,
+                                          style: TextStyle(
+                                            fontSize: 13.sp,
+                                            color: Colors.grey,
+                                          ),
                                           maxLines: 3,
                                           overflow: TextOverflow.ellipsis,
                                         ),
                                         SizedBox(height: 4.w),
                                         Text(
                                           "Cust. ID: ${d.customerId == "" ? "-" : d.customerId}",
-                                          style: TextStyle(fontSize: 14.sp, color: Colors.black87),
+                                          style: TextStyle(
+                                            fontSize: 14.sp,
+                                            color: Colors.black87,
+                                          ),
                                         ),
                                         SizedBox(height: 4.w),
                                         Text(
                                           "Cust. Phone: ${d.customerPhone == "" ? "-" : d.customerPhone}",
-                                          style: TextStyle(fontSize: 14.sp, color: Colors.black87),
+                                          style: TextStyle(
+                                            fontSize: 14.sp,
+                                            color: Colors.black87,
+                                          ),
                                         ),
                                         SizedBox(height: 4.w),
                                         Text(
                                           "Cust. KTP/NPWP: ${d.customerKtpNpwp == "" ? "-" : d.customerKtpNpwp}",
-                                          style: TextStyle(fontSize: 14.sp, color: Colors.black87),
+                                          style: TextStyle(
+                                            fontSize: 14.sp,
+                                            color: Colors.black87,
+                                          ),
                                           overflow: TextOverflow.ellipsis,
                                         ),
                                         SizedBox(height: 4.w),
                                         Text(
                                           "Sales ID: ${d.salesId} - ${d.entityId}",
-                                          style: TextStyle(fontSize: 14.sp, color: Colors.black87),
+                                          style: TextStyle(
+                                            fontSize: 14.sp,
+                                            color: Colors.black87,
+                                          ),
                                         ),
                                         SizedBox(height: 4.w),
                                         Text(
                                           "Vehicle: ${d.salesVehicle}",
-                                          style: TextStyle(fontSize: 14.sp, color: Colors.black87),
+                                          style: TextStyle(
+                                            fontSize: 14.sp,
+                                            color: Colors.black87,
+                                          ),
                                         ),
                                         SizedBox(height: 4.w),
                                         buildActivities(activities),
                                         SizedBox(height: 4.w),
                                         Text(
                                           "Remark: ${d.remark == "" ? "-" : d.remark}",
-                                          style: TextStyle(fontSize: 14.sp, color: Colors.black87),
+                                          style: TextStyle(
+                                            fontSize: 14.sp,
+                                            color: Colors.black87,
+                                          ),
                                         ),
                                         SizedBox(height: 12.w),
                                         SizedBox(
@@ -267,34 +316,41 @@ class _SalesActivityHistoryDetailScreenState extends State<SalesActivityHistoryD
                                           child: FlutterMap(
                                             mapController: mapController,
                                             options: MapOptions(
-                                              initialCenter: LatLng(-7.250445, 112.768845),
+                                              initialCenter: LatLng(
+                                                -7.250445,
+                                                112.768845,
+                                              ),
                                               initialZoom: 10,
                                             ),
                                             children: [
                                               TileLayer(
                                                 urlTemplate:
                                                     'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                                                subdomains: const ['a', 'b', 'c'],
+                                                subdomains: const [
+                                                  'a',
+                                                  'b',
+                                                  'c',
+                                                ],
                                                 userAgentPackageName:
                                                     'com.example.vivakencanaapp',
                                               ),
-                                                MarkerLayer(
-                                                  markers: [
-                                                    Marker(
-                                                      point: LatLng(
-                                                        latitude,
-                                                        longitude,
-                                                      ),
-                                                      width: 40,
-                                                      height: 40,
-                                                      child: const Icon(
-                                                        Icons.location_pin,
-                                                        color: Colors.red,
-                                                        size: 40,
-                                                      ),
+                                              MarkerLayer(
+                                                markers: [
+                                                  Marker(
+                                                    point: LatLng(
+                                                      latitude,
+                                                      longitude,
                                                     ),
-                                                  ],
-                                                ),
+                                                    width: 40,
+                                                    height: 40,
+                                                    child: const Icon(
+                                                      Icons.location_pin,
+                                                      color: Colors.red,
+                                                      size: 40,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
                                             ],
                                           ),
                                         ),
@@ -330,10 +386,11 @@ class _SalesActivityHistoryDetailScreenState extends State<SalesActivityHistoryD
       "customer_new": "Registrasi Customer Baru",
     };
 
-    final activeActivities = activityLabels.entries
-        .where((entry) => data[entry.key] == "Y")
-        .map((entry) => entry.value)
-        .toList();
+    final activeActivities =
+        activityLabels.entries
+            .where((entry) => data[entry.key] == "Y")
+            .map((entry) => entry.value)
+            .toList();
 
     return Text(
       activeActivities.isEmpty
@@ -343,7 +400,11 @@ class _SalesActivityHistoryDetailScreenState extends State<SalesActivityHistoryD
     );
   }
 
-  void _showAddImageDialog(BuildContext context, String seqId, HistoryDetail detail) {
+  void _showAddImageDialog(
+    BuildContext context,
+    String seqId,
+    HistoryDetail detail,
+  ) {
     File? imageFile;
     final remarkController = TextEditingController();
 
@@ -360,8 +421,14 @@ class _SalesActivityHistoryDetailScreenState extends State<SalesActivityHistoryD
               backgroundColor: Colors.white,
               surfaceTintColor: Colors.transparent,
               titlePadding: EdgeInsets.only(top: 20.w),
-              contentPadding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.w),
-              actionsPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.w),
+              contentPadding: EdgeInsets.symmetric(
+                horizontal: 20.w,
+                vertical: 10.w,
+              ),
+              actionsPadding: EdgeInsets.symmetric(
+                horizontal: 16.w,
+                vertical: 12.w,
+              ),
               content: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -382,7 +449,7 @@ class _SalesActivityHistoryDetailScreenState extends State<SalesActivityHistoryD
                       )
                     else
                       BasePrimaryButton(
-                        label: "Ambil Gambar", 
+                        label: "Ambil Gambar",
                         icon: Icons.camera_alt,
                         onPressed: () async {
                           final picker = ImagePicker();
@@ -396,12 +463,15 @@ class _SalesActivityHistoryDetailScreenState extends State<SalesActivityHistoryD
                             });
                           }
                         },
-                      )
+                      ),
                   ],
                 ),
               ),
               actions: [
-                BlocConsumer<SalesActivityHistoryVisitUploadImageBloc, SalesActivityHistoryVisitUploadImageState>(
+                BlocConsumer<
+                  SalesActivityHistoryVisitUploadImageBloc,
+                  SalesActivityHistoryVisitUploadImageState
+                >(
                   listener: (context, state) {
                     if (state is UploadImageSuccess) {
                       Navigator.pop(dialogContext);
@@ -421,33 +491,84 @@ class _SalesActivityHistoryDetailScreenState extends State<SalesActivityHistoryD
                     }
                   },
                   builder: (context, state) {
+                    // final isLoading = state is UploadImageLoading;
+
+                    // return Row(
+                    //   mainAxisAlignment: MainAxisAlignment.end,
+                    //   children: [
+                    //     TextButton(
+                    //       // 2. MATIKAN TOMBOL BATAL SAAT LOADING
+                    //       onPressed:
+                    //           isLoading
+                    //               ? null
+                    //               : () => Navigator.pop(dialogContext),
+                    //       child: Text(
+                    //         "Batal",
+                    //         style: TextStyle(
+                    //           color: isLoading ? Colors.grey : Colors.redAccent,
+                    //         ),
+                    //       ),
+                    //     ),
+                    //     BasePrimaryButton(
+                    //       // 3. UBAH TEKS TOMBOL SAAT LOADING
+                    //       label: isLoading ? "Loading..." : "Submit",
+                    //       // 4. MATIKAN TOMBOL SUBMIT SAAT LOADING AGAR TIDAK DOUBLE KLIK
+                    //       onPressed:
+                    //           (imageFile == null || isLoading)
+                    //               ? null
+                    //               : () {
+                    //                 context
+                    //                     .read<
+                    //                       SalesActivityHistoryVisitUploadImageBloc
+                    //                     >()
+                    //                     .add(
+                    //                       SubmitUploadImage(
+                    //                         entityId: detail.entityId,
+                    //                         trId: detail.trId,
+                    //                         seqId: seqId,
+                    //                         imageFile: imageFile!,
+                    //                         remark: remarkController.text,
+                    //                       ),
+                    //                     );
+                    //               },
+                    //     ),
+                    //   ],
+                    // );
                     return Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         TextButton(
                           onPressed: () => Navigator.pop(dialogContext),
-                          child: const Text("Batal", style: TextStyle(color: Colors.redAccent)),
+                          child: const Text(
+                            "Batal",
+                            style: TextStyle(color: Colors.redAccent),
+                          ),
                         ),
                         BasePrimaryButton(
                           label: "Submit",
-                          onPressed: imageFile == null
-                            ? null
-                            : () {
-                                context.read<SalesActivityHistoryVisitUploadImageBloc>().add(
-                                      SubmitUploadImage(
-                                        entityId: detail.entityId,
-                                        trId: detail.trId,
-                                        seqId: seqId,
-                                        imageFile: imageFile!,
-                                        remark: remarkController.text,
-                                      ),
-                                    );
-                              }
+                          onPressed:
+                              imageFile == null
+                                  ? null
+                                  : () {
+                                    context
+                                        .read<
+                                          SalesActivityHistoryVisitUploadImageBloc
+                                        >()
+                                        .add(
+                                          SubmitUploadImage(
+                                            entityId: detail.entityId,
+                                            trId: detail.trId,
+                                            seqId: seqId,
+                                            imageFile: imageFile!,
+                                            remark: remarkController.text,
+                                          ),
+                                        );
+                                  },
                         ),
                       ],
                     );
-                  }
-                )
+                  },
+                ),
               ],
             );
           },

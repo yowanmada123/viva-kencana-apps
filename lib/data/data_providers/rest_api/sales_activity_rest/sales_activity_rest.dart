@@ -22,11 +22,15 @@ class SalesActivityRest {
     try {
       http.options.headers['requiresToken'] = true;
       // log('Dio headers: ${http.options.headers}');
-      log('Request to: https://v3.kencana.org/api/viva/transaction/CustomerVisit/getUserData (GET)');
+      log(
+        'Request to: https://v3.kencana.org/api/viva/transaction/CustomerVisit/getUserData (GET)',
+      );
       final response = await http.get(
         "api/viva/transaction/CustomerVisit/getUserData",
       );
-      log('Response from "api/viva/transaction/CustomerVisit/getUserData" : ${response.toString()}');
+      log(
+        'Response from "api/viva/transaction/CustomerVisit/getUserData" : ${response.toString()}',
+      );
       if (response.statusCode == 200) {
         final body = response.data;
         final salesInfo = SalesInfo.fromMap(body['data']);
@@ -55,7 +59,9 @@ class SalesActivityRest {
       final response = await http.get(
         "api/kmb/sales/CustomerVisit/getProvinceMobile",
       );
-       log('Response from "api/kmb/sales/CustomerVisit/getProvinceMobile" : ${response.toString()}');
+      log(
+        'Response from "api/kmb/sales/CustomerVisit/getProvinceMobile" : ${response.toString()}',
+      );
       if (response.statusCode == 200) {
         final body = response.data;
 
@@ -92,8 +98,10 @@ class SalesActivityRest {
         "api/kmb/sales/CustomerVisit/provinceOnChange",
         data: {"province": province},
       );
-      log('Response from "api/kmb/sales/CustomerVisit/provinceOnChange" : ${response.toString()}');
-      
+      log(
+        'Response from "api/kmb/sales/CustomerVisit/provinceOnChange" : ${response.toString()}',
+      );
+
       if (response.statusCode == 200) {
         final body = response.data;
 
@@ -123,7 +131,7 @@ class SalesActivityRest {
   }) async {
     try {
       http.options.headers['requiresToken'] = true;
-      
+
       final response = await http.get(
         "api/kmb/sales/CustomerVisit/cityOnChange",
         data: {"city": city},
@@ -295,7 +303,7 @@ class SalesActivityRest {
     try {
       http.options.headers['requiresToken'] = true;
       log(
-        'Request to https://v2.kencana.org/api/viva/transaction/CustomerVisit/submitCustomerActivity (POST)',
+        'Request to ${http.options.baseUrl}api/viva/transaction/CustomerVisit/submitCustomerActivity (POST)',
       );
       final response = await http.post(
         "api/viva/transaction/CustomerVisit/submitCustomerActivity",
@@ -329,10 +337,7 @@ class SalesActivityRest {
       log(
         'Request to https://v2.kencana.org/api/viva/transaction/CustomerVisit/getActivityData (POST)',
       );
-      final body = {
-        'start_date': startDate ?? '',
-        'end_date': endDate ?? '',
-      };
+      final body = {'start_date': startDate ?? '', 'end_date': endDate ?? ''};
       final response = await http.post(
         "api/viva/transaction/CustomerVisit/getActivityData",
         data: body,
@@ -369,9 +374,7 @@ class SalesActivityRest {
       log(
         'Request to https://v2.kencana.org/api/viva/transaction/CustomerVisit/getActivityDetail (POST)',
       );
-      final body = {
-        'id': activityId,
-      };
+      final body = {'id': activityId};
       final response = await http.post(
         "api/viva/transaction/CustomerVisit/getActivityDetail",
         data: body,
@@ -408,7 +411,9 @@ class SalesActivityRest {
   }) async {
     try {
       http.options.headers['requiresToken'] = true;
-      log('Request to https://v2.kencana.org/api/viva/transaction/ActivityReport/submitImagesDetail (POST)');
+      log(
+        'Request to https://v2.kencana.org/api/viva/transaction/ActivityReport/submitImagesDetail (POST)',
+      );
       final body = {
         'entity': entityId,
         'tr_id': trId,
@@ -446,13 +451,9 @@ class SalesActivityRest {
     try {
       http.options.headers['requiresToken'] = true;
       log(
-        'Request to https://v2.kencana.org/api/viva/transaction/ActivityReport/getDetailImages (POST)',
+        'Request to ${http.options.baseUrl}api/viva/transaction/ActivityReport/getDetailImages (POST)',
       );
-      final body = {
-        'entity_id': entityId,
-        'tr_id': trId,
-        'seq_id': seqId,
-      };
+      final body = {'entity_id': entityId, 'tr_id': trId, 'seq_id': seqId};
       final response = await http.post(
         "api/viva/transaction/ActivityReport/getDetailImages",
         data: body,
