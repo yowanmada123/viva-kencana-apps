@@ -16,11 +16,11 @@ class EntityRest {
     try {
       dio.options.headers['requiresToken'] = true;
 
-      log('Request to ${dio.options.baseUrl}/api/mobile/getEntity (POST)');
+      log('Request to ${dio.options.baseUrl}api/mobile/getEntity (POST)');
       final response = await dio.post("api/mobile/getEntity");
 
       log(
-        'Response from ${dio.options.baseUrl}/api/mobile/getEntity (POST): $response',
+        'Response from ${dio.options.baseUrl}api/mobile/getEntity (POST): $response',
       );
 
       if (response.statusCode == 200) {

@@ -1,0 +1,738 @@
+================================================================================
+ PANDUAN ALUR HIT API - VIVA KENCANA APPS (Flutter)
+================================================================================
+ Versi app   : 1.0.16+14  (pubspec.yaml)
+ Dibuat      : 25 September 2026
+ Target baca : developer yang baru masuk / mau menambah fitur di project ini
+================================================================================
+
+
+--------------------------------------------------------------------------------
+BAGIAN 1. ARSITEKTUR SINGKAT
+--------------------------------------------------------------------------------
+
+Project ini memakai pola BLoC + Repository. Setiap permintaan data selalu
+melewati 5 lapis yang sama, tidak pernah memotong jalur:
+
+  [1] PRESENTATION (Screen/Widget)      lib/presentation/...
+        |  context.read<XBloc>().add(SomeEvent())
+        v
+  [2] BLOC (Event -> State)             lib/bloc/...
+        |  await xRepository.someMethod(...)
+        v
+  [3] REPOSITORY (aturan bisnis)        lib/data/repository/...
+        |  await xRest.someMethod(...)
+        v
+  [4] REST / DATA PROVIDER (HTTP)       lib/data/data_providers/rest_api/...
+        |  dio.post('api/...', data: body)
+        v
+  [5] DIO CLIENT + INTERCEPTOR          lib/environment.dart
+                                        lib/utils/interceptors/dio_request_token_interceptor.dart
+        |
+        v
+      SERVER (v2 / v3 / api-kmb / android.kencana.org)
+
+Arah balik (respons):
+
+  Server -> Rest (parse JSON jadi Model, bungkus Either)
+         -> Repository (boleh tambah logika: simpan token, simpan offline, filter)
+         -> Bloc (emit state: Loading / Success / Error)
+         -> Screen (BlocBuilder / BlocListener menggambar UI)
+
+Aturan penting:
+  * Screen TIDAK BOLEH memanggil Rest langsung. Selalu lewat Bloc.
+  * Rest TIDAK BOLEH tahu soal UI. Hanya HTTP + parsing.
+  * Semua Rest mengembalikan Either<CustomException, T> (package dartz),
+    KECUALI beberapa yang masih memakai throw Exception (lihat Bagian 9).
+
+
+--------------------------------------------------------------------------------
+BAGIAN 2. BASE URL / ENVIRONMENT
+--------------------------------------------------------------------------------
+
+Semua base URL ada di satu file: lib/environment.dart
+Setiap class punya BaseOptions dengan connectTimeout & receiveTimeout 20.000 ms
+(20 detik) dan contentType 'application/json'.
+
+  CLASS                         BASE URL
+  ---------------------------------------------------------------------
+  AuthEnvironment               https://v3.kencana.org/
+  Environment                   https://v2.kencana.org/
+  KmbEnvironment                https://api-kmb.kencana.org/
+  AndroidKencanaEnvironment     https://android.kencana.org/
+  DevEnvironment                http://10.65.65.222:8000/     (khusus tes)
+
+Di lib/main.dart dibuat 5 instance Dio, masing-masing memakai environment di
+atas, dan SEMUANYA dipasang DioRequestTokenInterceptor:
+
+  authClient            -> AuthEnvironment           (v3)
+  dioClient             -> Environment               (v2)
+  tesClient             -> Environment               (v2)   <- tukar ke DevEnvironment untuk tes
+  kmbClient             -> KmbEnvironment            (api-kmb)
+  androidKencanaClient  -> AndroidKencanaEnvironment (android.kencana.org)
+
+Pemetaan client ke class Rest (lib/main.dart):
+
+  authClient            : AuthRest, AuthorizationRest, MillSelectorRest
+  dioClient             : BatchRest, EntityRest, SalesActivityRest
+  tesClient             : ApprovalPRRest
+  kmbClient             : MillRest, ProdMasterRest, BarangJadiRest
+  androidKencanaClient  : OpnameStockHdrRest, OpnameStockDtlRest, OpnameRest, WHBinRest
+
+CARA PINDAH KE SERVER DEV:
+  Buka lib/main.dart, cari blok tesClient. Komentari baris Environment dan
+  buka komentar baris DevEnvironment. Atau ubah langsung nilai apiPath di
+  lib/environment.dart (baris yang dikomentari http://10.0.2.2:8000/ adalah
+  alamat localhost untuk emulator Android).
+
+
+--------------------------------------------------------------------------------
+BAGIAN 3. ALUR TOKEN (AUTENTIKASI)
+--------------------------------------------------------------------------------
+
+Token disimpan di SharedPreferences dengan key 'auth'
+(lib/data/data_providers/shared-preferences/shared_preferences_key.dart).
+
+ALUR LENGKAP:
+
+  1. User isi username + password di LoginFormScreen.
+  2. LoginFormBloc -> AuthRepository.login() -> AuthRest.login()
+       POST https://v3.kencana.org/api/login
+       body: { "username": "...", "password": "..." }
+  3. Respons sukses (200) dipetakan: Auth.fromMap(body['data'])
+       Auth berisi: user, avatar, access_token, token_type, expires_at
+  4. AuthRepository menyimpan seluruh objek Auth sebagai JSON string ke
+     SharedPreferences: authSharedPref.write(auth.toJson())
+  5. AuthenticationBloc (HydratedBloc) menerima SetAuthenticationStatus dan
+     emit Authenticated(user). Karena HydratedBloc, state ini ikut tersimpan
+     ke disk, jadi user tetap login setelah app ditutup.
+  6. Untuk request berikutnya, class Rest menandai request butuh token:
+
+       dio.options.headers['requiresToken'] = true;
+
+  7. DioRequestTokenInterceptor.onRequest() membaca penanda itu:
+       - hapus header 'requiresToken' (jangan sampai terkirim ke server)
+       - baca JSON 'auth' dari SharedPreferences
+       - tambahkan header: Authorization: Bearer <access_token>
+
+  8. Logout: AuthRest.logout() -> GET https://v3.kencana.org/api/logout
+     lalu AuthRepository menghapus key 'auth' (authSharedPref.clear()).
+
+CATATAN: penanda requiresToken dipasang ke dio.options (level CLIENT), bukan
+per-request. Artinya sekali sebuah Rest menyalakannya, client Dio yang sama
+akan terus mengirim token sampai interceptor menghapusnya di request
+berikutnya. Ini berfungsi, tapi bukan pola yang bersih - lihat Bagian 9.
+
+
+--------------------------------------------------------------------------------
+BAGIAN 4. ANATOMI SATU FUNGSI REST (POLA BAKU)
+--------------------------------------------------------------------------------
+
+Semua fungsi di lib/data/data_providers/rest_api/ mengikuti bentuk ini.
+Contoh nyata: lib/data/data_providers/rest_api/entity_rest/entity_rest.dart
+
+  Future<Either<CustomException, List<Entity>>> getEntities() async {
+    try {
+      dio.options.headers['requiresToken'] = true;          // (a) minta token
+
+      log('Request to ${dio.options.baseUrl}api/mobile/getEntity (POST)');
+
+      final response = await dio.post("api/mobile/getEntity");  // (b) hit API
+
+      log('Response ... : $response');
+
+      if (response.statusCode == 200) {                      // (c) sukses
+        final body = response.data;
+        final entities = List<Entity>.from(
+          body['data'].map((e) => Entity.fromMap(e)),         // (d) parse model
+        );
+        return Right(entities);                              // (e) Right = sukses
+      } else {
+        return Left(NetUtils.parseErrorResponse(response: response.data));
+      }
+    } on DioException catch (e) {                             // (f) error HTTP
+      return Left(NetUtils.parseDioException(e));
+    } on Exception catch (e) {
+      return Future.value(Left(CustomException(message: e.toString())));
+    } catch (e) {
+      return Left(CustomException(message: e.toString()));
+    }
+  }
+
+Penjelasan:
+  (a) wajib kalau endpoint butuh login.
+  (b) path TANPA slash depan, karena baseUrl sudah diakhiri '/'.
+  (c) Dio otomatis melempar DioException untuk status non-2xx, jadi cabang
+      else di (c) hampir tidak pernah tereksekusi.
+  (d) mayoritas respons server berbentuk { "status_code": ..., "message": ...,
+      "data": [...] }. Sebagian bersarang dua kali: data['data']['data'].
+  (e) Right = berhasil, Left = gagal (konvensi dartz).
+  (f) NetUtils.parseDioException memetakan status ke exception spesifik:
+      401 -> UnauthorizedException
+      403 -> ForbiddenException
+      404 -> NotFoundException
+      500 -> NotFoundException  (sengaja/keliru, lihat Bagian 9)
+      lainnya -> CustomException dengan message dari response.data['message']
+      Kalau parsing gagal: "Terjadi kesalahan! Silakan coba lagi."
+
+Di sisi Bloc, hasil Either dibaca dengan fold():
+
+  final result = await repository.getEntities();
+  result.fold(
+    (error) => emit(EntityLoadFailure(error.message!)),   // Left
+    (data)  => emit(EntityLoadSuccess(data)),             // Right
+  );
+
+
+--------------------------------------------------------------------------------
+BAGIAN 5. ALUR SAAT APLIKASI DIBUKA (STARTUP)
+--------------------------------------------------------------------------------
+
+Urutan di lib/main.dart -> void main():
+
+  1. WidgetsFlutterBinding.ensureInitialized()
+  2. initializeDateFormatting('id_ID')
+  3. SalesActivitySyncService().syncPendingActivities()
+       -> jalan di background, tunggu 3 detik, cek konektivitas,
+          lalu kirim ulang data Sales Activity yang tersimpan offline
+          (detail di Bagian 6.D)
+  4. HydratedBloc.storage disiapkan (untuk AuthenticationBloc)
+  5. SharedPreferencesManager(key: 'auth') dibuat
+  6. 5 Dio client dibuat + interceptor dipasang
+  7. Semua Rest dibuat, lalu semua Repository dibuat
+  8. runApp() dengan MultiRepositoryProvider + MultiBlocProvider
+       Banyak Bloc dibuat lazy: false, artinya langsung hidup saat app start.
+  9. UpdateBloc langsung menerima CheckForUpdate:
+       GET https://android.kencana.org/VivaKencana/version.json
+       (dipakai Dio() BARU tanpa interceptor - endpoint publik, tanpa token)
+       Bandingkan latest_version dengan versi app. Kalau lebih baru,
+       tampilkan dialog Update -> minta izin storage & install ->
+       Dio().download(apk_url) -> OpenFile.open(filePath)
+ 10. MyApp menggambar berdasarkan AuthenticationBloc:
+       Authenticated    -> EntityScreen
+       NotAuthenticated -> LoginFormScreen
+
+
+--------------------------------------------------------------------------------
+BAGIAN 6. ALUR HIT API PER FITUR
+--------------------------------------------------------------------------------
+
+=== 6.A  LOGIN, PILIH ENTITY, DAN MENU ===
+
+  Layar: login_form_screen.dart -> entity_screen.dart -> entity_menu_screen.dart
+
+  LANGKAH 1 - Login
+    Screen  : LoginFormScreen, tombol submit
+    Event   : LoginFormSubmitted(username, password)
+    Bloc    : LoginFormBloc -> AuthRepository.login
+    API     : POST  v3.kencana.org/api/login
+    Body    : {"username", "password"}
+    Sukses  : token disimpan, AuthenticationBloc.add(SetAuthenticationStatus)
+              -> app pindah ke EntityScreen
+
+  LANGKAH 2 - Ambil daftar Entity (perusahaan)
+    Screen  : EntityScreen (otomatis saat dibuat: ..add(LoadEntity()))
+    Bloc    : EntityBloc -> EntityRepository -> EntityRest.getEntities
+    API     : POST  v2.kencana.org/api/mobile/getEntity      [butuh token]
+    Body    : (kosong)
+    Hasil   : List<Entity>, digambar sebagai grid kartu entity
+
+  LANGKAH 3 - Pilih entity, ambil menu yang boleh diakses
+    Screen  : EntityMenuScreen(entityId, entityDescription)
+    Bloc    : AccessMenuBloc..add(LoadAccessMenu(entityId))
+    API     : POST  v2.kencana.org/api/mobile/getMenu        [butuh token]
+    Body    : {"entity_id": <entityId>, "appl_id": <applId>}
+    Hasil   : List<Menu> berisi SubMenu dengan menuId
+
+  LANGKAH 4 - Ambil konfigurasi environment (paralel dengan langkah 3)
+    Bloc    : CredentialsBloc..add(CredentialsLoad())
+    API     : POST  v2.kencana.org/api/mobile/getEnvConf     [butuh token]
+    Body    : {"entity_id", "appl_id"}
+    Hasil   : Map<String,String> dari pasangan var_id -> var_value
+
+  LANGKAH 5 - Routing menu (switch pada menuId di entity_menu_screen.dart)
+    'confirmLoading'    -> QrCodeScreen           (Bagian 6.B)
+    'mnuSalesActivity'  -> Sales Activity         (Bagian 6.C)
+    'mnuApprovalList'   -> ApprovalPrScreen       (Bagian 6.E)
+    'mnuGenQrFg'        -> MillSelectorScreen     (Bagian 6.F)
+
+
+=== 6.B  CONFIRM LOADING (KONFIRMASI MUAT) ===
+
+  Semua endpoint di v2.kencana.org, prefix api/viva/confirm_muat/
+  Semua POST dan semua butuh token.
+
+  LANGKAH 1 - Scan / input manual batch ID
+    Screen  : QrCodeScreen -> QrCodeScanScreen (kamera) atau
+              QrCodeManualScreen (ketik manual)
+    Hasil   : string batchID dikembalikan lewat Navigator.pop(context, code)
+    Catatan : langkah ini TIDAK hit API. Hanya baca QR.
+
+  LANGKAH 2 - Ambil daftar warehouse untuk batch tersebut
+    Screen  : WarehouseSelectScreen, initState -> add(LoadBatch(deliveryId))
+    Bloc    : BatchBloc -> BatchRepository -> BatchRest.getBatch
+    API     : POST api/viva/confirm_muat/getDataWh
+    Body    : {"batch_id": <batchID>}
+    Hasil   : objek Batch; daftar warehouse dibaca dari
+              body['data']['warehouses']
+    Catatan : WarehouseRest.getWarehouse memanggil endpoint yang SAMA dan
+              mengembalikan List<Warehouse> saja (duplikasi, lihat Bagian 9).
+
+  LANGKAH 3 - Pilih warehouse, ambil detail surat jalan
+    Screen  : WarehouseContentListScreen
+    Bloc    : DeliveryDetailBloc -> BatchRest.getDeliveryDetail
+    API     : POST api/viva/confirm_muat/getDelivDtl
+    Body    : {"batch_id", "company_id", "mill_id", "wh_id"}
+    Hasil   : List<DeliveryDetail>
+
+  LANGKAH 4a - Konfirmasi muat
+    Bloc    : ConfirmLoadBloc -> BatchRest.confirmLoad
+    API     : POST api/viva/confirm_muat/confirmLoad
+    Body    : {"batch_id", "company_id", "mill_id", "wh_id"}
+
+  LANGKAH 4b - Batalkan muat
+    Bloc    : CancelLoadBloc -> BatchRest.cancelLoad
+    API     : POST api/viva/confirm_muat/cancelLoad
+    Body    : {"batch_id", "company_id", "mill_id", "wh_id"}
+
+  Setelah sukses, daftar detail di-refresh (ulangi Langkah 3).
+
+
+=== 6.C  SALES ACTIVITY (KUNJUNGAN PELANGGAN) ===
+
+  Semua endpoint di v2.kencana.org, semua butuh token.
+  Ada tiga kelompok prefix:
+    api/viva/transaction/CustomerVisit/...   (data utama)
+    api/kmb/sales/CustomerVisit/...          (wilayah/alamat)
+    api/viva/transaction/ActivityReport/...  (foto)
+
+  LANGKAH 1 - Cek data sales milik user yang login
+    Dipanggil saat menu 'mnuSalesActivity' ditekan, juga di
+    SalesActivityDashboardScreen.initState.
+    Event   : LoadSalesData()
+    Bloc    : SalesActivityFormCheckInBloc
+    API     : GET api/viva/transaction/CustomerVisit/getUserData
+    Hasil   : SalesInfo (berisi salesId). Kalau salesId kosong, app
+              menampilkan snackbar "ID Sales belum terdaftarkan" dan
+              tidak melanjutkan.
+    Catatan : ada Timer 3 detik; kalau respons belum datang, muncul pesan
+              "Permintaan terlalu lama, coba lagi".
+
+  LANGKAH 2 - Check-in (titik kunjungan)
+    Screen  : SalesActivityFormCheckInScreen
+    Sebelum kirim: LoadCurrentLocation() mengambil GPS lewat
+                   StrictLocation.getCurrentPosition()
+    API     : POST api/viva/transaction/CustomerVisit/submitCheckpointActivity
+    Body    : hasil SalesActivityFormData.toMap()
+
+  LANGKAH 3 - Form aktivitas: cari pelanggan
+    Screen  : SalesActivityFormScreen
+    API     : POST api/viva/transaction/CustomerVisit/getCustomerById
+    Body    : {"entity_id", "customer_id": <keyword>}
+    Lanjut  : POST api/viva/transaction/CustomerVisit/getCustomer
+    Body    : {"entity_id", "customer_id"}   -> CustomerDetail
+
+  LANGKAH 4 - Dropdown wilayah berantai (masing-masing hit API saat dipilih)
+    FetchProvinces()  -> GET api/kmb/sales/CustomerVisit/getProvinceMobile
+    FetchCities(p)    -> GET api/kmb/sales/CustomerVisit/provinceOnChange
+                              body {"province": p}
+    FetchDistricts(c) -> GET api/kmb/sales/CustomerVisit/cityOnChange
+                              body {"city": c}
+    FetchVillages(d)  -> GET api/kmb/sales/CustomerVisit/districtOnChange
+                              body {"district": d}
+    Catatan : keempatnya memakai metode GET tetapi MENGIRIM BODY. Ini tidak
+              lazim untuk HTTP; server harus mendukungnya. Lihat Bagian 9.
+
+  LANGKAH 5 - Submit aktivitas (ADA JALUR OFFLINE)
+    Bloc    : SalesActivityFormBloc -> SalesActivityRepository.submitSalesActivity
+    Repository memeriksa koneksi LEBIH DULU:
+      a. Connectivity().checkConnectivity() == none
+           -> simpan ke SQLite, balas Right("Data disimpan offline.
+              Akan dikirim ketika online.")
+      b. _checkRealConnection() menyatakan offline (koneksi tidak stabil)
+           -> simpan ke SQLite, balas Right("Koneksi tidak stabil.
+              Data disimpan offline sementara.")
+      c. Online -> POST api/viva/transaction/CustomerVisit/submitCustomerActivity
+                   Body: SalesActivityFormData.toMap() berisi antara lain
+                   customer_id, customer_name, customer_address,
+                   customer_province/city/district/village, chk_* (checkbox
+                   aktivitas), latitude, longitude, gps_location, remark,
+                   images (list {src, remark}), vehicle_odometer, checkpoint,
+                   sales_id, office_id
+    PENTING : jalur (a) dan (b) mengembalikan Right/sukses, jadi UI menampilkan
+              pesan berhasil walaupun belum sampai ke server.
+
+  LANGKAH 6 - Riwayat kunjungan
+    Screen  : SalesActivityHistoryVisitScreen
+    API     : POST api/viva/transaction/CustomerVisit/getActivityData
+              (body berisi rentang tanggal start/end)
+    Detail  : POST api/viva/transaction/CustomerVisit/getActivityDetail
+    Foto    : POST api/viva/transaction/ActivityReport/getDetailImages
+    Upload  : POST api/viva/transaction/ActivityReport/submitImagesDetail
+              (gambar dikonversi base64 lewat utils/image_to_base_64_converter.dart)
+
+
+=== 6.D  SINKRONISASI OFFLINE SALES ACTIVITY ===
+
+  Penyimpanan lokal: SQLite, file sales_activity.db, tabel customer_visit
+  (kolom: id, customerId, customerName, data) - lihat
+  lib/utils/sales_activity/sales_activity_local_database.dart
+
+  Alur simpan  : SalesActivityRepository.submitSalesActivity mendeteksi offline
+                 -> insertActivity(formData)
+  Alur kirim   : SalesActivitySyncService().syncPendingActivities()
+                 dipanggil sekali di main() saat app start:
+                   1. tunggu 3 detik
+                   2. cek konektivitas; kalau none -> berhenti
+                   3. getPendingActivities() ambil semua baris
+                   4. untuk setiap baris: POST submitCustomerActivity
+                   5. kalau sukses -> deleteActivity(id)
+                      kalau gagal  -> hanya print, baris TETAP tersimpan
+  Catatan      : service ini membuat Dio SENDIRI (Environment + interceptor),
+                 tidak memakai client dari main(). Sinkronisasi hanya terjadi
+                 saat app dibuka, tidak ada retry otomatis saat koneksi pulih
+                 di tengah pemakaian.
+
+
+=== 6.E  APPROVAL PURCHASE REQUEST (PR) ===
+
+  Client  : tesClient (default v2.kencana.org; bisa ditukar ke DevEnvironment)
+  Semua butuh token.
+
+  LANGKAH 1 - Ambil data user + daftar department
+    Screen  : ApprovalSrMenuScreen ..add(GetApprovalPrDepartmentEvent())
+    Bloc    : ApprovalPrDepartmentBloc
+    API     : GET api/srs/mobile/approval/getUserData
+              (khusus endpoint ini sendTimeout & receiveTimeout di-override
+               jadi 15 detik, dan receiveDataWhenStatusError: true)
+    Hasil   : List<Department> dibaca dari data['department']
+
+  LANGKAH 2 - Ambil daftar PR yang perlu disetujui
+    Screen  : ApprovalPrScreen
+    Bloc    : ApprovalPrListBloc
+    API     : POST api/<entityId>/mobile/approval/getApprovalList
+    Body    : {"tr_type": "PR"}
+    Catatan : entityId masuk ke dalam PATH, bukan body.
+    Hasil   : List<ApprovalPrFSunrise>
+
+  LANGKAH 3 - Setujui atau tolak
+    Bloc    : ApprovePrBloc
+    API     : POST api/<entityId>/mobile/approval/submitApprove
+    Body approve : {"id": <prId>, "approve_type": "approve"}
+    Body reject  : {"id": <prId>, "approve_type": "reject"}
+    Catatan : approve dan reject memakai endpoint yang SAMA, hanya nilai
+              approve_type yang berbeda.
+    Sukses  : Right("Successfully approved") / Right("Successfully rejected")
+
+
+=== 6.F  STOCK OPNAME / GENERATE QR BARANG JADI ===
+
+  Fitur ini memakai TIGA base URL sekaligus. Perhatikan betul:
+    v3.kencana.org           -> MillSelectorRest (pemilihan mill)
+    api-kmb.kencana.org      -> MillRest, ProdMasterRest, BarangJadiRest
+    android.kencana.org      -> OpnameStockHdrRest, OpnameStockDtlRest,
+                                OpnameRest, WHBinRest
+
+  LANGKAH 1 - Tentukan mill yang boleh diakses user (RANTAI 3 API)
+    Screen  : MillSelectorScreen
+    Bloc    : MillSelectorBloc -> MillSelectorRepository.getAvailableMill()
+    Rantai di dalam repository (berurutan, saling bergantung):
+
+      1a. POST v3.kencana.org/api/menu/group
+          Body: {"entity_id": "KMB", "appl_id": "WAREHOUSE WEB"}
+          Ambil: response.data['data']  -> groupId
+
+      1b. POST v3.kencana.org/api/menu/env_conf
+          Body: {"entity_id": "KMB", "appl_id": "WAREHOUSE WEB",
+                 "groupid": <groupId>, "var_id": "OFFICEID"}
+          Ambil: response.data['data']  -> mis. "KMJ" atau "KMJ,KMW"
+          Kalau null/kosong -> repository return [] dan UI FALLBACK ke MillBloc
+
+      1c. POST v3.kencana.org/api/kmb/master/mill
+          Body: {}
+          Ambil: response.data['data'] -> List<Mill>
+
+      1d. Filter di sisi aplikasi: ambil mill yang millID-nya ada di daftar
+          OFFICEID hasil 1b.
+
+    Catatan : ketiga API ini memeriksa response.data['status_code'] == 200
+              (bukan HTTP status) dan melempar Exception, bukan Either.
+    Fallback: MillBloc -> MillRest.getMill
+              POST api-kmb.kencana.org/api/kmb/master/mill  body {}
+              (endpoint sama, host BERBEDA - lihat Bagian 9)
+
+  LANGKAH 2 - Ambil header stock opname yang masih terbuka
+    Screen  : StockOpnameHdrScreen
+    Bloc    : OpnameStockHdrBloc
+    API     : POST android.kencana.org/api/getOpenOpnameHdrByMillAndPeriod
+    Body    : {"mill_id", "wh_id", "bin_id"}
+    Parsing : response.data['data']['data'] (bersarang dua kali)
+    Hasil   : List<StockOpnameHdr>
+
+  LANGKAH 3 - Buka detail, muat data pendukung
+    Screen  : StockOpnameDtlScreen. Saat dibuka langsung menembak beberapa API:
+
+    3a. ProdMasterBloc..add(LoadProdMaster())
+        POST api-kmb.kencana.org/api/kmb/warehouse/getListProdAdd  -> List<ProdAdd>
+        POST api-kmb.kencana.org/api/kmb/warehouse/getListProdTor  -> List<ProdTor>
+
+    3b. WHBinBloc..add(LoadWHBin(millId, whId))
+        POST android.kencana.org/api/listWHBinKMB
+        Parameter dikirim sebagai QUERY STRING, bukan body:
+          ?mill_id=<millId>&wh_id=<whId>
+        Catatan: Rest ini TIDAK menyalakan requiresToken dan TIDAK memakai
+                 Either (langsung throw). Lihat Bagian 9.
+
+    3c. StockOpnameDtlBloc -> OpnameStockDtlRest.getOpnameDetail
+        POST android.kencana.org/api/getOpnameDetail
+        Body: {"tr_id", "mill_id", "wh_id", "bin_id", "batch_id"}
+        Parsing: response.data['data']['data']
+
+  LANGKAH 4 - Cari barang jadi (manual atau hasil scan QR)
+    Event   : SearchBarangJadi(keyword) / SearchBarangJadiFromScan(prodCode)
+    Bloc    : BarangJadiBloc
+    API     : POST api-kmb.kencana.org/api/kmb/warehouse/getBarangJadi
+    Body    : {"nama_barang": <keyword>}
+    Scan    : QrCodeOpnameScreen / QrCodeScanScreen mengembalikan prodCode,
+              lalu dipakai sebagai keyword. Scan sendiri tidak hit API.
+
+  LANGKAH 5 - Submit hasil opname
+    Event   : SubmitOpnameUpdate(...)
+    Bloc    : OpnameBloc -> OpnameRepository -> OpnameRest.submitOpnameUpdate
+    API     : POST android.kencana.org/api/updateOpnameItemByScan
+    Body    : {"mill_id", "wh_id", "bin_id", "tr_id", "prod_code", "add_id",
+               "tor_id", "panjang", "batch_id", "remark", "qty_opname",
+               "user_id"}
+    Hasil   : response.data['data'] berisi qty_awal dan qty_opname,
+              di-emit sebagai OpnameSuccess(qtyAwal, qtyOpname)
+    Catatan : event punya field qualityId tetapi TIDAK dikirim ke server.
+              Ada dua mode di UI: OpnameUpdateMode.overwrite dan .add.
+
+
+--------------------------------------------------------------------------------
+BAGIAN 7. DAFTAR LENGKAP ENDPOINT
+--------------------------------------------------------------------------------
+
+Kolom TKN = butuh token (Y/N). Path relatif terhadap base URL.
+
+HOST: https://v3.kencana.org/   (authClient)
+  M      PATH                       BODY                              TKN  FILE
+  POST   api/login                  username, password                N    auth_rest.dart
+  GET    api/logout                 -                                 N    auth_rest.dart
+  POST   api/menu/group             entity_id, appl_id                Y*   mill_selector_rest.dart
+  POST   api/menu/env_conf          entity_id, appl_id, groupid,      Y*   mill_selector_rest.dart
+                                    var_id
+  POST   api/kmb/master/mill        {}                                Y*   mill_selector_rest.dart
+  POST   api/mobile/getMenu         entity_id, appl_id                Y    authorization_rest.dart
+  POST   api/mobile/getEnvConf      entity_id, appl_id                Y    authorization_rest.dart
+  (* MillSelectorRest tidak menyalakan requiresToken sendiri; token ikut
+     terkirim kalau Rest lain pada authClient sudah menyalakannya)
+
+HOST: https://v2.kencana.org/   (dioClient / tesClient)
+  POST   api/mobile/getEntity                             {}             Y  entity_rest.dart
+  POST   api/viva/confirm_muat/getDataWh                  batch_id       Y  batch_rest.dart / warehouse_rest.dart
+  POST   api/viva/confirm_muat/getDelivDtl                batch_id,      Y  batch_rest.dart
+                                                          company_id,
+                                                          mill_id, wh_id
+  POST   api/viva/confirm_muat/confirmLoad                idem           Y  batch_rest.dart
+  POST   api/viva/confirm_muat/cancelLoad                 idem           Y  batch_rest.dart
+  GET    api/viva/transaction/CustomerVisit/getUserData    -             Y  sales_activity_rest.dart
+  GET    api/kmb/sales/CustomerVisit/getProvinceMobile     -             Y  sales_activity_rest.dart
+  GET    api/kmb/sales/CustomerVisit/provinceOnChange      province      Y  sales_activity_rest.dart
+  GET    api/kmb/sales/CustomerVisit/cityOnChange          city          Y  sales_activity_rest.dart
+  GET    api/kmb/sales/CustomerVisit/districtOnChange      district      Y  sales_activity_rest.dart
+  POST   api/viva/transaction/CustomerVisit/getCustomerById
+                                                   entity_id,
+                                                   customer_id          Y  sales_activity_rest.dart
+  POST   api/viva/transaction/CustomerVisit/getCustomer
+                                                   entity_id,
+                                                   customer_id          Y  sales_activity_rest.dart
+  POST   api/viva/transaction/CustomerVisit/submitCheckpointActivity
+                                                   SalesActivityFormData Y sales_activity_rest.dart
+  POST   api/viva/transaction/CustomerVisit/submitCustomerActivity
+                                                   SalesActivityFormData Y sales_activity_rest.dart
+  POST   api/viva/transaction/CustomerVisit/getActivityData
+                                                   rentang tanggal      Y  sales_activity_rest.dart
+  POST   api/viva/transaction/CustomerVisit/getActivityDetail            Y  sales_activity_rest.dart
+  POST   api/viva/transaction/ActivityReport/submitImagesDetail  images  Y  sales_activity_rest.dart
+  POST   api/viva/transaction/ActivityReport/getDetailImages             Y  sales_activity_rest.dart
+  GET    api/srs/mobile/approval/getUserData              -             Y  approval_pr_rest.dart
+  POST   api/<entityId>/mobile/approval/getApprovalList   tr_type: "PR" Y  approval_pr_rest.dart
+  POST   api/<entityId>/mobile/approval/submitApprove     id,           Y  approval_pr_rest.dart
+                                                          approve_type
+
+HOST: https://api-kmb.kencana.org/   (kmbClient)
+  POST   api/kmb/master/mill                    {}                       Y  mill_rest.dart
+  POST   api/kmb/warehouse/getListProdAdd       -                        Y  master_prod_rest.dart
+  POST   api/kmb/warehouse/getListProdTor       -                        Y  master_prod_rest.dart
+  POST   api/kmb/warehouse/getBarangJadi        nama_barang              Y  barang_jadi_rest.dart
+
+HOST: https://android.kencana.org/   (androidKencanaClient)
+  POST   api/getOpenOpnameHdrByMillAndPeriod    mill_id, wh_id, bin_id   Y  opname_stock_hdr_rest.dart
+  POST   api/getOpnameDetail                    tr_id, mill_id, wh_id,   Y  opname_stock_dtl_rest.dart
+                                                bin_id, batch_id
+  POST   api/updateOpnameItemByScan             12 field (Bagian 6.F)    Y  opname_update.dart
+  POST   api/listWHBinKMB                       query: mill_id, wh_id    N  bin_rest.dart
+  GET    VivaKencana/version.json               -                        N  bloc/update/update_bloc.dart
+
+
+--------------------------------------------------------------------------------
+BAGIAN 8. CARA MENAMBAH ENDPOINT BARU (CHECKLIST)
+--------------------------------------------------------------------------------
+
+Misal mau menambah endpoint POST api/kmb/warehouse/getRak.
+
+  1. MODEL
+     Buat lib/models/.../rak.dart dengan factory Rak.fromMap(Map) dan toMap().
+     Ikuti pola model yang ada (pakai `?? ""` supaya aman kalau field null).
+
+  2. REST
+     Tambah method di class Rest yang sesuai, atau buat file baru di
+     lib/data/data_providers/rest_api/. Salin pola dari Bagian 4:
+       - nyalakan requiresToken kalau butuh login
+       - log() request dan response
+       - cek statusCode == 200
+       - parse dan bungkus Right(...)
+       - tangkap DioException -> Left(NetUtils.parseDioException(e))
+
+  3. REPOSITORY
+     Tambah method pembungkus di lib/data/repository/. Kalau tidak ada logika
+     tambahan, cukup `return xRest.method(...)`. Taruh di sini kalau perlu
+     simpan cache, cek koneksi, atau filter data.
+
+  4. BLOC
+     Buat 3 file: x_event.dart, x_state.dart, x_bloc.dart (pola part-of).
+     State minimal: Initial, Loading, Success(data), Error(message).
+     Di handler: emit Loading -> await repository -> result.fold(error, data).
+
+  5. DAFTARKAN DI main.dart
+     a. buat instance Rest dengan Dio client yang base URL-nya benar
+     b. buat instance Repository
+     c. tambahkan RepositoryProvider.value(value: xRepository)
+     d. tambahkan BlocProvider kalau Bloc dipakai global. Kalau hanya dipakai
+        satu layar, lebih baik dibuat lokal di screen itu (lihat EntityScreen).
+
+  6. SCREEN
+     Panggil `context.read<XBloc>().add(LoadX())` di initState atau saat
+     tombol ditekan, lalu gambar dengan BlocBuilder / BlocListener.
+
+  7. UJI
+     Jalankan dan lihat log. Semua Rest memakai `log()` dari dart:developer,
+     jadi request dan response muncul di Debug Console / `flutter logs`.
+
+
+--------------------------------------------------------------------------------
+BAGIAN 9. CATATAN, KEJANGGALAN, DAN HAL YANG PERLU HATI-HATI
+--------------------------------------------------------------------------------
+
+Bagian ini mencatat kondisi kode apa adanya supaya tidak bingung saat membaca
+atau menambah fitur. Bukan daftar tugas wajib, tapi sebaiknya diketahui.
+
+ 1. requiresToken dipasang di level CLIENT, bukan per-request.
+    `dio.options.headers['requiresToken'] = true` mengubah konfigurasi global
+    client. Karena interceptor menghapusnya setiap request, hasilnya terlihat
+    benar, tapi sifatnya bergantung urutan pemanggilan. Cara yang lebih aman:
+    kirim lewat Options(headers: {...}) per request.
+
+ 2. Rest yang TIDAK menyalakan requiresToken:
+    - WHBinRest (api/listWHBinKMB)
+    - MillSelectorRest (ketiga endpoint-nya)
+    Kalau endpoint ini sebenarnya butuh token, request bisa lolos hanya karena
+    Rest lain di client yang sama sudah menyalakan penanda.
+
+ 3. Dua gaya error handling bercampur:
+    - Mayoritas: Either<CustomException, T> (dartz)
+    - MillSelectorRest, WHBinRest: langsung `throw Exception`, ditangkap
+      try/catch di Bloc
+    Kalau menambah kode baru, pakai gaya Either supaya konsisten.
+
+ 4. NetUtils.parseErrorResponse menerima parameter bertipe Response dari
+    package:http, tetapi di semua pemanggil yang dikirim adalah
+    `response.data` (Map dari Dio). Kode ini lolos compile karena dynamic,
+    dan praktisnya tidak pernah jalan karena Dio sudah melempar DioException
+    untuk status non-2xx lebih dulu. Jadi cabang `else` di semua Rest
+    sebenarnya kode mati.
+
+ 5. NetUtils memetakan status 500 ke NotFoundException. Secara semantik keliru
+    (500 = kesalahan server, bukan tidak ditemukan), tapi pesan yang tampil ke
+    user tetap dari response['message'] sehingga tidak terlihat.
+
+ 6. Endpoint api/kmb/master/mill dipanggil dari DUA host berbeda:
+    - MillSelectorRest -> v3.kencana.org
+    - MillRest         -> api-kmb.kencana.org
+    Pastikan mana yang benar sebelum mengubah salah satunya.
+
+ 7. Empat endpoint wilayah Sales Activity memakai GET tetapi mengirim body
+    (provinceOnChange, cityOnChange, districtOnChange; getProvinceMobile tanpa
+    body). Banyak proxy/gateway membuang body pada GET. Kalau suatu saat
+    dropdown wilayah kosong tanpa error, curigai ini lebih dulu.
+
+ 8. getDataWh dipanggil oleh dua Rest berbeda (BatchRest.getBatch dan
+    WarehouseRest.getWarehouse) dengan parsing yang berbeda. WarehouseRest
+    sebagian sudah dikomentari.
+
+ 9. Jalur offline Sales Activity mengembalikan Right (sukses) walaupun data
+    belum terkirim ke server. UI menampilkan pesan berbeda, tapi Bloc melihat
+    keduanya sebagai sukses. Hati-hati kalau menambah logika setelah submit.
+
+10. Sinkronisasi offline hanya jalan sekali di main(). Kalau app sudah terbuka
+    lalu koneksi pulih, data pending baru terkirim saat app dibuka lagi.
+
+11. Di main.dart, MyApp memiliki `if (true) { return EntityScreen(); }` di
+    dalam blok Authenticated - sisa kode percabangan yang dinonaktifkan.
+
+12. SubmitOpnameUpdate membawa field qualityId yang tidak pernah masuk payload.
+
+13. Timeout default 20 detik untuk semua client. Hanya
+    approval/getUserData yang menurunkannya ke 15 detik.
+
+14. Beberapa Rest masih menulis URL absolut di dalam log() secara hardcode
+    (mis. 'https://v3.kencana.org/api/login'). Kalau base URL diganti ke dev,
+    log akan menampilkan URL yang salah walaupun request-nya benar.
+    Yang lebih baru sudah memakai ${dio.options.baseUrl}.
+
+
+--------------------------------------------------------------------------------
+BAGIAN 10. CARA DEBUG REQUEST
+--------------------------------------------------------------------------------
+
+ * Semua Rest memakai `log()` dari dart:developer. Buka Debug Console di
+   VS Code/Android Studio, atau jalankan `flutter logs`.
+ * Pola log yang dipakai:
+     'Request to <url> (POST)'
+     'Response from <url> (POST): <response>'
+     'DIO ERROR STATUS : ...' / 'DIO ERROR DATA : ...' / 'DIO ERROR MSG : ...'
+ * Untuk melihat token yang terkirim, buka komentar baris print di
+   lib/utils/interceptors/dio_request_token_interceptor.dart.
+ * Beberapa log response sengaja dikomentari (mis. di auth_rest.dart) supaya
+   token tidak tercetak. Buka hanya saat perlu, jangan sampai ter-commit.
+ * Kalau ingin log HTTP penuh, tambahkan LogInterceptor bawaan Dio di
+   main.dart:
+     ..interceptors.addAll([
+        DioRequestTokenInterceptor(),
+        LogInterceptor(requestBody: true, responseBody: true),
+     ])
+
+
+--------------------------------------------------------------------------------
+BAGIAN 11. PETA FILE CEPAT
+--------------------------------------------------------------------------------
+
+  lib/main.dart                     titik awal; semua client, Rest, Repository,
+                                    dan Bloc global didaftarkan di sini
+  lib/environment.dart              semua base URL dan timeout
+  lib/utils/interceptors/           penyisipan token Bearer
+  lib/utils/net_utils.dart          pemetaan error HTTP -> CustomException
+  lib/data/data_providers/rest_api/ SEMUA pemanggilan HTTP ada di sini
+  lib/data/data_providers/shared-preferences/  penyimpanan token
+  lib/data/repository/              logika bisnis (cek koneksi, simpan token,
+                                    filter data, simpan offline)
+  lib/models/                       model + fromMap/toMap
+  lib/models/errors/custom_exception.dart  hierarki exception
+  lib/bloc/                         Event -> State per fitur
+  lib/presentation/                 layar dan widget
+  lib/utils/sales_activity/         SQLite lokal + service sinkronisasi
+
+================================================================================
+ SELESAI
+================================================================================

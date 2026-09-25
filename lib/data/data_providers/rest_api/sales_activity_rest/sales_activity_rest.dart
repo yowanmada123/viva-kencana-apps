@@ -23,7 +23,7 @@ class SalesActivityRest {
       http.options.headers['requiresToken'] = true;
       // log('Dio headers: ${http.options.headers}');
       log(
-        'Request to: https://v3.kencana.org/api/viva/transaction/CustomerVisit/getUserData (GET)',
+        'Request to: ${http.options.baseUrl}/viva/transaction/CustomerVisit/getUserData (GET)',
       );
       final response = await http.get(
         "api/viva/transaction/CustomerVisit/getUserData",
@@ -54,7 +54,7 @@ class SalesActivityRest {
     try {
       http.options.headers['requiresToken'] = true;
       log(
-        'Request to https://v2.kencana.org/api/kmb/sales/CustomerVisit/getProvinceMobile (GET)',
+        'Request to ${http.options.baseUrl}/api/kmb/sales/CustomerVisit/getProvinceMobile (GET)',
       );
       final response = await http.get(
         "api/kmb/sales/CustomerVisit/getProvinceMobile",
@@ -92,7 +92,7 @@ class SalesActivityRest {
     try {
       http.options.headers['requiresToken'] = true;
       log(
-        'Request to https://v2.kencana.org/api/kmb/sales/CustomerVisit/provinceOnChange (GET)',
+        'Request to ${http.options.baseUrl}/api/kmb/sales/CustomerVisit/provinceOnChange (GET)',
       );
       final response = await http.get(
         "api/kmb/sales/CustomerVisit/provinceOnChange",
@@ -166,7 +166,7 @@ class SalesActivityRest {
     try {
       http.options.headers['requiresToken'] = true;
       log(
-        'Request to https://v2.kencana.org/api/kmb/sales/CustomerVisit/districtOnChange (GET)',
+        'Request to ${http.options.baseUrl}/api/kmb/sales/CustomerVisit/districtOnChange (GET)',
       );
       final response = await http.get(
         "api/kmb/sales/CustomerVisit/districtOnChange",
@@ -203,7 +203,7 @@ class SalesActivityRest {
     try {
       http.options.headers['requiresToken'] = true;
       log(
-        'Request to https://v2.kencana.org/api/viva/transaction/CustomerVisit/getCustomerById (GET)',
+        'Request to ${http.options.baseUrl}/api/viva/transaction/CustomerVisit/getCustomerById (GET)',
       );
       final response = await http.post(
         "api/viva/transaction/CustomerVisit/getCustomerById",
@@ -240,7 +240,7 @@ class SalesActivityRest {
     try {
       http.options.headers['requiresToken'] = true;
       log(
-        'Request to https://v2.kencana.org/api/viva/transaction/CustomerVisit/getCustomer (POST)',
+        'Request to ${http.options.baseUrl}/api/viva/transaction/CustomerVisit/getCustomer (POST)',
       );
 
       final response = await http.post(
@@ -272,7 +272,7 @@ class SalesActivityRest {
     try {
       http.options.headers['requiresToken'] = true;
       log(
-        'Request to https://v2.kencana.org/api/viva/transaction/CustomerVisit/submitCheckpointActivity (POST)',
+        'Request to ${http.options.baseUrl}/api/viva/transaction/CustomerVisit/submitCheckpointActivity (POST)',
       );
       final response = await http.post(
         "api/viva/transaction/CustomerVisit/submitCheckpointActivity",
@@ -335,7 +335,7 @@ class SalesActivityRest {
     try {
       http.options.headers['requiresToken'] = true;
       log(
-        'Request to https://v2.kencana.org/api/viva/transaction/CustomerVisit/getActivityData (POST)',
+        'Request to ${http.options.baseUrl}api/viva/transaction/CustomerVisit/getActivityData (POST)',
       );
       final body = {'start_date': startDate ?? '', 'end_date': endDate ?? ''};
       final response = await http.post(
@@ -372,7 +372,7 @@ class SalesActivityRest {
     try {
       http.options.headers['requiresToken'] = true;
       log(
-        'Request to https://v2.kencana.org/api/viva/transaction/CustomerVisit/getActivityDetail (POST)',
+        'Request to ${http.options.baseUrl}/api/viva/transaction/CustomerVisit/getActivityDetail (POST)',
       );
       final body = {'id': activityId};
       final response = await http.post(
@@ -412,7 +412,7 @@ class SalesActivityRest {
     try {
       http.options.headers['requiresToken'] = true;
       log(
-        'Request to https://v2.kencana.org/api/viva/transaction/ActivityReport/submitImagesDetail (POST)',
+        'Request to ${http.options.baseUrl}//api/viva/transaction/ActivityReport/submitImagesDetail (POST)',
       );
       final body = {
         'entity': entityId,
