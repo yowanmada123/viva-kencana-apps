@@ -16,8 +16,12 @@ class EntityRest {
     try {
       dio.options.headers['requiresToken'] = true;
 
-      log('Request to ${dio.options.baseUrl}api/mobile/getEntity (POST)');
-      final response = await dio.post("api/mobile/getEntity");
+      final data = <String, dynamic>{};
+
+      log(
+        'Request to ${dio.options.baseUrl}api/mobile/getEntity (POST) body: $data',
+      );
+      final response = await dio.post("api/mobile/getEntity", data: data);
 
       log(
         'Response from ${dio.options.baseUrl}api/mobile/getEntity (POST): $response',

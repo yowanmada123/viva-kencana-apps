@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:vivakencanaapp/bloc/authorization/credentials/credentials_bloc.dart';
 import 'package:vivakencanaapp/presentation/approval/approval_pr_screen.dart';
+import 'package:vivakencanaapp/presentation/incomine_inspection/incoming_inspection_screen.dart';
 import 'package:vivakencanaapp/presentation/stock_opname/stock_opname_qr/mill_selector_screen.dart';
 
 import '../../bloc/auth/authentication/authentication_bloc.dart';
@@ -181,6 +182,20 @@ class _MyGridLayoutState extends State<MyGridLayout> {
           );
         };
         break;
+      case 'mnuIncomingInspection':
+        routeAction = () async {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder:
+                  (_) => IncomingInspectionScreen(
+                    title: 'Incoming Inspection',
+                    entityId: widget.entityId,
+                  ),
+            ),
+          );
+        };
+        break;
       default:
         routeAction = null;
     }
@@ -294,6 +309,21 @@ class _MyGridLayoutState extends State<MyGridLayout> {
             );
           },
         );
+      case 'mnuIncomingInspection':
+        return submenu.copyWith(
+          action: () async {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder:
+                    (_) => IncomingInspectionScreen(
+                      title: 'Incoming Inspection',
+                      entityId: entityId,
+                    ),
+              ),
+            );
+          },
+        );
       default:
         return submenu.copyWith(action: null);
     }
@@ -309,6 +339,8 @@ class _MyGridLayoutState extends State<MyGridLayout> {
         return Icons.location_searching;
       case 'mnuGenQrFg':
         return Icons.inventory;
+      case 'mnuIncomingInspection':
+        return Icons.fact_check;
       default:
         return Icons.menu;
     }

@@ -53,6 +53,7 @@ import 'data/data_providers/rest_api/stock_opname/master_prod_rest.dart';
 import 'data/data_providers/rest_api/stock_opname/mill_rest.dart';
 import 'data/data_providers/rest_api/stock_opname/opname_stock_dtl_rest.dart';
 import 'data/data_providers/rest_api/stock_opname/opname_stock_hdr_rest.dart';
+import 'data/data_providers/rest_api/incoming_inspection/incoming_inspection_rest.dart';
 import 'data/data_providers/rest_api/stock_opname/opname_update.dart';
 import 'data/data_providers/shared-preferences/shared_preferences_key.dart';
 import 'data/data_providers/shared-preferences/shared_preferences_manager.dart';
@@ -60,6 +61,7 @@ import 'data/repository/auth_repository.dart';
 import 'data/repository/authorization_repository.dart';
 import 'data/repository/batch_repository.dart';
 import 'data/repository/entity_repository.dart';
+import 'data/repository/incoming_inspection_repository.dart';
 import 'data/repository/sales_repository.dart';
 import 'data/repository/stock_opname/barang_jadi_repository.dart';
 import 'data/repository/stock_opname/opname_stock_hdr_repository.dart';
@@ -115,6 +117,7 @@ void main() async {
   final prodMasterRest = ProdMasterRest(kmbClient);
   final barangJadiRest = BarangJadiRest(kmbClient);
   final whBinRest = WHBinRest(androidKencanaClient);
+  final incomingInspectionRest = IncomingInspectionRest(androidKencanaClient);
 
   final authRepository = AuthRepository(
     authRest: authRest,
@@ -142,6 +145,9 @@ void main() async {
   final barangJadiRepository = BarangJadiRepository(barangJadiRest);
   final opnameRepository = OpnameRepository(opnameUpdateRest);
   final binRepository = WHBinRepository(whBinRest);
+  final incomingInspectionRepository = IncomingInspectionRepository(
+    incomingInspectionRest: incomingInspectionRest,
+  );
 
   runApp(
     MultiRepositoryProvider(
@@ -160,6 +166,7 @@ void main() async {
         RepositoryProvider.value(value: barangJadiRepository),
         RepositoryProvider.value(value: opnameRepository),
         RepositoryProvider.value(value: binRepository),
+        RepositoryProvider.value(value: incomingInspectionRepository),
       ],
       child: MultiBlocProvider(
         providers: [

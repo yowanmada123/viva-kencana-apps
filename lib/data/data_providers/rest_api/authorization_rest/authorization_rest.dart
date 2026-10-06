@@ -53,8 +53,12 @@ class AuthorizationRest {
 
       final data = {"entity_id": entityId, "appl_id": applId};
       final response = await dio.post("api/mobile/getEnvConf", data: data);
+      log('Request to ${dio.options.baseUrl}api/mobile/getEnvConf (Post)');
 
       if (response.statusCode == 200) {
+        log(
+          'Response "${dio.options.baseUrl}api/mobile/getEnvConf (Post)" : ${response.data.toString()}',
+        );
         final body = response.data;
 
         Map<String, String> result = {};

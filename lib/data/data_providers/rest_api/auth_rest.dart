@@ -18,12 +18,12 @@ class AuthRest {
   }) async {
     try {
       final body = {'username': username, 'password': password};
-      log('Request to https://v3.kencana.org/api/login (POST)');
+      log('Request to ${http.options.baseUrl}api/login (POST)');
       final response = await http.post('api/login', data: body);
-      // log('Response from: https://v3.kencana.org/api/login (POST): $response');
+      // log('Response from: ${http.options.baseUrl}api/login (POST): $response');
 
       if (response.statusCode == 200) {
-        // log('Response body: ${response.data}');
+        log('Response body: ${response.data}');
         final body = response.data;
         final auth = Auth.fromMap(body['data']);
         return Right(auth);
