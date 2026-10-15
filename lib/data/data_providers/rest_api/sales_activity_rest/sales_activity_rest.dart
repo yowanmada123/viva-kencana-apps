@@ -23,13 +23,13 @@ class SalesActivityRest {
       http.options.headers['requiresToken'] = true;
       // log('Dio headers: ${http.options.headers}');
       log(
-        'Request to: ${http.options.baseUrl}/viva/transaction/CustomerVisit/getUserData (GET)',
+        'Request to: ${http.options.baseUrl}/api/salesActivity/getUserData (GET)',
       );
       final response = await http.get(
-        "api/viva/transaction/CustomerVisit/getUserData",
+        "api/salesActivity/getUserData",
       );
       log(
-        'Response from "api/viva/transaction/CustomerVisit/getUserData" : ${response.toString()}',
+        'Response from "api/salesActivity/getUserData" : ${response.toString()}',
       );
       if (response.statusCode == 200) {
         final body = response.data;
@@ -54,13 +54,13 @@ class SalesActivityRest {
     try {
       http.options.headers['requiresToken'] = true;
       log(
-        'Request to ${http.options.baseUrl}/api/kmb/sales/CustomerVisit/getProvinceMobile (GET)',
+        'Request to ${http.options.baseUrl}/api/salesActivity/getProvinceMobile (GET)',
       );
       final response = await http.get(
-        "api/kmb/sales/CustomerVisit/getProvinceMobile",
+        "api/salesActivity/getProvinceMobile",
       );
       log(
-        'Response from "api/kmb/sales/CustomerVisit/getProvinceMobile" : ${response.toString()}',
+        'Response from "api/salesActivity/getProvinceMobile" : ${response.toString()}',
       );
       if (response.statusCode == 200) {
         final body = response.data;
@@ -92,14 +92,14 @@ class SalesActivityRest {
     try {
       http.options.headers['requiresToken'] = true;
       log(
-        'Request to ${http.options.baseUrl}/api/kmb/sales/CustomerVisit/provinceOnChange (GET)',
+        'Request to ${http.options.baseUrl}/api/salesActivity/provinceOnChange (GET)',
       );
       final response = await http.get(
-        "api/kmb/sales/CustomerVisit/provinceOnChange",
+        "api/salesActivity/provinceOnChange",
         data: {"province": province},
       );
       log(
-        'Response from "api/kmb/sales/CustomerVisit/provinceOnChange" : ${response.toString()}',
+        'Response from "api/salesActivity/provinceOnChange" : ${response.toString()}',
       );
 
       if (response.statusCode == 200) {
@@ -133,7 +133,7 @@ class SalesActivityRest {
       http.options.headers['requiresToken'] = true;
 
       final response = await http.get(
-        "api/kmb/sales/CustomerVisit/cityOnChange",
+        "api/salesActivity/cityOnChange",
         data: {"city": city},
       );
       if (response.statusCode == 200) {
@@ -166,10 +166,10 @@ class SalesActivityRest {
     try {
       http.options.headers['requiresToken'] = true;
       log(
-        'Request to ${http.options.baseUrl}/api/kmb/sales/CustomerVisit/districtOnChange (GET)',
+        'Request to ${http.options.baseUrl}/api/salesActivity/districtOnChange (GET)',
       );
       final response = await http.get(
-        "api/kmb/sales/CustomerVisit/districtOnChange",
+        "api/salesActivity/districtOnChange",
         data: {"district": district},
       );
       if (response.statusCode == 200) {
@@ -203,10 +203,10 @@ class SalesActivityRest {
     try {
       http.options.headers['requiresToken'] = true;
       log(
-        'Request to ${http.options.baseUrl}/api/viva/transaction/CustomerVisit/getCustomerById (GET)',
+        'Request to ${http.options.baseUrl}/api/salesActivity/getCustomerById (GET)',
       );
       final response = await http.post(
-        "api/viva/transaction/CustomerVisit/getCustomerById",
+        "api/salesActivity/getCustomerById",
         data: {"entity_id": entityId, "customer_id": keyword},
       );
       if (response.statusCode == 200) {
@@ -240,11 +240,11 @@ class SalesActivityRest {
     try {
       http.options.headers['requiresToken'] = true;
       log(
-        'Request to ${http.options.baseUrl}/api/viva/transaction/CustomerVisit/getCustomer (POST)',
+        'Request to ${http.options.baseUrl}/api/salesActivity/getCustomer (POST)',
       );
 
       final response = await http.post(
-        "api/viva/transaction/CustomerVisit/getCustomer",
+        "api/salesActivity/getCustomer",
         data: {"entity_id": entityId, "customer_id": customerId},
       );
       if (response.statusCode == 200) {
@@ -272,10 +272,10 @@ class SalesActivityRest {
     try {
       http.options.headers['requiresToken'] = true;
       log(
-        'Request to ${http.options.baseUrl}/api/viva/transaction/CustomerVisit/submitCheckpointActivity (POST)',
+        'Request to ${http.options.baseUrl}/api/salesActivity/submitCheckpointActivity (POST)',
       );
       final response = await http.post(
-        "api/viva/transaction/CustomerVisit/submitCheckpointActivity",
+        "api/salesActivity/submitCheckpointActivity",
         data: formData.toMap(),
       );
       if (response.statusCode == 200) {
@@ -303,10 +303,10 @@ class SalesActivityRest {
     try {
       http.options.headers['requiresToken'] = true;
       log(
-        'Request to ${http.options.baseUrl}api/viva/transaction/CustomerVisit/submitCustomerActivity (POST)',
+        'Request to ${http.options.baseUrl}api/salesActivity/submitCustomerActivity (POST)',
       );
       final response = await http.post(
-        "api/viva/transaction/CustomerVisit/submitCustomerActivity",
+        "api/salesActivity/submitCustomerActivity",
         data: formData.toMap(),
       );
       if (response.statusCode == 200) {
@@ -335,11 +335,11 @@ class SalesActivityRest {
     try {
       http.options.headers['requiresToken'] = true;
       log(
-        'Request to ${http.options.baseUrl}api/viva/transaction/CustomerVisit/getActivityData (POST)',
+        'Request to ${http.options.baseUrl}api/salesActivity/getActivityData (POST)',
       );
       final body = {'start_date': startDate ?? '', 'end_date': endDate ?? ''};
       final response = await http.post(
-        "api/viva/transaction/CustomerVisit/getActivityData",
+        "api/salesActivity/getActivityData",
         data: body,
       );
       if (response.statusCode == 200) {
@@ -372,11 +372,11 @@ class SalesActivityRest {
     try {
       http.options.headers['requiresToken'] = true;
       log(
-        'Request to ${http.options.baseUrl}/api/viva/transaction/CustomerVisit/getActivityDetail (POST)',
+        'Request to ${http.options.baseUrl}/api/salesActivity/getActivityDetail (POST)',
       );
       final body = {'id': activityId};
       final response = await http.post(
-        "api/viva/transaction/CustomerVisit/getActivityDetail",
+        "api/salesActivity/getActivityDetail",
         data: body,
       );
       if (response.statusCode == 200) {
@@ -412,7 +412,7 @@ class SalesActivityRest {
     try {
       http.options.headers['requiresToken'] = true;
       log(
-        'Request to ${http.options.baseUrl}//api/viva/transaction/ActivityReport/submitImagesDetail (POST)',
+        'Request to ${http.options.baseUrl}//api/salesActivity/submitImagesDetail (POST)',
       );
       final body = {
         'entity': entityId,
@@ -422,7 +422,7 @@ class SalesActivityRest {
         'image': image,
       };
       final response = await http.post(
-        "api/viva/transaction/ActivityReport/submitImagesDetail",
+        "api/salesActivity/submitImagesDetail",
         data: body,
       );
       if (response.statusCode == 200) {
@@ -451,11 +451,11 @@ class SalesActivityRest {
     try {
       http.options.headers['requiresToken'] = true;
       log(
-        'Request to ${http.options.baseUrl}api/viva/transaction/ActivityReport/getDetailImages (POST)',
+        'Request to ${http.options.baseUrl}api/salesActivity/getDetailImages (POST)',
       );
       final body = {'entity_id': entityId, 'tr_id': trId, 'seq_id': seqId};
       final response = await http.post(
-        "api/viva/transaction/ActivityReport/getDetailImages",
+        "api/salesActivity/getDetailImages",
         data: body,
       );
       if (response.statusCode == 200) {

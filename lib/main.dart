@@ -107,7 +107,7 @@ void main() async {
   final batchRest = BatchRest(dioClient);
   final entityRest = EntityRest(dioClient);
   final authorizationRest = AuthorizationRest(authClient);
-  final salesActivityRest = SalesActivityRest(dioClient);
+  final salesActivityRest = SalesActivityRest(androidKencanaClient);
   final approvalPrRest = ApprovalPRRest(tesClient);
   final millRest = MillRest(kmbClient);
   final millSelectorRest = MillSelectorRest(authClient);

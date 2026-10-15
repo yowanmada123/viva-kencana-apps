@@ -8,7 +8,7 @@ import '../../models/sales_activity/submit_data.dart';
 import 'sales_activity_local_database.dart';
 
 class SalesActivitySyncService {
-  final SalesActivityRest api = SalesActivityRest(Dio(Environment.dioBaseOptions)..interceptors.addAll([DioRequestTokenInterceptor()]));
+  final SalesActivityRest api = SalesActivityRest(Dio(AndroidKencanaEnvironment.dioBaseOptions)..interceptors.addAll([DioRequestTokenInterceptor()]));
 
   Future<void> syncPendingActivities() async {
     await Future.delayed(const Duration(seconds: 3));

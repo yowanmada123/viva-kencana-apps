@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../bloc/sales_activity/history_visit/history_visit_detail/list_image/sales_activity_history_visit_detail_list_image_bloc.dart';
+import '../../environment.dart';
 import '../../models/sales_activity/history_detail.dart';
 
 class SalesActivityHistoryDetailImagesScreen extends StatefulWidget {
@@ -82,27 +83,11 @@ class _SalesActivityHistoryDetailImagesScreenState
                   final image = state.images[index];
                   return ClipRRect(
                     borderRadius: BorderRadius.circular(12.r),
-                    child: Image.network(
-                      "https://v2.kencana.org/storage/sales-activity/VIVA/${image.imgUrl}",
-                      fit: BoxFit.cover,
-                      loadingBuilder: (context, child, progress) {
-                        if (progress == null) return child;
-                        return Container(
-                          color: Colors.grey.shade300,
-                          child: const Center(
-                            child: CircularProgressIndicator(),
-                          ),
-                        );
-                      },
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          color: Colors.grey.shade200,
-                          child: const Icon(
-                            Icons.broken_image,
-                            color: Colors.grey,
-                          ),
-                        );
-                      },
+                    // Foto baru tersimpan di server android, foto lama masih di v2
+                    child: _networkImage(
+                      "${AndroidKencanaEnvironment.apiPath}storage/sales-activity/VIVA/${image.imgUrl}",
+                      fallbackUrl:
+                          "${Environment.apiPath}storage/sales-activity/VIVA/${image.imgUrl}",
                     ),
                   );
                 },
@@ -113,6 +98,32 @@ class _SalesActivityHistoryDetailImagesScreenState
           }
         },
       ),
+    );
+  }
+
+  Widget _networkImage(String url, {String? fallbackUrl}) {
+    return Image.network(
+      url,
+      fit: BoxFit.cover,
+      loadingBuilder: (context, child, progress) {
+        if (progress == null) return child;
+        return Container(
+          color: Colors.grey.shade300,
+          child: const Center(
+            child: CircularProgressIndicator(),
+          ),
+        );
+      },
+      errorBuilder: (context, error, stackTrace) {
+        if (fallbackUrl != null) return _networkImage(fallbackUrl);
+        return Container(
+          color: Colors.grey.shade200,
+          child: const Icon(
+            Icons.broken_image,
+            color: Colors.grey,
+          ),
+        );
+      },
     );
   }
 }
