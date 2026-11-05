@@ -57,6 +57,8 @@ import 'data/data_providers/rest_api/incoming_inspection/incoming_inspection_res
 import 'data/data_providers/rest_api/stock_opname/opname_update.dart';
 import 'data/data_providers/shared-preferences/shared_preferences_key.dart';
 import 'data/data_providers/shared-preferences/shared_preferences_manager.dart';
+import 'data/data_providers/rest_api/driver_activity/driver_activity_rest.dart';
+import 'data/repository/driver_activity_repository.dart';
 import 'data/repository/auth_repository.dart';
 import 'data/repository/authorization_repository.dart';
 import 'data/repository/batch_repository.dart';
@@ -118,6 +120,7 @@ void main() async {
   final barangJadiRest = BarangJadiRest(kmbClient);
   final whBinRest = WHBinRest(androidKencanaClient);
   final incomingInspectionRest = IncomingInspectionRest(androidKencanaClient);
+  final driverActivityRest = DriverActivityRest(dioClient);
 
   final authRepository = AuthRepository(
     authRest: authRest,
@@ -148,6 +151,9 @@ void main() async {
   final incomingInspectionRepository = IncomingInspectionRepository(
     incomingInspectionRest: incomingInspectionRest,
   );
+  final driverActivityRepository = DriverActivityRepository(
+    driverActivityRest: driverActivityRest,
+  );
 
   runApp(
     MultiRepositoryProvider(
@@ -167,6 +173,7 @@ void main() async {
         RepositoryProvider.value(value: opnameRepository),
         RepositoryProvider.value(value: binRepository),
         RepositoryProvider.value(value: incomingInspectionRepository),
+        RepositoryProvider.value(value: driverActivityRepository),
       ],
       child: MultiBlocProvider(
         providers: [

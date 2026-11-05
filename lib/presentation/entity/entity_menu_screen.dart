@@ -23,6 +23,7 @@ import '../qr_code/qr_code_screen.dart';
 import '../stock_opname/stock_opname_qr/qr_code_opname_screen.dart';
 import '../sales_activity/sales_activity_dashboard_screen.dart';
 import '../approval/approval_sr_menu_screen.dart';
+import '../driver_activity/delivery_list_screen.dart';
 
 class EntityMenuScreen extends StatelessWidget {
   const EntityMenuScreen({
@@ -182,6 +183,19 @@ class _MyGridLayoutState extends State<MyGridLayout> {
           );
         };
         break;
+      case 'Delivery List':
+        routeAction = () async {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder:
+                  (_) => DeliveryListScreen(
+                    entityId: widget.entityId,
+                  ),
+            ),
+          );
+        };
+        break;
       case 'mnuIncomingInspection':
         routeAction = () async {
           Navigator.push(
@@ -309,6 +323,20 @@ class _MyGridLayoutState extends State<MyGridLayout> {
             );
           },
         );
+      case 'Delivery List':
+        return submenu.copyWith(
+          action: () async {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder:
+                    (_) => DeliveryListScreen(
+                      entityId: entityId,
+                    ),
+              ),
+            );
+          },
+        );
       case 'mnuIncomingInspection':
         return submenu.copyWith(
           action: () async {
@@ -339,6 +367,8 @@ class _MyGridLayoutState extends State<MyGridLayout> {
         return Icons.location_searching;
       case 'mnuGenQrFg':
         return Icons.inventory;
+      case 'Delivery List':
+        return Icons.local_shipping;
       case 'mnuIncomingInspection':
         return Icons.fact_check;
       default:
