@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 
@@ -10,8 +12,7 @@ part 'access_menu_state.dart';
 class AccessMenuBloc extends Bloc<AccessMenuEvent, AccessMenuState> {
   final AuthorizationRepository authorizationRepository;
 
-  AccessMenuBloc(this.authorizationRepository)
-    : super(AccessMenuInitial()) {
+  AccessMenuBloc(this.authorizationRepository) : super(AccessMenuInitial()) {
     on<LoadAccessMenu>(_onLoadAccessMenu);
   }
 
@@ -20,6 +21,8 @@ class AccessMenuBloc extends Bloc<AccessMenuEvent, AccessMenuState> {
     Emitter<AccessMenuState> emit,
   ) async {
     emit(AccessMenuLoading());
+
+    log(event.entityId);
 
     final result = await authorizationRepository.getMenu(
       event.entityId,
