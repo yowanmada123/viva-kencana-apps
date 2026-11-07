@@ -34,13 +34,13 @@ class AuthRepository {
 
   Future<Either<CustomException, void>> logout() async {
     final res = await authRest.logout();
+    await authSharedPref.clear();
     return res.fold(
       (exception) {
         return Left(exception);
       },
-      (auth) {
-        authSharedPref.clear();
-        return Right(null);
+      (_) {
+        return const Right(null);
       },
     );
   }

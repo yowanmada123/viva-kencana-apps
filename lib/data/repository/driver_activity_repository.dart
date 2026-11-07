@@ -11,5 +11,25 @@ class DriverActivityRepository {
   Future<Either<CustomException, List<DriverDelivery>>> getDeliveryList() async {
     return await driverActivityRest.getDeliveryList();
   }
-}
 
+  Future<Either<CustomException, List<DriverDeliveryDetailItem>>> getDetailItem({
+    required String entity,
+    required String id,
+  }) async {
+    return await driverActivityRest.getDetailItem(entity: entity, id: id);
+  }
+
+  Future<Either<CustomException, String>> goCheckOut({
+    required String id,
+    required String entity,
+  }) async {
+    return await driverActivityRest.goCheckOut(id: id, entity: entity);
+  }
+
+  Future<Either<CustomException, String>> goCheckIn({
+    required String id,
+    required String entity,
+  }) async {
+    return await driverActivityRest.goCheckIn(id: id, entity: entity);
+  }
+}

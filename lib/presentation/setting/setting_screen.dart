@@ -9,6 +9,7 @@ import '../../bloc/auth/authentication/authentication_bloc.dart';
 import '../../bloc/auth/logout/logout_bloc.dart';
 import '../../data/data_providers/shared-preferences/shared_preferences_manager.dart';
 import '../../data/repository/auth_repository.dart';
+import '../login/login_form_screen.dart';
 import '../widgets/base_pop_up.dart';
 
 class SettingScreen extends StatefulWidget {
@@ -116,16 +117,17 @@ class _SettingScreenState extends State<SettingScreen> {
                   children: [
                     BlocConsumer<LogoutBloc, LogoutState>(
                       listener: (context, state) {
-                        if (state is LogoutFailure) {
+                        if (state is LogoutFailure || state is LogoutSuccess) {
                           BlocProvider.of<AuthenticationBloc>(context).add(
-                            SetAuthenticationStatus(isAuthenticated: false),
+                            const SetAuthenticationStatus(isAuthenticated: false),
                           );
-                        } else if (state is LogoutSuccess) {
-                          BlocProvider.of<AuthenticationBloc>(context).add(
-                            SetAuthenticationStatus(isAuthenticated: false),
+                          Navigator.of(context).pushAndRemoveUntil(
+                            MaterialPageRoute(
+                              builder: (context) => const LoginFormScreen(),
+                            ),
+                            (route) => false,
                           );
                         }
-                        Navigator.of(context).popUntil((route) => route.isFirst);
                       },
                       builder: (context, state) {
                         return InkWell(

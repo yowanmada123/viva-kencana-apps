@@ -13,6 +13,7 @@ import '../../data/repository/auth_repository.dart';
 import '../../data/repository/entity_repository.dart';
 import '../../models/errors/custom_exception.dart';
 import 'entity_menu_screen.dart';
+import '../login/login_form_screen.dart';
 import '../setting/setting_screen.dart';
 
 class EntityScreen extends StatelessWidget {
@@ -122,7 +123,13 @@ class _GridLayoutState extends State<GridLayout> {
                     listener: (context, state) {
                       if (state is LogoutSuccess || state is LogoutFailure) {
                         context.read<AuthenticationBloc>().add(
-                          SetAuthenticationStatus(isAuthenticated: false),
+                          const SetAuthenticationStatus(isAuthenticated: false),
+                        );
+                        Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(
+                            builder: (context) => const LoginFormScreen(),
+                          ),
+                          (route) => false,
                         );
                       }
                     },

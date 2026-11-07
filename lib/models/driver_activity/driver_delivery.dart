@@ -21,28 +21,30 @@ class DriverDelivery {
   final String dtDrop;
   final String dtLeave;
   final String dtHome;
+  final List<DelivHdrItem> delivHdrItems;
 
   DriverDelivery({
-    required this.companyId,
-    required this.officeId,
-    required this.deptId,
-    required this.idEmployee,
-    required this.name,
-    required this.entity,
-    required this.millId,
-    required this.millName,
-    required this.trId,
-    required this.driverId,
-    required this.vehicleId,
-    required this.destination,
-    required this.trDate,
-    required this.userId,
-    required this.dtConfirm1,
-    required this.dtConfirm2,
-    required this.dtArrive,
-    required this.dtDrop,
-    required this.dtLeave,
-    required this.dtHome,
+    this.companyId = '',
+    this.officeId = '',
+    this.deptId = '',
+    this.idEmployee = '',
+    this.name = '',
+    this.entity = '',
+    this.millId = '',
+    this.millName = '',
+    this.trId = '',
+    this.driverId = '',
+    this.vehicleId = '',
+    this.destination = '',
+    this.trDate = '',
+    this.userId = '',
+    this.dtConfirm1 = '',
+    this.dtConfirm2 = '',
+    this.dtArrive = '',
+    this.dtDrop = '',
+    this.dtLeave = '',
+    this.dtHome = '',
+    this.delivHdrItems = const [],
   });
 
   DriverDelivery copyWith({
@@ -66,6 +68,7 @@ class DriverDelivery {
     String? dtDrop,
     String? dtLeave,
     String? dtHome,
+    List<DelivHdrItem>? delivHdrItems,
   }) {
     return DriverDelivery(
       companyId: companyId ?? this.companyId,
@@ -88,6 +91,7 @@ class DriverDelivery {
       dtDrop: dtDrop ?? this.dtDrop,
       dtLeave: dtLeave ?? this.dtLeave,
       dtHome: dtHome ?? this.dtHome,
+      delivHdrItems: delivHdrItems ?? this.delivHdrItems,
     );
   }
 
@@ -113,15 +117,34 @@ class DriverDelivery {
       'dt_drop': dtDrop,
       'dt_leave': dtLeave,
       'dt_home': dtHome,
+      'delivHdrItems': delivHdrItems.map((x) => x.toMap()).toList(),
     };
   }
 
   factory DriverDelivery.fromMap(Map<String, dynamic> map) {
+    List<DelivHdrItem> items = [];
+    if (map['delivHdrItems'] != null && map['delivHdrItems'] is List) {
+      items = (map['delivHdrItems'] as List)
+          .whereType<Map>()
+          .map((item) => DelivHdrItem.fromMap(Map<String, dynamic>.from(item)))
+          .toList();
+    }
+
+    String parsedDestination = (map['destination'] ?? '').toString().trim();
+    if (parsedDestination.isEmpty && items.isNotEmpty) {
+      final shiptos = items
+          .map((e) => e.shipto.isNotEmpty ? e.shipto : e.receiver)
+          .where((s) => s.isNotEmpty)
+          .toSet()
+          .toList();
+      parsedDestination = shiptos.join(', ');
+    }
+
     return DriverDelivery(
       companyId: (map['company_id'] ?? '').toString().trim(),
       officeId: (map['office_id'] ?? '').toString().trim(),
       deptId: (map['dept_id'] ?? '').toString().trim(),
-      idEmployee: (map['idemployee'] ?? '').toString().trim(),
+      idEmployee: (map['idemployee'] ?? map['id_employee'] ?? '').toString().trim(),
       name: (map['name'] ?? '').toString().trim(),
       entity: (map['entity'] ?? '').toString().trim(),
       millId: (map['mill_id'] ?? '').toString().trim(),
@@ -129,7 +152,7 @@ class DriverDelivery {
       trId: (map['tr_id'] ?? '').toString().trim(),
       driverId: (map['driver_id'] ?? '').toString().trim(),
       vehicleId: (map['vehicle_id'] ?? '').toString().trim(),
-      destination: (map['destination'] ?? '').toString().trim(),
+      destination: parsedDestination,
       trDate: (map['tr_date'] ?? '').toString().trim(),
       userId: (map['user_id'] ?? '').toString().trim(),
       dtConfirm1: (map['dt_confirm1'] ?? '').toString().trim(),
@@ -138,6 +161,7 @@ class DriverDelivery {
       dtDrop: (map['dt_drop'] ?? '').toString().trim(),
       dtLeave: (map['dt_leave'] ?? '').toString().trim(),
       dtHome: (map['dt_home'] ?? '').toString().trim(),
+      delivHdrItems: items,
     );
   }
 
@@ -165,3 +189,112 @@ class DriverDelivery {
   }
 }
 
+class DelivHdrItem {
+  final String delivId;
+  final String orderId;
+  final String millId;
+  final String trType;
+  final String trId;
+  final String shipDate;
+  final String shipto;
+  final String receiver;
+  final String receiverPhone;
+  final String stat;
+  final String dtArrive;
+  final String dtDrop;
+  final String totWeight;
+  final String totPcs;
+
+  DelivHdrItem({
+    this.delivId = '',
+    this.orderId = '',
+    this.millId = '',
+    this.trType = '',
+    this.trId = '',
+    this.shipDate = '',
+    this.shipto = '',
+    this.receiver = '',
+    this.receiverPhone = '',
+    this.stat = '',
+    this.dtArrive = '',
+    this.dtDrop = '',
+    this.totWeight = '',
+    this.totPcs = '',
+  });
+
+  factory DelivHdrItem.fromMap(Map<String, dynamic> map) {
+    return DelivHdrItem(
+      delivId: (map['deliv_id'] ?? '').toString().trim(),
+      orderId: (map['order_id'] ?? '').toString().trim(),
+      millId: (map['mill_id'] ?? '').toString().trim(),
+      trType: (map['tr_type'] ?? '').toString().trim(),
+      trId: (map['tr_id'] ?? map['batch_id'] ?? '').toString().trim(),
+      shipDate: (map['ship_date'] ?? '').toString().trim(),
+      shipto: (map['shipto'] ?? map['address'] ?? '').toString().trim(),
+      receiver: (map['receiver'] ?? map['cust_name'] ?? '').toString().trim(),
+      receiverPhone: (map['receiver_phone'] ?? map['receiver_phone2'] ?? '').toString().trim(),
+      stat: (map['stat'] ?? '').toString().trim(),
+      dtArrive: (map['dt_arrive'] ?? '').toString().trim(),
+      dtDrop: (map['dt_drop'] ?? '').toString().trim(),
+      totWeight: (map['tot_weight'] ?? map['weight'] ?? '').toString().trim(),
+      totPcs: (map['tot_pcs'] ?? '').toString().trim(),
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'deliv_id': delivId,
+      'order_id': orderId,
+      'mill_id': millId,
+      'tr_type': trType,
+      'tr_id': trId,
+      'ship_date': shipDate,
+      'shipto': shipto,
+      'receiver': receiver,
+      'receiver_phone': receiverPhone,
+      'stat': stat,
+      'dt_arrive': dtArrive,
+      'dt_drop': dtDrop,
+      'tot_weight': totWeight,
+      'tot_pcs': totPcs,
+    };
+  }
+
+  String toJson() => json.encode(toMap());
+
+  factory DelivHdrItem.fromJson(String source) =>
+      DelivHdrItem.fromMap(json.decode(source));
+}
+
+class DriverDeliveryDetailItem {
+  final String namaBarang;
+  final num qtyShip;
+  final String panjang;
+
+  DriverDeliveryDetailItem({
+    required this.namaBarang,
+    required this.qtyShip,
+    required this.panjang,
+  });
+
+  factory DriverDeliveryDetailItem.fromMap(Map<String, dynamic> map) {
+    return DriverDeliveryDetailItem(
+      namaBarang: (map['NamaBarang'] ?? map['nama_barang'] ?? map['descr'] ?? '').toString().trim(),
+      qtyShip: num.tryParse((map['qty_ship'] ?? '0').toString()) ?? 0,
+      panjang: (map['panjang'] ?? map['Panjang'] ?? map['length_ship'] ?? '').toString().trim(),
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'NamaBarang': namaBarang,
+      'qty_ship': qtyShip,
+      'panjang': panjang,
+    };
+  }
+
+  String toJson() => json.encode(toMap());
+
+  factory DriverDeliveryDetailItem.fromJson(String source) =>
+      DriverDeliveryDetailItem.fromMap(json.decode(source));
+}

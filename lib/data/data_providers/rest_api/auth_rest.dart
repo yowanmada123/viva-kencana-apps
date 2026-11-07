@@ -44,7 +44,8 @@ class AuthRest {
 
   Future<Either<CustomException, void>> logout() async {
     try {
-      log('Request to https://v3.kencana.org/api/logout (GET))');
+      http.options.headers['requiresToken'] = true;
+      log('Request to ${http.options.baseUrl}api/logout (GET)');
       final response = await http.get('api/logout');
       if (response.statusCode == 200) {
         // log('Response body: ${response.data}');

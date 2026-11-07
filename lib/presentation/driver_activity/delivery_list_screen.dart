@@ -14,9 +14,10 @@ class DeliveryListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => DeliveryListBloc(
-        driverActivityRepository: context.read<DriverActivityRepository>(),
-      )..add(const GetDeliveryListEvent()),
+      create:
+          (context) => DeliveryListBloc(
+            driverActivityRepository: context.read<DriverActivityRepository>(),
+          )..add(const GetDeliveryListEvent()),
       child: const _DeliveryListView(),
     );
   }
@@ -31,6 +32,8 @@ class _DeliveryListView extends StatefulWidget {
 
 class _DeliveryListViewState extends State<_DeliveryListView> {
   final TextEditingController _searchController = TextEditingController();
+  bool _isActionLoading = false;
+  String? _selectedBatchTrId;
 
   @override
   void dispose() {
@@ -58,6 +61,130 @@ class _DeliveryListViewState extends State<_DeliveryListView> {
     return Colors.blue;
   }
 
+  Future<void> _executeCheckOut(DriverDelivery batch) async {
+    setState(() {
+      _isActionLoading = true;
+    });
+
+    final repo = context.read<DriverActivityRepository>();
+    final result = await repo.goCheckOut(id: batch.trId, entity: batch.entity);
+
+    if (!mounted) return;
+
+    setState(() {
+      _isActionLoading = false;
+    });
+
+    result.fold(
+      (failure) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(failure.message ?? 'Gagal memproses keberangkatan'),
+            backgroundColor: Colors.red.shade700,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      },
+      (successMsg) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(successMsg),
+            backgroundColor: Colors.green.shade700,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+        context.read<DeliveryListBloc>().add(const RefreshDeliveryListEvent());
+      },
+    );
+  }
+
+  Future<void> _executeCheckIn(DriverDelivery batch) async {
+    setState(() {
+      _isActionLoading = true;
+    });
+
+    final repo = context.read<DriverActivityRepository>();
+    final result = await repo.goCheckIn(id: batch.trId, entity: batch.entity);
+
+    if (!mounted) return;
+
+    setState(() {
+      _isActionLoading = false;
+    });
+
+    result.fold(
+      (failure) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(failure.message ?? 'Gagal memproses kepulangan'),
+            backgroundColor: Colors.red.shade700,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      },
+      (successMsg) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(successMsg),
+            backgroundColor: Colors.green.shade700,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+        context.read<DeliveryListBloc>().add(const RefreshDeliveryListEvent());
+      },
+    );
+  }
+
+  void _confirmAction({
+    required String title,
+    required String message,
+    required String confirmText,
+    required Color confirmColor,
+    required VoidCallback onConfirm,
+  }) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.r),
+          ),
+          title: Text(
+            title,
+            style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.bold),
+          ),
+          content: Text(
+            message,
+            style: TextStyle(fontSize: 12.sp, color: Colors.grey.shade800),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: Text(
+                'Batal',
+                style: TextStyle(color: Colors.grey.shade600),
+              ),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: confirmColor,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8.r),
+                ),
+              ),
+              onPressed: () {
+                Navigator.pop(dialogContext);
+                onConfirm();
+              },
+              child: Text(confirmText),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final primaryColor = Theme.of(context).primaryColor;
@@ -81,16 +208,16 @@ class _DeliveryListViewState extends State<_DeliveryListView> {
             icon: const Icon(Icons.refresh, color: Colors.white),
             tooltip: 'Muat Ulang',
             onPressed: () {
-              context
-                  .read<DeliveryListBloc>()
-                  .add(const RefreshDeliveryListEvent());
+              context.read<DeliveryListBloc>().add(
+                const RefreshDeliveryListEvent(),
+              );
             },
           ),
         ],
       ),
       body: Column(
         children: [
-          // Search & Summary Header
+          // Search Header
           Container(
             padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
             decoration: BoxDecoration(
@@ -117,12 +244,13 @@ class _DeliveryListViewState extends State<_DeliveryListView> {
                   child: TextField(
                     controller: _searchController,
                     onChanged: (value) {
-                      context
-                          .read<DeliveryListBloc>()
-                          .add(FilterDeliveryListEvent(value));
+                      context.read<DeliveryListBloc>().add(
+                        FilterDeliveryListEvent(value),
+                      );
                     },
                     decoration: InputDecoration(
-                      hintText: 'Cari No. Surat Jalan / Nopol / Tujuan...',
+                      hintText:
+                          'Cari No. SJ / Batch / Nopol / Penerima / Tujuan...',
                       hintStyle: TextStyle(
                         fontSize: 12.sp,
                         color: Colors.grey.shade500,
@@ -132,22 +260,23 @@ class _DeliveryListViewState extends State<_DeliveryListView> {
                         color: primaryColor,
                         size: 20.w,
                       ),
-                      suffixIcon: _searchController.text.isNotEmpty
-                          ? IconButton(
-                              icon: Icon(
-                                Icons.clear,
-                                size: 18.w,
-                                color: Colors.grey,
-                              ),
-                              onPressed: () {
-                                _searchController.clear();
-                                context
-                                    .read<DeliveryListBloc>()
-                                    .add(const FilterDeliveryListEvent(''));
-                                setState(() {});
-                              },
-                            )
-                          : null,
+                      suffixIcon:
+                          _searchController.text.isNotEmpty
+                              ? IconButton(
+                                icon: Icon(
+                                  Icons.clear,
+                                  size: 18.w,
+                                  color: Colors.grey,
+                                ),
+                                onPressed: () {
+                                  _searchController.clear();
+                                  context.read<DeliveryListBloc>().add(
+                                    const FilterDeliveryListEvent(''),
+                                  );
+                                  setState(() {});
+                                },
+                              )
+                              : null,
                       border: InputBorder.none,
                       contentPadding: EdgeInsets.symmetric(
                         horizontal: 16.w,
@@ -165,9 +294,7 @@ class _DeliveryListViewState extends State<_DeliveryListView> {
             child: BlocBuilder<DeliveryListBloc, DeliveryListState>(
               builder: (context, state) {
                 if (state is DeliveryListLoading) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
+                  return const Center(child: CircularProgressIndicator());
                 }
 
                 if (state is DeliveryListFailure) {
@@ -204,9 +331,9 @@ class _DeliveryListViewState extends State<_DeliveryListView> {
                             icon: const Icon(Icons.refresh),
                             label: const Text('Coba Lagi'),
                             onPressed: () {
-                              context
-                                  .read<DeliveryListBloc>()
-                                  .add(const GetDeliveryListEvent());
+                              context.read<DeliveryListBloc>().add(
+                                const GetDeliveryListEvent(),
+                              );
                             },
                           ),
                         ],
@@ -216,9 +343,9 @@ class _DeliveryListViewState extends State<_DeliveryListView> {
                 }
 
                 if (state is DeliveryListSuccess) {
-                  final list = state.filteredDeliveries;
+                  final allBatches = state.allDeliveries;
 
-                  if (list.isEmpty) {
+                  if (allBatches.isEmpty) {
                     return Center(
                       child: SingleChildScrollView(
                         physics: const AlwaysScrollableScrollPhysics(),
@@ -259,23 +386,119 @@ class _DeliveryListViewState extends State<_DeliveryListView> {
                     );
                   }
 
+                  // Deduplikasi daftar batch agar aman dari duplikasi data backend
+                  final List<DriverDelivery> uniqueBatches = [];
+                  final Set<String> seenKeys = {};
+                  for (final b in allBatches) {
+                    final key = '${b.entity.trim()}_${b.trId.trim()}';
+                    if (b.trId.trim().isNotEmpty && !seenKeys.contains(key)) {
+                      seenKeys.add(key);
+                      uniqueBatches.add(b);
+                    }
+                  }
+                  final batches =
+                      uniqueBatches.isNotEmpty ? uniqueBatches : allBatches;
+
+                  // Tentukan batch yang sedang dipilih
+                  DriverDelivery? selectedBatch;
+                  if (_selectedBatchTrId != null) {
+                    for (final b in batches) {
+                      if (b.trId == _selectedBatchTrId) {
+                        selectedBatch = b;
+                        break;
+                      }
+                    }
+                  }
+                  if (selectedBatch == null && batches.isNotEmpty) {
+                    selectedBatch = batches.first;
+                    _selectedBatchTrId = selectedBatch.trId;
+                  }
+
+                  // Filter surat jalan berdasarkan search query jika ada
+                  final searchQuery = state.searchQuery.trim();
+                  DriverDelivery? filteredBatch;
+                  if (searchQuery.isNotEmpty) {
+                    for (final b in state.filteredDeliveries) {
+                      if (b.trId == selectedBatch?.trId) {
+                        filteredBatch = b;
+                        break;
+                      }
+                    }
+                    // Jika batch terpilih tidak cocok tapi ada batch lain yang cocok, beralih ke batch tersebut
+                    if (filteredBatch == null &&
+                        state.filteredDeliveries.isNotEmpty) {
+                      selectedBatch = state.filteredDeliveries.first;
+                      _selectedBatchTrId = selectedBatch.trId;
+                      filteredBatch = state.filteredDeliveries.first;
+                    }
+                  }
+
+                  final List<DelivHdrItem> displayedSjList =
+                      searchQuery.isNotEmpty
+                          ? (filteredBatch?.delivHdrItems ?? [])
+                          : (selectedBatch?.delivHdrItems ?? []);
+
                   return RefreshIndicator(
                     color: primaryColor,
                     onRefresh: () async {
-                      context
-                          .read<DeliveryListBloc>()
-                          .add(const RefreshDeliveryListEvent());
+                      context.read<DeliveryListBloc>().add(
+                        const RefreshDeliveryListEvent(),
+                      );
                     },
-                    child: ListView.separated(
+                    child: ListView.builder(
                       padding: EdgeInsets.symmetric(
                         horizontal: 16.w,
-                        vertical: 16.h,
+                        vertical: 12.h,
                       ),
-                      itemCount: list.length,
-                      separatorBuilder: (_, __) => SizedBox(height: 12.h),
+                      itemCount:
+                          2 +
+                          (displayedSjList.isEmpty
+                              ? 1
+                              : displayedSjList.length),
                       itemBuilder: (context, index) {
-                        final item = list[index];
-                        return _buildDeliveryCard(item, primaryColor);
+                        // Index 0: Kartu Aksi Batch Paling Atas (Selector Batch, Info, Waktu & Tombol Aksi)
+                        if (index == 0) {
+                          return Padding(
+                            padding: EdgeInsets.only(bottom: 12.h),
+                            child: _buildTopActionCard(
+                              context,
+                              batches,
+                              primaryColor,
+                              selectedBatch!,
+                            ),
+                          );
+                        }
+
+                        // Index 1: Header Daftar Surat Jalan
+                        if (index == 1) {
+                          return Padding(
+                            padding: EdgeInsets.only(bottom: 10.h),
+                            child: _buildSjSectionHeader(
+                              selectedBatch!,
+                              displayedSjList.length,
+                              primaryColor,
+                            ),
+                          );
+                        }
+
+                        // Index 2+: Item Surat Jalan untuk Batch yang Dipilih
+                        if (displayedSjList.isEmpty) {
+                          return _buildEmptySjCard(
+                            searchQuery,
+                            selectedBatch?.trId ?? '',
+                          );
+                        }
+
+                        final sjIndex = index - 2;
+                        final delivHdr = displayedSjList[sjIndex];
+                        return Padding(
+                          padding: EdgeInsets.only(bottom: 10.h),
+                          child: _buildDelivHdrCard(
+                            delivHdr: delivHdr,
+                            entity: selectedBatch!.entity,
+                            primaryColor: primaryColor,
+                          ),
+                        );
                       },
                     ),
                   );
@@ -290,200 +513,666 @@ class _DeliveryListViewState extends State<_DeliveryListView> {
     );
   }
 
-  Widget _buildDeliveryCard(DriverDelivery item, Color primaryColor) {
-    final statusColor = _getStatusColor(item);
+  Widget _buildTopActionCard(
+    BuildContext context,
+    List<DriverDelivery> batches,
+    Color primaryColor,
+    DriverDelivery selected,
+  ) {
+    final statusColor = _getStatusColor(selected);
 
-    return InkWell(
-      onTap: () => _showDetailBottomSheet(item),
-      borderRadius: BorderRadius.circular(14.r),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(14.r),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.04),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
-          border: Border.all(
-            color: Colors.grey.shade200,
-            width: 1,
-          ),
+    return Container(
+      padding: EdgeInsets.all(14.w),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14.r),
+        border: Border.all(
+          color: primaryColor.withValues(alpha: 0.25),
+          width: 1.2,
         ),
-        padding: EdgeInsets.all(14.w),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Top Row: Surat Jalan & Status Badge
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Row(
-                    children: [
-                      Container(
-                        padding: EdgeInsets.all(6.w),
-                        decoration: BoxDecoration(
-                          color: primaryColor.withValues(alpha: 0.1),
-                          shape: BoxShape.circle,
+        boxShadow: [
+          BoxShadow(
+            color: primaryColor.withValues(alpha: 0.06),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header Row: Selector Batch & Status Badge
+          Row(
+            children: [
+              Expanded(
+                child:
+                    batches.length > 1
+                        ? InkWell(
+                          onTap:
+                              () => _showBatchSelectorBottomSheet(
+                                context,
+                                batches,
+                                selected,
+                                primaryColor,
+                              ),
+                          borderRadius: BorderRadius.circular(8.r),
+                          child: Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 10.w,
+                              vertical: 6.h,
+                            ),
+                            decoration: BoxDecoration(
+                              color: primaryColor.withValues(alpha: 0.08),
+                              borderRadius: BorderRadius.circular(8.r),
+                              border: Border.all(
+                                color: primaryColor.withValues(alpha: 0.35),
+                                width: 1,
+                              ),
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.local_shipping,
+                                  size: 16.w,
+                                  color: primaryColor,
+                                ),
+                                SizedBox(width: 6.w),
+                                Expanded(
+                                  child: Text(
+                                    'Batch: ${selected.trId} (${selected.entity})',
+                                    style: TextStyle(
+                                      fontSize: 12.sp,
+                                      fontWeight: FontWeight.bold,
+                                      color: primaryColor,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                SizedBox(width: 4.w),
+                                Icon(
+                                  Icons.arrow_drop_down_rounded,
+                                  size: 22.w,
+                                  color: primaryColor,
+                                ),
+                              ],
+                            ),
+                          ),
+                        )
+                        : Row(
+                          children: [
+                            Container(
+                              padding: EdgeInsets.all(6.w),
+                              decoration: BoxDecoration(
+                                color: primaryColor.withValues(alpha: 0.1),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                Icons.local_shipping,
+                                size: 16.w,
+                                color: primaryColor,
+                              ),
+                            ),
+                            SizedBox(width: 8.w),
+                            Expanded(
+                              child: Text(
+                                'Batch: ${selected.trId} (${selected.entity})',
+                                style: TextStyle(
+                                  fontSize: 13.sp,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black87,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
                         ),
-                        child: Icon(
-                          Icons.receipt_long_rounded,
-                          size: 16.w,
-                          color: primaryColor,
+              ),
+              SizedBox(width: 8.w),
+              // Status Badge
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+                decoration: BoxDecoration(
+                  color: statusColor.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(16.r),
+                  border: Border.all(
+                    color: statusColor.withValues(alpha: 0.4),
+                    width: 1,
+                  ),
+                ),
+                child: Text(
+                  selected.statusText,
+                  style: TextStyle(
+                    fontSize: 10.sp,
+                    fontWeight: FontWeight.w600,
+                    color: statusColor,
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          SizedBox(height: 8.h),
+
+          // Detail info chip (Nopol, Pabrik, Tujuan)
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF8F9FA),
+              borderRadius: BorderRadius.circular(8.r),
+              border: Border.all(color: Colors.grey.shade200, width: 0.8),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      Icons.directions_car_outlined,
+                      size: 13.w,
+                      color: Colors.grey.shade700,
+                    ),
+                    SizedBox(width: 4.w),
+                    Text(
+                      'Nopol: ${selected.vehicleId.isNotEmpty ? selected.vehicleId : "-"}',
+                      style: TextStyle(
+                        fontSize: 11.sp,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    SizedBox(width: 12.w),
+                    Icon(
+                      Icons.business_outlined,
+                      size: 13.w,
+                      color: Colors.grey.shade700,
+                    ),
+                    SizedBox(width: 4.w),
+                    Expanded(
+                      child: Text(
+                        'Pabrik: ${selected.millName.isNotEmpty ? selected.millName : selected.entity}',
+                        style: TextStyle(
+                          fontSize: 11.sp,
+                          color: Colors.grey.shade700,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+
+          SizedBox(height: 8.h),
+
+          // Status Times (Waktu Berangkat & Waktu Pulang)
+          Row(
+            children: [
+              Expanded(
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 6.h),
+                  decoration: BoxDecoration(
+                    color:
+                        selected.hasLeft
+                            ? Colors.orange.shade50
+                            : Colors.grey.shade100,
+                    borderRadius: BorderRadius.circular(8.r),
+                    border: Border.all(
+                      color:
+                          selected.hasLeft
+                              ? Colors.orange.shade300
+                              : Colors.grey.shade300,
+                      width: 0.6,
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Waktu Berangkat',
+                        style: TextStyle(
+                          fontSize: 9.sp,
+                          color: Colors.grey.shade600,
                         ),
                       ),
-                      SizedBox(width: 8.w),
-                      Expanded(
-                        child: Text(
-                          item.trId,
-                          style: TextStyle(
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black87,
-                            letterSpacing: 0.3,
-                          ),
-                          overflow: TextOverflow.ellipsis,
+                      Text(
+                        _formatDate(selected.dtLeave),
+                        style: TextStyle(
+                          fontSize: 10.sp,
+                          fontWeight: FontWeight.w600,
+                          color:
+                              selected.hasLeft
+                                  ? Colors.orange.shade900
+                                  : Colors.black87,
                         ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ),
                 ),
-                Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 10.w,
-                    vertical: 4.h,
-                  ),
+              ),
+              SizedBox(width: 8.w),
+              Expanded(
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 6.h),
                   decoration: BoxDecoration(
-                    color: statusColor.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(20.r),
+                    color:
+                        selected.isCompleted
+                            ? Colors.green.shade50
+                            : Colors.grey.shade100,
+                    borderRadius: BorderRadius.circular(8.r),
                     border: Border.all(
-                      color: statusColor.withValues(alpha: 0.4),
-                      width: 1,
+                      color:
+                          selected.isCompleted
+                              ? Colors.green.shade300
+                              : Colors.grey.shade300,
+                      width: 0.6,
                     ),
                   ),
-                  child: Text(
-                    item.statusText,
-                    style: TextStyle(
-                      fontSize: 10.sp,
-                      fontWeight: FontWeight.w600,
-                      color: statusColor,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Waktu Pulang',
+                        style: TextStyle(
+                          fontSize: 9.sp,
+                          color: Colors.grey.shade600,
+                        ),
+                      ),
+                      Text(
+                        _formatDate(selected.dtHome),
+                        style: TextStyle(
+                          fontSize: 10.sp,
+                          fontWeight: FontWeight.w600,
+                          color:
+                              selected.isCompleted
+                                  ? Colors.green.shade900
+                                  : Colors.black87,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          SizedBox(height: 12.h),
+
+          // Two Primary Action Buttons: Berangkat & Pulang
+          Row(
+            children: [
+              Expanded(
+                child: ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.orange.shade700,
+                    foregroundColor: Colors.white,
+                    elevation: 1,
+                    padding: EdgeInsets.symmetric(vertical: 10.h),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.r),
                     ),
                   ),
-                ),
-              ],
-            ),
-
-            Divider(height: 18.h, color: Colors.grey.shade200),
-
-            // Vehicle & Mill Info
-            Row(
-              children: [
-                Icon(
-                  Icons.local_shipping_outlined,
-                  size: 15.w,
-                  color: Colors.grey.shade600,
-                ),
-                SizedBox(width: 6.w),
-                Text(
-                  item.vehicleId.isNotEmpty ? item.vehicleId : '-',
-                  style: TextStyle(
-                    fontSize: 12.sp,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black87,
-                  ),
-                ),
-                SizedBox(width: 14.w),
-                Icon(
-                  Icons.business_outlined,
-                  size: 15.w,
-                  color: Colors.grey.shade600,
-                ),
-                SizedBox(width: 6.w),
-                Expanded(
-                  child: Text(
-                    item.millName.isNotEmpty ? item.millName : item.entity,
+                  icon:
+                      _isActionLoading
+                          ? SizedBox(
+                            width: 14.w,
+                            height: 14.w,
+                            child: const CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                          : Icon(Icons.departure_board_rounded, size: 16.w),
+                  label: Text(
+                    'Berangkat',
                     style: TextStyle(
                       fontSize: 12.sp,
-                      color: Colors.grey.shade700,
+                      fontWeight: FontWeight.bold,
                     ),
-                    overflow: TextOverflow.ellipsis,
                   ),
+                  onPressed:
+                      _isActionLoading
+                          ? null
+                          : () => _confirmAction(
+                            title: 'Konfirmasi Berangkat',
+                            message:
+                                'Apakah Anda yakin ingin memulai perjalanan (Check Out) untuk Batch ${selected.trId} (${selected.entity})?',
+                            confirmText: 'Ya, Berangkat',
+                            confirmColor: Colors.orange.shade700,
+                            onConfirm: () => _executeCheckOut(selected),
+                          ),
                 ),
-              ],
+              ),
+              SizedBox(width: 12.w),
+              Expanded(
+                child: ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.teal.shade700,
+                    foregroundColor: Colors.white,
+                    elevation: 1,
+                    padding: EdgeInsets.symmetric(vertical: 10.h),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.r),
+                    ),
+                  ),
+                  icon:
+                      _isActionLoading
+                          ? SizedBox(
+                            width: 14.w,
+                            height: 14.w,
+                            child: const CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                          : Icon(Icons.home_rounded, size: 16.w),
+                  label: Text(
+                    'Pulang',
+                    style: TextStyle(
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  onPressed:
+                      _isActionLoading
+                          ? null
+                          : () => _confirmAction(
+                            title: 'Konfirmasi Pulang',
+                            message:
+                                'Apakah Anda yakin telah selesai dan kembali (Check In) untuk Batch ${selected.trId} (${selected.entity})?',
+                            confirmText: 'Ya, Pulang',
+                            confirmColor: Colors.teal.shade700,
+                            onConfirm: () => _executeCheckIn(selected),
+                          ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showBatchSelectorBottomSheet(
+    BuildContext context,
+    List<DriverDelivery> batches,
+    DriverDelivery selected,
+    Color primaryColor,
+  ) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (sheetContext) {
+        return Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20.r),
+              topRight: Radius.circular(20.r),
             ),
-
-            SizedBox(height: 8.h),
-
-            // Destination
-            Row(
+          ),
+          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+          child: SafeArea(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(
-                  Icons.location_on_outlined,
-                  size: 15.w,
-                  color: Colors.red.shade400,
-                ),
-                SizedBox(width: 6.w),
-                Expanded(
-                  child: Text(
-                    item.destination.isNotEmpty
-                        ? item.destination
-                        : 'Tujuan belum ditentukan',
-                    style: TextStyle(
-                      fontSize: 12.sp,
-                      color: Colors.grey.shade800,
-                      fontWeight: FontWeight.w500,
+                Center(
+                  child: Container(
+                    width: 36.w,
+                    height: 4.h,
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade300,
+                      borderRadius: BorderRadius.circular(10.r),
                     ),
                   ),
                 ),
+                SizedBox(height: 12.h),
+                Row(
+                  children: [
+                    Icon(
+                      Icons.layers_outlined,
+                      size: 18.w,
+                      color: primaryColor,
+                    ),
+                    SizedBox(width: 8.w),
+                    Text(
+                      'Pilih Batch Pengiriman',
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 12.h),
+                Flexible(
+                  child: ListView.separated(
+                    shrinkWrap: true,
+                    itemCount: batches.length,
+                    separatorBuilder: (_, __) => SizedBox(height: 8.h),
+                    itemBuilder: (context, idx) {
+                      final b = batches[idx];
+                      final isSelected = b.trId == selected.trId;
+                      final stColor = _getStatusColor(b);
+
+                      return InkWell(
+                        onTap: () {
+                          setState(() {
+                            _selectedBatchTrId = b.trId;
+                          });
+                          Navigator.pop(sheetContext);
+                        },
+                        borderRadius: BorderRadius.circular(10.r),
+                        child: Container(
+                          padding: EdgeInsets.all(12.w),
+                          decoration: BoxDecoration(
+                            color:
+                                isSelected
+                                    ? primaryColor.withValues(alpha: 0.06)
+                                    : Colors.white,
+                            borderRadius: BorderRadius.circular(10.r),
+                            border: Border.all(
+                              color:
+                                  isSelected
+                                      ? primaryColor
+                                      : Colors.grey.shade200,
+                              width: isSelected ? 1.5 : 1,
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                isSelected
+                                    ? Icons.radio_button_checked
+                                    : Icons.radio_button_off,
+                                size: 18.w,
+                                color:
+                                    isSelected
+                                        ? primaryColor
+                                        : Colors.grey.shade400,
+                              ),
+                              SizedBox(width: 10.w),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          'Batch: ${b.trId}',
+                                          style: TextStyle(
+                                            fontSize: 12.sp,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black87,
+                                          ),
+                                        ),
+                                        Container(
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: 6.w,
+                                            vertical: 2.h,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: stColor.withValues(
+                                              alpha: 0.1,
+                                            ),
+                                            borderRadius: BorderRadius.circular(
+                                              8.r,
+                                            ),
+                                          ),
+                                          child: Text(
+                                            b.statusText,
+                                            style: TextStyle(
+                                              fontSize: 9.sp,
+                                              fontWeight: FontWeight.w600,
+                                              color: stColor,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: 2.h),
+                                    Text(
+                                      '${b.entity} - ${b.millName.isNotEmpty ? b.millName : "-"} • Nopol: ${b.vehicleId.isNotEmpty ? b.vehicleId : "-"}',
+                                      style: TextStyle(
+                                        fontSize: 10.sp,
+                                        color: Colors.grey.shade600,
+                                      ),
+                                    ),
+                                    SizedBox(height: 2.h),
+                                    Text(
+                                      '${b.delivHdrItems.length} Surat Jalan',
+                                      style: TextStyle(
+                                        fontSize: 10.sp,
+                                        fontWeight: FontWeight.w600,
+                                        color: primaryColor,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                SizedBox(height: 8.h),
               ],
             ),
+          ),
+        );
+      },
+    );
+  }
 
-            SizedBox(height: 8.h),
+  Widget _buildSjSectionHeader(
+    DriverDelivery selected,
+    int count,
+    Color primaryColor,
+  ) {
+    return Padding(
+      padding: EdgeInsets.only(top: 4.h, bottom: 2.h),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.inventory_2_outlined, size: 16.w, color: primaryColor),
+              SizedBox(width: 6.w),
+              Text(
+                'Daftar Surat Jalan',
+                style: TextStyle(
+                  fontSize: 13.sp,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+              ),
+              SizedBox(width: 8.w),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
+                decoration: BoxDecoration(
+                  color: primaryColor.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
+                child: Text(
+                  '$count SJ',
+                  style: TextStyle(
+                    fontSize: 11.sp,
+                    fontWeight: FontWeight.bold,
+                    color: primaryColor,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          InkWell(
+            onTap: () => _showBatchDetailBottomSheet(selected),
+            borderRadius: BorderRadius.circular(6.r),
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.info_outline,
+                    size: 14.w,
+                    color: Colors.blue.shade700,
+                  ),
+                  SizedBox(width: 4.w),
+                  Text(
+                    'Detail Batch',
+                    style: TextStyle(
+                      fontSize: 11.sp,
+                      color: Colors.blue.shade700,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
-            // Date & Driver
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    Icon(
-                      Icons.calendar_today_outlined,
-                      size: 13.w,
-                      color: Colors.grey.shade500,
-                    ),
-                    SizedBox(width: 6.w),
-                    Text(
-                      _formatDate(item.trDate),
-                      style: TextStyle(
-                        fontSize: 11.sp,
-                        color: Colors.grey.shade600,
-                      ),
-                    ),
-                  ],
-                ),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.person_outline,
-                      size: 14.w,
-                      color: Colors.grey.shade500,
-                    ),
-                    SizedBox(width: 4.w),
-                    Text(
-                      item.name.isNotEmpty ? item.name : item.driverId,
-                      style: TextStyle(
-                        fontSize: 11.sp,
-                        color: Colors.grey.shade700,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+  Widget _buildEmptySjCard(String searchQuery, String trId) {
+    return Container(
+      margin: EdgeInsets.only(top: 8.h),
+      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 28.h),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: Center(
+        child: Column(
+          children: [
+            Icon(
+              Icons.receipt_long_outlined,
+              size: 44.w,
+              color: Colors.grey.shade300,
+            ),
+            SizedBox(height: 10.h),
+            Text(
+              searchQuery.isNotEmpty
+                  ? 'Tidak ada surat jalan yang cocok dengan "$searchQuery" pada batch $trId.'
+                  : 'Belum ada surat jalan pada muatan batch ini.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 12.sp,
+                color: Colors.grey.shade600,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ],
         ),
@@ -491,7 +1180,204 @@ class _DeliveryListViewState extends State<_DeliveryListView> {
     );
   }
 
-  void _showDetailBottomSheet(DriverDelivery item) {
+  Widget _buildDelivHdrCard({
+    required DelivHdrItem delivHdr,
+    required String entity,
+    required Color primaryColor,
+  }) {
+    return Container(
+      padding: EdgeInsets.all(12.w),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(color: Colors.grey.shade200, width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Row 1: Deliv ID (Surat Jalan) & Order ID & Tombol Detail
+          Row(
+            children: [
+              Container(
+                padding: EdgeInsets.all(6.w),
+                decoration: BoxDecoration(
+                  color: primaryColor.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(6.r),
+                ),
+                child: Icon(
+                  Icons.receipt_long_rounded,
+                  size: 15.w,
+                  color: primaryColor,
+                ),
+              ),
+              SizedBox(width: 8.w),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'No. SJ: ${delivHdr.delivId.isNotEmpty ? delivHdr.delivId : "-"}',
+                      style: TextStyle(
+                        fontSize: 12.sp,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    if (delivHdr.orderId.isNotEmpty)
+                      Text(
+                        'Order: ${delivHdr.orderId}',
+                        style: TextStyle(
+                          fontSize: 10.sp,
+                          color: Colors.blue.shade700,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+              // Tombol Detail Muatan (Memanggil getDetailItem)
+              InkWell(
+                onTap: () => _showMuatanDetailModal(context, entity, delivHdr),
+                borderRadius: BorderRadius.circular(8.r),
+                child: Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 10.w,
+                    vertical: 6.h,
+                  ),
+                  decoration: BoxDecoration(
+                    color: primaryColor,
+                    borderRadius: BorderRadius.circular(8.r),
+                    boxShadow: [
+                      BoxShadow(
+                        color: primaryColor.withValues(alpha: 0.2),
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.inventory_2_outlined,
+                        size: 13.w,
+                        color: Colors.white,
+                      ),
+                      SizedBox(width: 4.w),
+                      Text(
+                        'Detail',
+                        style: TextStyle(
+                          fontSize: 11.sp,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          Divider(height: 16.h, color: Colors.grey.shade100),
+
+          // Receiver & Shipto
+          if (delivHdr.receiver.isNotEmpty || delivHdr.shipto.isNotEmpty) ...[
+            if (delivHdr.receiver.isNotEmpty)
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(
+                    Icons.storefront_outlined,
+                    size: 14.w,
+                    color: Colors.grey.shade600,
+                  ),
+                  SizedBox(width: 6.w),
+                  Expanded(
+                    child: Text(
+                      delivHdr.receiver,
+                      style: TextStyle(
+                        fontSize: 12.sp,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            if (delivHdr.shipto.isNotEmpty) ...[
+              SizedBox(height: 4.h),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(
+                    Icons.location_on_outlined,
+                    size: 14.w,
+                    color: Colors.red.shade400,
+                  ),
+                  SizedBox(width: 6.w),
+                  Expanded(
+                    child: Text(
+                      delivHdr.shipto,
+                      style: TextStyle(
+                        fontSize: 11.sp,
+                        color: Colors.grey.shade600,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ],
+
+          SizedBox(height: 6.h),
+
+          // Date
+          Row(
+            children: [
+              Icon(Icons.access_time, size: 12.w, color: Colors.grey.shade500),
+              SizedBox(width: 4.w),
+              Text(
+                'Tgl Kirim: ${_formatDate(delivHdr.shipDate)}',
+                style: TextStyle(fontSize: 10.sp, color: Colors.grey.shade500),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showMuatanDetailModal(
+    BuildContext context,
+    String entity,
+    DelivHdrItem delivHdr,
+  ) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (bottomSheetContext) {
+        return _MuatanDetailBottomSheet(
+          entity: entity,
+          delivHdr: delivHdr,
+          repository: context.read<DriverActivityRepository>(),
+        );
+      },
+    );
+  }
+
+  void _showBatchDetailBottomSheet(DriverDelivery item) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -527,9 +1413,9 @@ class _DeliveryListViewState extends State<_DeliveryListView> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Detail Pengiriman',
+                        'Detail Informasi Batch',
                         style: TextStyle(
-                          fontSize: 16.sp,
+                          fontSize: 15.sp,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -540,13 +1426,28 @@ class _DeliveryListViewState extends State<_DeliveryListView> {
                     ],
                   ),
                   Divider(color: Colors.grey.shade200),
-                  _buildDetailRow('No. Surat Jalan', item.trId),
+                  _buildDetailRow('No. Batch', item.trId),
                   _buildDetailRow('No. Kendaraan', item.vehicleId),
                   _buildDetailRow('Nama Driver', item.name),
-                  _buildDetailRow('ID Driver', item.idEmployee),
-                  _buildDetailRow('Entity / Pabrik', '${item.entity} - ${item.millName}'),
-                  _buildDetailRow('Tujuan', item.destination),
-                  _buildDetailRow('Tanggal Surat Jalan', _formatDate(item.trDate)),
+                  _buildDetailRow(
+                    'ID Driver',
+                    item.idEmployee.isNotEmpty
+                        ? item.idEmployee
+                        : item.driverId,
+                  ),
+                  _buildDetailRow(
+                    'Entity / Pabrik',
+                    '${item.entity} - ${item.millName}',
+                  ),
+                  _buildDetailRow(
+                    'Jumlah Muatan (SJ)',
+                    '${item.delivHdrItems.length} Surat Jalan',
+                  ),
+                  _buildDetailRow('Tujuan Pengiriman', item.destination),
+                  _buildDetailRow(
+                    'Tanggal Transaksi',
+                    _formatDate(item.trDate),
+                  ),
                   Divider(color: Colors.grey.shade200),
                   Text(
                     'Riwayat Status Waktu',
@@ -557,10 +1458,22 @@ class _DeliveryListViewState extends State<_DeliveryListView> {
                     ),
                   ),
                   SizedBox(height: 8.h),
-                  _buildDetailRow('Waktu Berangkat (Leave)', _formatDate(item.dtLeave)),
-                  _buildDetailRow('Waktu Tiba (Arrive)', _formatDate(item.dtArrive)),
-                  _buildDetailRow('Waktu Bongkar (Drop)', _formatDate(item.dtDrop)),
-                  _buildDetailRow('Waktu Kembali (Home)', _formatDate(item.dtHome)),
+                  _buildDetailRow(
+                    'Waktu Berangkat (Leave)',
+                    _formatDate(item.dtLeave),
+                  ),
+                  _buildDetailRow(
+                    'Waktu Tiba (Arrive)',
+                    _formatDate(item.dtArrive),
+                  ),
+                  _buildDetailRow(
+                    'Waktu Bongkar (Drop)',
+                    _formatDate(item.dtDrop),
+                  ),
+                  _buildDetailRow(
+                    'Waktu Kembali (Home)',
+                    _formatDate(item.dtHome),
+                  ),
                   SizedBox(height: 16.h),
                 ],
               ),
@@ -581,18 +1494,12 @@ class _DeliveryListViewState extends State<_DeliveryListView> {
             width: 140.w,
             child: Text(
               label,
-              style: TextStyle(
-                fontSize: 12.sp,
-                color: Colors.grey.shade600,
-              ),
+              style: TextStyle(fontSize: 12.sp, color: Colors.grey.shade600),
             ),
           ),
           Text(
             ': ',
-            style: TextStyle(
-              fontSize: 12.sp,
-              color: Colors.grey.shade600,
-            ),
+            style: TextStyle(fontSize: 12.sp, color: Colors.grey.shade600),
           ),
           Expanded(
             child: Text(
@@ -610,3 +1517,430 @@ class _DeliveryListViewState extends State<_DeliveryListView> {
   }
 }
 
+class _MuatanDetailBottomSheet extends StatefulWidget {
+  final String entity;
+  final DelivHdrItem delivHdr;
+  final DriverActivityRepository repository;
+
+  const _MuatanDetailBottomSheet({
+    required this.entity,
+    required this.delivHdr,
+    required this.repository,
+  });
+
+  @override
+  State<_MuatanDetailBottomSheet> createState() =>
+      _MuatanDetailBottomSheetState();
+}
+
+class _MuatanDetailBottomSheetState extends State<_MuatanDetailBottomSheet> {
+  bool _isLoading = true;
+  String? _errorMessage;
+  List<DriverDeliveryDetailItem> _items = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadDetail();
+  }
+
+  Future<void> _loadDetail() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    final result = await widget.repository.getDetailItem(
+      entity: widget.entity,
+      id: widget.delivHdr.delivId,
+    );
+
+    if (!mounted) return;
+
+    result.fold(
+      (failure) {
+        setState(() {
+          _isLoading = false;
+          _errorMessage = failure.message ?? 'Gagal memuat detail item muatan';
+        });
+      },
+      (data) {
+        setState(() {
+          _isLoading = false;
+          _items = data;
+        });
+      },
+    );
+  }
+
+  num get _totalQty {
+    return _items.fold(0, (sum, item) => sum + item.qtyShip);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final primaryColor = Theme.of(context).primaryColor;
+    final maxSheetHeight = MediaQuery.of(context).size.height * 0.85;
+
+    return Container(
+      constraints: BoxConstraints(maxHeight: maxSheetHeight),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(24.r),
+          topRight: Radius.circular(24.r),
+        ),
+      ),
+      child: SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Drag handle
+            SizedBox(height: 12.h),
+            Center(
+              child: Container(
+                width: 40.w,
+                height: 4.h,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(10.r),
+                ),
+              ),
+            ),
+            SizedBox(height: 12.h),
+
+            // Header info
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20.w),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 6.w,
+                                vertical: 2.h,
+                              ),
+                              decoration: BoxDecoration(
+                                color: primaryColor.withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(4.r),
+                              ),
+                              child: Text(
+                                widget.entity,
+                                style: TextStyle(
+                                  fontSize: 10.sp,
+                                  fontWeight: FontWeight.bold,
+                                  color: primaryColor,
+                                ),
+                              ),
+                            ),
+                            SizedBox(width: 6.w),
+                            Expanded(
+                              child: Text(
+                                'Detail Item Muatan',
+                                style: TextStyle(
+                                  fontSize: 15.sp,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black87,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 4.h),
+                        Text(
+                          'No. SJ: ${widget.delivHdr.delivId}',
+                          style: TextStyle(
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.grey.shade800,
+                          ),
+                        ),
+                        if (widget.delivHdr.orderId.isNotEmpty)
+                          Text(
+                            'No. Order: ${widget.delivHdr.orderId}',
+                            style: TextStyle(
+                              fontSize: 11.sp,
+                              color: Colors.grey.shade600,
+                            ),
+                          ),
+                        if (widget.delivHdr.receiver.isNotEmpty)
+                          Text(
+                            'Penerima: ${widget.delivHdr.receiver}',
+                            style: TextStyle(
+                              fontSize: 11.sp,
+                              color: Colors.grey.shade600,
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ],
+              ),
+            ),
+
+            Divider(height: 16.h, color: Colors.grey.shade200),
+
+            // Body
+            Expanded(child: _buildBody(primaryColor)),
+
+            // Bottom Summary Bar
+            if (!_isLoading && _errorMessage == null && _items.isNotEmpty)
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade50,
+                  border: Border(
+                    top: BorderSide(color: Colors.grey.shade200, width: 1),
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Total Item: ${_items.length} Macam',
+                          style: TextStyle(
+                            fontSize: 11.sp,
+                            color: Colors.grey.shade600,
+                          ),
+                        ),
+                        Text(
+                          'Total Qty: $_totalQty',
+                          style: TextStyle(
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.bold,
+                            color: primaryColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: primaryColor,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8.r),
+                        ),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 18.w,
+                          vertical: 10.h,
+                        ),
+                      ),
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('Tutup'),
+                    ),
+                  ],
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBody(Color primaryColor) {
+    if (_isLoading) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const CircularProgressIndicator(),
+            SizedBox(height: 12.h),
+            Text(
+              'Memuat item muatan...',
+              style: TextStyle(fontSize: 12.sp, color: Colors.grey.shade600),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (_errorMessage != null) {
+      return Center(
+        child: Padding(
+          padding: EdgeInsets.all(24.w),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.error_outline_rounded,
+                size: 48.w,
+                color: Colors.red.shade400,
+              ),
+              SizedBox(height: 10.h),
+              Text(
+                _errorMessage!,
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 12.sp, color: Colors.grey.shade800),
+              ),
+              SizedBox(height: 14.h),
+              ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: primaryColor,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8.r),
+                  ),
+                ),
+                icon: const Icon(Icons.refresh, size: 16),
+                label: const Text('Coba Lagi'),
+                onPressed: _loadDetail,
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    if (_items.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: EdgeInsets.all(24.w),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.inbox_outlined,
+                size: 52.w,
+                color: Colors.grey.shade400,
+              ),
+              SizedBox(height: 10.h),
+              Text(
+                'Tidak ada data item pada muatan surat jalan ini.',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 13.sp, color: Colors.grey.shade600),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    return ListView.separated(
+      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 8.h),
+      itemCount: _items.length,
+      separatorBuilder: (_, __) => SizedBox(height: 8.h),
+      itemBuilder: (context, index) {
+        final item = _items[index];
+        final hasPanjang =
+            item.panjang.isNotEmpty &&
+            item.panjang != '0' &&
+            item.panjang != '0.00' &&
+            item.panjang != '-';
+
+        return Container(
+          padding: EdgeInsets.all(12.w),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(10.r),
+            border: Border.all(color: Colors.grey.shade200, width: 1),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.02),
+                blurRadius: 4,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Index badge
+              Container(
+                width: 26.w,
+                height: 26.w,
+                decoration: BoxDecoration(
+                  color: primaryColor.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(6.r),
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  '${index + 1}',
+                  style: TextStyle(
+                    fontSize: 11.sp,
+                    fontWeight: FontWeight.bold,
+                    color: primaryColor,
+                  ),
+                ),
+              ),
+              SizedBox(width: 10.w),
+
+              // Item Name & Spec
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      item.namaBarang.isNotEmpty
+                          ? item.namaBarang
+                          : 'Barang Jadi Tanpa Nama',
+                      style: TextStyle(
+                        fontSize: 12.sp,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    if (hasPanjang) ...[
+                      SizedBox(height: 4.h),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.straighten,
+                            size: 12.w,
+                            color: Colors.grey.shade600,
+                          ),
+                          SizedBox(width: 4.w),
+                          Text(
+                            'Panjang: ${item.panjang} m',
+                            style: TextStyle(
+                              fontSize: 11.sp,
+                              color: Colors.grey.shade700,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              SizedBox(width: 8.w),
+
+              // Qty Badge
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+                decoration: BoxDecoration(
+                  color: Colors.green.shade50,
+                  borderRadius: BorderRadius.circular(6.r),
+                  border: Border.all(color: Colors.green.shade200, width: 0.6),
+                ),
+                child: Text(
+                  '${item.qtyShip} Qty',
+                  style: TextStyle(
+                    fontSize: 11.sp,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.green.shade800,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}

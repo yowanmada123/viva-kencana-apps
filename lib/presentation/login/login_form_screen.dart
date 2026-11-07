@@ -11,6 +11,7 @@ import '../../bloc/auth/login-form/login_form_bloc.dart';
 import '../../data/data_providers/shared-preferences/shared_preferences_key.dart';
 import '../../data/data_providers/shared-preferences/shared_preferences_manager.dart';
 import '../../data/repository/auth_repository.dart';
+import '../entity/entity_screen.dart';
 
 class LoginFormScreen extends StatelessWidget {
   const LoginFormScreen({super.key});
@@ -176,6 +177,13 @@ class _LoginFormViewState extends State<LoginFormView> {
                           isAuthenticated: true,
                           user: state.user,
                         ),
+                      );
+
+                      Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(
+                          builder: (context) => const EntityScreen(),
+                        ),
+                        (route) => false,
                       );
                     }
                   },
