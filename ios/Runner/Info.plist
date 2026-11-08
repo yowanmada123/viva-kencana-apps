@@ -45,5 +45,36 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+
+	<!-- Permissions for Camera & QR Scanner -->
+	<key>NSCameraUsageDescription</key>
+	<string>Aplikasi membutuhkan akses kamera untuk memindai QR Code dan mengambil foto inspeksi atau kunjungan.</string>
+
+	<!-- Permissions for Photo Library / Image Picker -->
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Aplikasi membutuhkan akses galeri foto untuk memilih gambar bukti dokumen atau muatan.</string>
+
+	<!-- Permissions for Microphone (Image Picker / Media) -->
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Aplikasi membutuhkan akses mikrofon saat merekam media.</string>
+
+	<!-- Permissions for Location / GPS Tracking & Check-In -->
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Aplikasi membutuhkan akses lokasi saat digunakan untuk validasi posisi check-in pengiriman dan kunjungan sales.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Aplikasi membutuhkan akses lokasi untuk pelacakan rute perjalanan driver dan aktivitas pengiriman.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Aplikasi membutuhkan akses lokasi untuk pelacakan rute pengiriman driver.</string>
+
+	<!-- Network Security / App Transport Security -->
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
+
+	<!-- Flutter Embedded Views for Camera/QR -->
+	<key>io.flutter.embedded_views_preview</key>
+	<true/>
 </dict>
 </plist>
