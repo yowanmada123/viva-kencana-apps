@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:vivakencanaapp/bloc/driver_activity/delivery_list/delivery_list_bloc.dart';
 import 'package:vivakencanaapp/data/repository/driver_activity_repository.dart';
 import 'package:vivakencanaapp/models/driver_activity/driver_delivery.dart';
+import 'package:vivakencanaapp/utils/strict_location.dart';
 
 class DeliveryListScreen extends StatelessWidget {
   final String? entityId;
@@ -31,15 +32,8 @@ class _DeliveryListView extends StatefulWidget {
 }
 
 class _DeliveryListViewState extends State<_DeliveryListView> {
-  final TextEditingController _searchController = TextEditingController();
   bool _isActionLoading = false;
   String? _selectedBatchTrId;
-
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
-  }
 
   String _formatDate(String rawDate) {
     if (rawDate.isEmpty || rawDate.startsWith('1900-01-01')) {
@@ -185,6 +179,183 @@ class _DeliveryListViewState extends State<_DeliveryListView> {
     );
   }
 
+  String _formatTime(String rawDate) {
+    if (rawDate.isEmpty ||
+        rawDate.startsWith('1900-01-01') ||
+        rawDate == 'null') {
+      return '-';
+    }
+    try {
+      final parsed = DateTime.parse(rawDate);
+      return DateFormat('HH:mm', 'id_ID').format(parsed);
+    } catch (_) {
+      try {
+        final parts = rawDate.split(' ');
+        if (parts.length > 1) {
+          final timeParts = parts[1].split(':');
+          if (timeParts.length >= 2) {
+            return '${timeParts[0]}:${timeParts[1]}';
+          }
+        }
+      } catch (_) {}
+      return rawDate;
+    }
+  }
+
+  void _showLoadingDialog(String message) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogCtx) => PopScope(
+        canPop: false,
+        child: AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.r),
+          ),
+          content: Row(
+            children: [
+              const CircularProgressIndicator(),
+              SizedBox(width: 16.w),
+              Expanded(
+                child: Text(
+                  message,
+                  style: TextStyle(
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _confirmCheckPoint(DelivHdrItem delivHdr, String entity) {
+    _confirmAction(
+      title: 'Sampai di Tujuan',
+      message:
+          'Catat waktu dan titik koordinat GPS saat tiba di tujuan untuk Surat Jalan No. ${delivHdr.delivId}?',
+      confirmText: 'Ya, Sampai',
+      confirmColor: Colors.blue.shade700,
+      onConfirm: () => _executeCheckPoint(delivHdr, entity),
+    );
+  }
+
+  Future<void> _executeCheckPoint(DelivHdrItem delivHdr, String entity) async {
+    _showLoadingDialog('Mencatat koordinat GPS & titik kedatangan...');
+    try {
+      final position = await StrictLocation.getCurrentPosition();
+      if (!mounted) return;
+
+      final repo = context.read<DriverActivityRepository>();
+      final result = await repo.checkPointOrder(
+        id: delivHdr.delivId,
+        entity: entity,
+        latitude: position.latitude,
+        longitude: position.longitude,
+      );
+
+      if (!mounted) return;
+      Navigator.of(context, rootNavigator: true).pop(); // dismiss loading
+
+      result.fold(
+        (failure) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(failure.message ?? 'Gagal mencatat kedatangan'),
+              backgroundColor: Colors.red.shade700,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        },
+        (successMsg) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(successMsg),
+              backgroundColor: Colors.green.shade700,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+          context.read<DeliveryListBloc>().add(const RefreshDeliveryListEvent());
+        },
+      );
+    } catch (e) {
+      if (!mounted) return;
+      Navigator.of(context, rootNavigator: true).pop(); // dismiss loading
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.toString().replaceAll('Exception: ', '')),
+          backgroundColor: Colors.red.shade700,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
+  }
+
+  void _confirmDropOrder(DelivHdrItem delivHdr, String entity) {
+    _confirmAction(
+      title: 'Bongkar Muat',
+      message:
+          'Catat waktu dan titik koordinat GPS saat bongkar muat untuk Surat Jalan No. ${delivHdr.delivId}?',
+      confirmText: 'Ya, Selesai Bongkar',
+      confirmColor: Colors.orange.shade800,
+      onConfirm: () => _executeDropOrder(delivHdr, entity),
+    );
+  }
+
+  Future<void> _executeDropOrder(DelivHdrItem delivHdr, String entity) async {
+    _showLoadingDialog('Mencatat koordinat GPS & bongkar muat...');
+    try {
+      final position = await StrictLocation.getCurrentPosition();
+      if (!mounted) return;
+
+      final repo = context.read<DriverActivityRepository>();
+      final result = await repo.dropOrder(
+        id: delivHdr.delivId,
+        entity: entity,
+        latitude: position.latitude,
+        longitude: position.longitude,
+      );
+
+      if (!mounted) return;
+      Navigator.of(context, rootNavigator: true).pop(); // dismiss loading
+
+      result.fold(
+        (failure) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(failure.message ?? 'Gagal mencatat bongkar muat'),
+              backgroundColor: Colors.red.shade700,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        },
+        (successMsg) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(successMsg),
+              backgroundColor: Colors.green.shade700,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+          context.read<DeliveryListBloc>().add(const RefreshDeliveryListEvent());
+        },
+      );
+    } catch (e) {
+      if (!mounted) return;
+      Navigator.of(context, rootNavigator: true).pop(); // dismiss loading
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.toString().replaceAll('Exception: ', '')),
+          backgroundColor: Colors.red.shade700,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final primaryColor = Theme.of(context).primaryColor;
@@ -215,300 +386,197 @@ class _DeliveryListViewState extends State<_DeliveryListView> {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          // Search Header
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-            decoration: BoxDecoration(
-              color: primaryColor,
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(20.r),
-                bottomRight: Radius.circular(20.r),
+      body: BlocBuilder<DeliveryListBloc, DeliveryListState>(
+        builder: (context, state) {
+          if (state is DeliveryListLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (state is DeliveryListFailure) {
+            return Center(
+              child: Padding(
+                padding: EdgeInsets.all(24.w),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.error_outline_rounded,
+                      size: 54.w,
+                      color: Colors.red.shade400,
+                    ),
+                    SizedBox(height: 12.h),
+                    Text(
+                      state.message,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 13.sp,
+                        color: Colors.grey.shade800,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    SizedBox(height: 16.h),
+                    ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: primaryColor,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.r),
+                        ),
+                      ),
+                      icon: const Icon(Icons.refresh),
+                      label: const Text('Coba Lagi'),
+                      onPressed: () {
+                        context.read<DeliveryListBloc>().add(
+                          const GetDeliveryListEvent(),
+                        );
+                      },
+                    ),
+                  ],
+                ),
               ),
-            ),
-            child: Column(
-              children: [
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12.r),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.05),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: TextField(
-                    controller: _searchController,
-                    onChanged: (value) {
-                      context.read<DeliveryListBloc>().add(
-                        FilterDeliveryListEvent(value),
-                      );
-                    },
-                    decoration: InputDecoration(
-                      hintText:
-                          'Cari No. SJ / Batch / Nopol / Penerima / Tujuan...',
-                      hintStyle: TextStyle(
-                        fontSize: 12.sp,
-                        color: Colors.grey.shade500,
-                      ),
-                      prefixIcon: Icon(
-                        Icons.search,
-                        color: primaryColor,
-                        size: 20.w,
-                      ),
-                      suffixIcon:
-                          _searchController.text.isNotEmpty
-                              ? IconButton(
-                                icon: Icon(
-                                  Icons.clear,
-                                  size: 18.w,
-                                  color: Colors.grey,
-                                ),
-                                onPressed: () {
-                                  _searchController.clear();
-                                  context.read<DeliveryListBloc>().add(
-                                    const FilterDeliveryListEvent(''),
-                                  );
-                                  setState(() {});
-                                },
-                              )
-                              : null,
-                      border: InputBorder.none,
-                      contentPadding: EdgeInsets.symmetric(
-                        horizontal: 16.w,
-                        vertical: 12.h,
-                      ),
+            );
+          }
+
+          if (state is DeliveryListSuccess) {
+            final allBatches = state.allDeliveries;
+
+            if (allBatches.isEmpty) {
+              return Center(
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  child: Padding(
+                    padding: EdgeInsets.all(32.w),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.local_shipping_outlined,
+                          size: 64.w,
+                          color: Colors.grey.shade400,
+                        ),
+                        SizedBox(height: 12.h),
+                        Text(
+                          'Tidak ada surat jalan yang perlu dikirim',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 14.sp,
+                            color: Colors.grey.shade700,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        SizedBox(height: 6.h),
+                        Text(
+                          'Tarik ke bawah untuk memuat ulang data.',
+                          style: TextStyle(
+                            fontSize: 11.sp,
+                            color: Colors.grey.shade500,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
-              ],
-            ),
-          ),
+              );
+            }
 
-          // Content List
-          Expanded(
-            child: BlocBuilder<DeliveryListBloc, DeliveryListState>(
-              builder: (context, state) {
-                if (state is DeliveryListLoading) {
-                  return const Center(child: CircularProgressIndicator());
+            // Deduplikasi daftar batch agar aman dari duplikasi data backend
+            final List<DriverDelivery> uniqueBatches = [];
+            final Set<String> seenKeys = {};
+            for (final b in allBatches) {
+              final key = '${b.entity.trim()}_${b.trId.trim()}';
+              if (b.trId.trim().isNotEmpty && !seenKeys.contains(key)) {
+                seenKeys.add(key);
+                uniqueBatches.add(b);
+              }
+            }
+            final batches =
+                uniqueBatches.isNotEmpty ? uniqueBatches : allBatches;
+
+            // Tentukan batch yang sedang dipilih
+            DriverDelivery? selectedBatch;
+            if (_selectedBatchTrId != null) {
+              for (final b in batches) {
+                if (b.trId == _selectedBatchTrId) {
+                  selectedBatch = b;
+                  break;
                 }
+              }
+            }
+            if (selectedBatch == null && batches.isNotEmpty) {
+              selectedBatch = batches.first;
+              _selectedBatchTrId = selectedBatch.trId;
+            }
 
-                if (state is DeliveryListFailure) {
-                  return Center(
-                    child: Padding(
-                      padding: EdgeInsets.all(24.w),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.error_outline_rounded,
-                            size: 54.w,
-                            color: Colors.red.shade400,
-                          ),
-                          SizedBox(height: 12.h),
-                          Text(
-                            state.message,
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 13.sp,
-                              color: Colors.grey.shade800,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          SizedBox(height: 16.h),
-                          ElevatedButton.icon(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: primaryColor,
-                              foregroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10.r),
-                              ),
-                            ),
-                            icon: const Icon(Icons.refresh),
-                            label: const Text('Coba Lagi'),
-                            onPressed: () {
-                              context.read<DeliveryListBloc>().add(
-                                const GetDeliveryListEvent(),
-                              );
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                }
+            final List<DelivHdrItem> displayedSjList =
+                selectedBatch?.delivHdrItems ?? [];
 
-                if (state is DeliveryListSuccess) {
-                  final allBatches = state.allDeliveries;
-
-                  if (allBatches.isEmpty) {
-                    return Center(
-                      child: SingleChildScrollView(
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        child: Padding(
-                          padding: EdgeInsets.all(32.w),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.local_shipping_outlined,
-                                size: 64.w,
-                                color: Colors.grey.shade400,
-                              ),
-                              SizedBox(height: 12.h),
-                              Text(
-                                state.searchQuery.isNotEmpty
-                                    ? 'Tidak ada hasil untuk "${state.searchQuery}"'
-                                    : 'Tidak ada surat jalan yang perlu dikirim',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 14.sp,
-                                  color: Colors.grey.shade700,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              SizedBox(height: 6.h),
-                              Text(
-                                'Tarik ke bawah untuk memuat ulang data.',
-                                style: TextStyle(
-                                  fontSize: 11.sp,
-                                  color: Colors.grey.shade500,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
+            return RefreshIndicator(
+              color: primaryColor,
+              onRefresh: () async {
+                context.read<DeliveryListBloc>().add(
+                  const RefreshDeliveryListEvent(),
+                );
+              },
+              child: ListView.builder(
+                padding: EdgeInsets.symmetric(
+                  horizontal: 16.w,
+                  vertical: 12.h,
+                ),
+                itemCount:
+                    2 +
+                    (displayedSjList.isEmpty
+                        ? 1
+                        : displayedSjList.length),
+                itemBuilder: (context, index) {
+                  // Index 0: Kartu Aksi Batch Paling Atas (Selector Batch, Info, Waktu & Tombol Aksi)
+                  if (index == 0) {
+                    return Padding(
+                      padding: EdgeInsets.only(bottom: 12.h),
+                      child: _buildTopActionCard(
+                        context,
+                        batches,
+                        primaryColor,
+                        selectedBatch!,
                       ),
                     );
                   }
 
-                  // Deduplikasi daftar batch agar aman dari duplikasi data backend
-                  final List<DriverDelivery> uniqueBatches = [];
-                  final Set<String> seenKeys = {};
-                  for (final b in allBatches) {
-                    final key = '${b.entity.trim()}_${b.trId.trim()}';
-                    if (b.trId.trim().isNotEmpty && !seenKeys.contains(key)) {
-                      seenKeys.add(key);
-                      uniqueBatches.add(b);
-                    }
-                  }
-                  final batches =
-                      uniqueBatches.isNotEmpty ? uniqueBatches : allBatches;
-
-                  // Tentukan batch yang sedang dipilih
-                  DriverDelivery? selectedBatch;
-                  if (_selectedBatchTrId != null) {
-                    for (final b in batches) {
-                      if (b.trId == _selectedBatchTrId) {
-                        selectedBatch = b;
-                        break;
-                      }
-                    }
-                  }
-                  if (selectedBatch == null && batches.isNotEmpty) {
-                    selectedBatch = batches.first;
-                    _selectedBatchTrId = selectedBatch.trId;
-                  }
-
-                  // Filter surat jalan berdasarkan search query jika ada
-                  final searchQuery = state.searchQuery.trim();
-                  DriverDelivery? filteredBatch;
-                  if (searchQuery.isNotEmpty) {
-                    for (final b in state.filteredDeliveries) {
-                      if (b.trId == selectedBatch?.trId) {
-                        filteredBatch = b;
-                        break;
-                      }
-                    }
-                    // Jika batch terpilih tidak cocok tapi ada batch lain yang cocok, beralih ke batch tersebut
-                    if (filteredBatch == null &&
-                        state.filteredDeliveries.isNotEmpty) {
-                      selectedBatch = state.filteredDeliveries.first;
-                      _selectedBatchTrId = selectedBatch.trId;
-                      filteredBatch = state.filteredDeliveries.first;
-                    }
-                  }
-
-                  final List<DelivHdrItem> displayedSjList =
-                      searchQuery.isNotEmpty
-                          ? (filteredBatch?.delivHdrItems ?? [])
-                          : (selectedBatch?.delivHdrItems ?? []);
-
-                  return RefreshIndicator(
-                    color: primaryColor,
-                    onRefresh: () async {
-                      context.read<DeliveryListBloc>().add(
-                        const RefreshDeliveryListEvent(),
-                      );
-                    },
-                    child: ListView.builder(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 16.w,
-                        vertical: 12.h,
+                  // Index 1: Header Daftar Surat Jalan
+                  if (index == 1) {
+                    return Padding(
+                      padding: EdgeInsets.only(bottom: 10.h),
+                      child: _buildSjSectionHeader(
+                        selectedBatch!,
+                        displayedSjList.length,
+                        primaryColor,
                       ),
-                      itemCount:
-                          2 +
-                          (displayedSjList.isEmpty
-                              ? 1
-                              : displayedSjList.length),
-                      itemBuilder: (context, index) {
-                        // Index 0: Kartu Aksi Batch Paling Atas (Selector Batch, Info, Waktu & Tombol Aksi)
-                        if (index == 0) {
-                          return Padding(
-                            padding: EdgeInsets.only(bottom: 12.h),
-                            child: _buildTopActionCard(
-                              context,
-                              batches,
-                              primaryColor,
-                              selectedBatch!,
-                            ),
-                          );
-                        }
+                    );
+                  }
 
-                        // Index 1: Header Daftar Surat Jalan
-                        if (index == 1) {
-                          return Padding(
-                            padding: EdgeInsets.only(bottom: 10.h),
-                            child: _buildSjSectionHeader(
-                              selectedBatch!,
-                              displayedSjList.length,
-                              primaryColor,
-                            ),
-                          );
-                        }
+                  // Index 2+: Item Surat Jalan untuk Batch yang Dipilih
+                  if (displayedSjList.isEmpty) {
+                    return _buildEmptySjCard(
+                      selectedBatch?.trId ?? '',
+                    );
+                  }
 
-                        // Index 2+: Item Surat Jalan untuk Batch yang Dipilih
-                        if (displayedSjList.isEmpty) {
-                          return _buildEmptySjCard(
-                            searchQuery,
-                            selectedBatch?.trId ?? '',
-                          );
-                        }
-
-                        final sjIndex = index - 2;
-                        final delivHdr = displayedSjList[sjIndex];
-                        return Padding(
-                          padding: EdgeInsets.only(bottom: 10.h),
-                          child: _buildDelivHdrCard(
-                            delivHdr: delivHdr,
-                            entity: selectedBatch!.entity,
-                            primaryColor: primaryColor,
-                          ),
-                        );
-                      },
+                  final sjIndex = index - 2;
+                  final delivHdr = displayedSjList[sjIndex];
+                  return Padding(
+                    padding: EdgeInsets.only(bottom: 10.h),
+                    child: _buildDelivHdrCard(
+                      delivHdr: delivHdr,
+                      entity: selectedBatch!.entity,
+                      primaryColor: primaryColor,
                     ),
                   );
-                }
+                },
+              ),
+            );
+          }
 
-                return const SizedBox.shrink();
-              },
-            ),
-          ),
-        ],
+          return const SizedBox.shrink();
+        },
       ),
     );
   }
@@ -541,114 +609,112 @@ class _DeliveryListViewState extends State<_DeliveryListView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header Row: Selector Batch & Status Badge
-          Row(
-            children: [
-              Expanded(
-                child:
-                    batches.length > 1
-                        ? InkWell(
-                          onTap:
-                              () => _showBatchSelectorBottomSheet(
-                                context,
-                                batches,
-                                selected,
-                                primaryColor,
-                              ),
-                          borderRadius: BorderRadius.circular(8.r),
-                          child: Container(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 10.w,
-                              vertical: 6.h,
-                            ),
-                            decoration: BoxDecoration(
-                              color: primaryColor.withValues(alpha: 0.08),
-                              borderRadius: BorderRadius.circular(8.r),
-                              border: Border.all(
-                                color: primaryColor.withValues(alpha: 0.35),
-                                width: 1,
-                              ),
-                            ),
-                            child: Row(
-                              children: [
-                                Icon(
-                                  Icons.local_shipping,
-                                  size: 16.w,
-                                  color: primaryColor,
-                                ),
-                                SizedBox(width: 6.w),
-                                Expanded(
-                                  child: Text(
-                                    'Batch: ${selected.trId} (${selected.entity})',
-                                    style: TextStyle(
-                                      fontSize: 12.sp,
-                                      fontWeight: FontWeight.bold,
-                                      color: primaryColor,
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                                SizedBox(width: 4.w),
-                                Icon(
-                                  Icons.arrow_drop_down_rounded,
-                                  size: 22.w,
-                                  color: primaryColor,
-                                ),
-                              ],
-                            ),
+          // Selector Batch (Opsi Batch)
+          batches.length > 1
+              ? InkWell(
+                onTap:
+                    () => _showBatchSelectorBottomSheet(
+                      context,
+                      batches,
+                      selected,
+                      primaryColor,
+                    ),
+                borderRadius: BorderRadius.circular(8.r),
+                child: Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 10.w,
+                    vertical: 6.h,
+                  ),
+                  decoration: BoxDecoration(
+                    color: primaryColor.withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(8.r),
+                    border: Border.all(
+                      color: primaryColor.withValues(alpha: 0.35),
+                      width: 1,
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.local_shipping,
+                        size: 16.w,
+                        color: primaryColor,
+                      ),
+                      SizedBox(width: 6.w),
+                      Expanded(
+                        child: Text(
+                          'Batch: ${selected.trId} (${selected.entity})',
+                          style: TextStyle(
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.bold,
+                            color: primaryColor,
                           ),
-                        )
-                        : Row(
-                          children: [
-                            Container(
-                              padding: EdgeInsets.all(6.w),
-                              decoration: BoxDecoration(
-                                color: primaryColor.withValues(alpha: 0.1),
-                                shape: BoxShape.circle,
-                              ),
-                              child: Icon(
-                                Icons.local_shipping,
-                                size: 16.w,
-                                color: primaryColor,
-                              ),
-                            ),
-                            SizedBox(width: 8.w),
-                            Expanded(
-                              child: Text(
-                                'Batch: ${selected.trId} (${selected.entity})',
-                                style: TextStyle(
-                                  fontSize: 13.sp,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black87,
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
+                          overflow: TextOverflow.ellipsis,
                         ),
-              ),
-              SizedBox(width: 8.w),
-              // Status Badge
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
-                decoration: BoxDecoration(
-                  color: statusColor.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(16.r),
-                  border: Border.all(
-                    color: statusColor.withValues(alpha: 0.4),
-                    width: 1,
+                      ),
+                      SizedBox(width: 4.w),
+                      Icon(
+                        Icons.arrow_drop_down_rounded,
+                        size: 22.w,
+                        color: primaryColor,
+                      ),
+                    ],
                   ),
                 ),
-                child: Text(
-                  selected.statusText,
-                  style: TextStyle(
-                    fontSize: 10.sp,
-                    fontWeight: FontWeight.w600,
-                    color: statusColor,
+              )
+              : Row(
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(6.w),
+                    decoration: BoxDecoration(
+                      color: primaryColor.withValues(alpha: 0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.local_shipping,
+                      size: 16.w,
+                      color: primaryColor,
+                    ),
                   ),
+                  SizedBox(width: 8.w),
+                  Expanded(
+                    child: Text(
+                      'Batch: ${selected.trId} (${selected.entity})',
+                      style: TextStyle(
+                        fontSize: 13.sp,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+
+          SizedBox(height: 6.h),
+
+          // Status Badge di bawah No Batch
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 3.h),
+              decoration: BoxDecoration(
+                color: statusColor.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(16.r),
+                border: Border.all(
+                  color: statusColor.withValues(alpha: 0.4),
+                  width: 1,
                 ),
               ),
-            ],
+              child: Text(
+                selected.statusText,
+                style: TextStyle(
+                  fontSize: 10.sp,
+                  fontWeight: FontWeight.w600,
+                  color: statusColor,
+                ),
+              ),
+            ),
           ),
 
           SizedBox(height: 8.h),
@@ -1145,7 +1211,7 @@ class _DeliveryListViewState extends State<_DeliveryListView> {
     );
   }
 
-  Widget _buildEmptySjCard(String searchQuery, String trId) {
+  Widget _buildEmptySjCard(String trId) {
     return Container(
       margin: EdgeInsets.only(top: 8.h),
       padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 28.h),
@@ -1164,8 +1230,8 @@ class _DeliveryListViewState extends State<_DeliveryListView> {
             ),
             SizedBox(height: 10.h),
             Text(
-              searchQuery.isNotEmpty
-                  ? 'Tidak ada surat jalan yang cocok dengan "$searchQuery" pada batch $trId.'
+              trId.isNotEmpty
+                  ? 'Belum ada surat jalan pada muatan batch $trId.'
                   : 'Belum ada surat jalan pada muatan batch ini.',
               textAlign: TextAlign.center,
               style: TextStyle(
@@ -1350,6 +1416,147 @@ class _DeliveryListViewState extends State<_DeliveryListView> {
               Text(
                 'Tgl Kirim: ${_formatDate(delivHdr.shipDate)}',
                 style: TextStyle(fontSize: 10.sp, color: Colors.grey.shade500),
+              ),
+            ],
+          ),
+
+          Divider(height: 16.h, color: Colors.grey.shade100),
+
+          // Action Buttons: Sampai Tujuan & Bongkar Muat
+          Row(
+            children: [
+              // Tombol / Status Sampai Tujuan (checkPointOrder)
+              Expanded(
+                child: delivHdr.hasArrived
+                    ? Container(
+                        padding: EdgeInsets.symmetric(
+                          vertical: 7.h,
+                          horizontal: 8.w,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.green.shade50,
+                          borderRadius: BorderRadius.circular(8.r),
+                          border: Border.all(color: Colors.green.shade200),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.check_circle,
+                              size: 14.w,
+                              color: Colors.green.shade700,
+                            ),
+                            SizedBox(width: 4.w),
+                            Flexible(
+                              child: Text(
+                                'Tiba: ${_formatTime(delivHdr.dtArrive)}',
+                                style: TextStyle(
+                                  fontSize: 10.sp,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.green.shade800,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    : ElevatedButton.icon(
+                        onPressed: () => _confirmCheckPoint(delivHdr, entity),
+                        icon: Icon(
+                          Icons.location_on,
+                          size: 13.w,
+                          color: Colors.white,
+                        ),
+                        label: Text(
+                          'Sampai Tujuan',
+                          style: TextStyle(
+                            fontSize: 10.sp,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue.shade700,
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          padding: EdgeInsets.symmetric(
+                            vertical: 7.h,
+                            horizontal: 6.w,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.r),
+                          ),
+                        ),
+                      ),
+              ),
+              SizedBox(width: 8.w),
+              // Tombol / Status Bongkar Muat (dropOrder)
+              Expanded(
+                child: delivHdr.hasDropped
+                    ? Container(
+                        padding: EdgeInsets.symmetric(
+                          vertical: 7.h,
+                          horizontal: 8.w,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.teal.shade50,
+                          borderRadius: BorderRadius.circular(8.r),
+                          border: Border.all(color: Colors.teal.shade200),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.check_circle,
+                              size: 14.w,
+                              color: Colors.teal.shade700,
+                            ),
+                            SizedBox(width: 4.w),
+                            Flexible(
+                              child: Text(
+                                'Bongkar: ${_formatTime(delivHdr.dtDrop)}',
+                                style: TextStyle(
+                                  fontSize: 10.sp,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.teal.shade800,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    : ElevatedButton.icon(
+                        onPressed: () => _confirmDropOrder(delivHdr, entity),
+                        icon: Icon(
+                          Icons.inventory_2,
+                          size: 13.w,
+                          color: Colors.white,
+                        ),
+                        label: Text(
+                          'Bongkar Muat',
+                          style: TextStyle(
+                            fontSize: 10.sp,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.orange.shade800,
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          padding: EdgeInsets.symmetric(
+                            vertical: 7.h,
+                            horizontal: 6.w,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.r),
+                          ),
+                        ),
+                      ),
               ),
             ],
           ),

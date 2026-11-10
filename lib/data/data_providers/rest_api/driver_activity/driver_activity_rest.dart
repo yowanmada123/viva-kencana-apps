@@ -271,4 +271,108 @@ class DriverActivityRest {
       return Left(CustomException(message: e.toString()));
     }
   }
+
+  Future<Either<CustomException, String>> checkPointOrder({
+    required String id,
+    required String entity,
+    required double latitude,
+    required double longitude,
+  }) async {
+    try {
+      http.options.headers['requiresToken'] = true;
+      final url = 'api/viva/driver-activity/checkPointOrder';
+      final body = {
+        'id': id.trim(),
+        'entity': entity.trim(),
+        'latitude': latitude,
+        'longitude': longitude,
+      };
+      log('Request to ${http.options.baseUrl}$url (POST) body: $body');
+      debugPrint('Request to ${http.options.baseUrl}$url (POST) body: $body');
+
+      final response = await http.post(url, data: body);
+      log('Response from checkPointOrder [${response.statusCode}]: ${response.data}');
+
+      if (response.statusCode == 200) {
+        final data = response.data;
+        if (data is Map) {
+          if (data['status'] == 'error' || data['result'] == 'entity not set') {
+            return Left(CustomException(
+              message: data['message'] ??
+                  'Gagal memproses titik tiba di tujuan: ${data['result']}',
+            ));
+          }
+          final msg = data['message'] ??
+              'Berhasil konfirmasi sampai di tujuan (Check Point)';
+          return Right(msg.toString());
+        }
+        return const Right('Berhasil konfirmasi sampai di tujuan (Check Point)');
+      } else {
+        return Left(NetUtils.parseErrorResponse(response: response.data));
+      }
+    } on DioException catch (e) {
+      log('DIO ERROR checkPointOrder: ${e.response?.statusCode} - ${e.message}');
+      if (e.response?.statusCode == 404) {
+        return Left(CustomException(
+          message: 'Endpoint checkPointOrder tidak ditemukan (404 Not Found).',
+        ));
+      }
+      return Left(NetUtils.parseDioException(e));
+    } catch (e) {
+      log('checkPointOrder Exception: $e');
+      return Left(CustomException(message: e.toString()));
+    }
+  }
+
+  Future<Either<CustomException, String>> dropOrder({
+    required String id,
+    required String entity,
+    required double latitude,
+    required double longitude,
+  }) async {
+    try {
+      http.options.headers['requiresToken'] = true;
+      final url = 'api/viva/driver-activity/dropOrder';
+      final body = {
+        'id': id.trim(),
+        'entity': entity.trim(),
+        'latitude': latitude,
+        'longitude': longitude,
+      };
+      log('Request to ${http.options.baseUrl}$url (POST) body: $body');
+      debugPrint('Request to ${http.options.baseUrl}$url (POST) body: $body');
+
+      final response = await http.post(url, data: body);
+      log('Response from dropOrder [${response.statusCode}]: ${response.data}');
+
+      if (response.statusCode == 200) {
+        final data = response.data;
+        if (data is Map) {
+          if (data['status'] == 'error' || data['result'] == 'entity not set') {
+            return Left(CustomException(
+              message: data['message'] ??
+                  'Gagal memproses bongkar muat: ${data['result']}',
+            ));
+          }
+          final msg = data['message'] ??
+              'Berhasil konfirmasi bongkar muat (Drop Order)';
+          return Right(msg.toString());
+        }
+        return const Right('Berhasil konfirmasi bongkar muat (Drop Order)');
+      } else {
+        return Left(NetUtils.parseErrorResponse(response: response.data));
+      }
+    } on DioException catch (e) {
+      log('DIO ERROR dropOrder: ${e.response?.statusCode} - ${e.message}');
+      if (e.response?.statusCode == 404) {
+        return Left(CustomException(
+          message: 'Endpoint dropOrder tidak ditemukan (404 Not Found).',
+        ));
+      }
+      return Left(NetUtils.parseDioException(e));
+    } catch (e) {
+      log('dropOrder Exception: $e');
+      return Left(CustomException(message: e.toString()));
+    }
+  }
 }

@@ -32,4 +32,32 @@ class DriverActivityRepository {
   }) async {
     return await driverActivityRest.goCheckIn(id: id, entity: entity);
   }
+
+  Future<Either<CustomException, String>> checkPointOrder({
+    required String id,
+    required String entity,
+    required double latitude,
+    required double longitude,
+  }) async {
+    return await driverActivityRest.checkPointOrder(
+      id: id,
+      entity: entity,
+      latitude: latitude,
+      longitude: longitude,
+    );
+  }
+
+  Future<Either<CustomException, String>> dropOrder({
+    required String id,
+    required String entity,
+    required double latitude,
+    required double longitude,
+  }) async {
+    return await driverActivityRest.dropOrder(
+      id: id,
+      entity: entity,
+      latitude: latitude,
+      longitude: longitude,
+    );
+  }
 }

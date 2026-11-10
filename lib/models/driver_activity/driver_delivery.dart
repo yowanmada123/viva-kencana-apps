@@ -264,6 +264,11 @@ class DelivHdrItem {
 
   factory DelivHdrItem.fromJson(String source) =>
       DelivHdrItem.fromMap(json.decode(source));
+
+  bool get hasArrived =>
+      dtArrive.isNotEmpty && !dtArrive.startsWith('1900-01-01') && dtArrive != 'null';
+  bool get hasDropped =>
+      dtDrop.isNotEmpty && !dtDrop.startsWith('1900-01-01') && dtDrop != 'null';
 }
 
 class DriverDeliveryDetailItem {
