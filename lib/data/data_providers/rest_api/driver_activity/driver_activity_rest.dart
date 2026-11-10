@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
@@ -329,20 +330,39 @@ class DriverActivityRest {
     required String entity,
     required double latitude,
     required double longitude,
+    File? imageFile,
   }) async {
     try {
       http.options.headers['requiresToken'] = true;
       final url = 'api/viva/driver-activity/dropOrder';
-      final body = {
-        'id': id.trim(),
-        'entity': entity.trim(),
-        'latitude': latitude,
-        'longitude': longitude,
-      };
-      log('Request to ${http.options.baseUrl}$url (POST) body: $body');
-      debugPrint('Request to ${http.options.baseUrl}$url (POST) body: $body');
 
-      final response = await http.post(url, data: body);
+      dynamic requestData;
+      if (imageFile != null && await imageFile.exists()) {
+        final fileName = imageFile.path.split(Platform.pathSeparator).last;
+        requestData = FormData.fromMap({
+          'id': id.trim(),
+          'entity': entity.trim(),
+          'latitude': latitude,
+          'longitude': longitude,
+          'image': await MultipartFile.fromFile(
+            imageFile.path,
+            filename: fileName,
+          ),
+        });
+        log('Request to ${http.options.baseUrl}$url (POST Multipart with image: $fileName)');
+        debugPrint('Request to ${http.options.baseUrl}$url (POST Multipart with image: $fileName)');
+      } else {
+        requestData = FormData.fromMap({
+          'id': id.trim(),
+          'entity': entity.trim(),
+          'latitude': latitude,
+          'longitude': longitude,
+        });
+        log('Request to ${http.options.baseUrl}$url (POST without image)');
+        debugPrint('Request to ${http.options.baseUrl}$url (POST without image)');
+      }
+
+      final response = await http.post(url, data: requestData);
       log('Response from dropOrder [${response.statusCode}]: ${response.data}');
 
       if (response.statusCode == 200) {

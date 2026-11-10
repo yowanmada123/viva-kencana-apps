@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:vivakencanaapp/bloc/driver_activity/delivery_list/delivery_list_bloc.dart';
 import 'package:vivakencanaapp/data/repository/driver_activity_repository.dart';
 import 'package:vivakencanaapp/models/driver_activity/driver_delivery.dart';
+import 'package:vivakencanaapp/presentation/driver_activity/bongkar_muat_screen.dart';
 import 'package:vivakencanaapp/utils/strict_location.dart';
 
 class DeliveryListScreen extends StatelessWidget {
@@ -294,65 +295,22 @@ class _DeliveryListViewState extends State<_DeliveryListView> {
     }
   }
 
-  void _confirmDropOrder(DelivHdrItem delivHdr, String entity) {
-    _confirmAction(
-      title: 'Bongkar Muat',
-      message:
-          'Catat waktu dan titik koordinat GPS saat bongkar muat untuk Surat Jalan No. ${delivHdr.delivId}?',
-      confirmText: 'Ya, Selesai Bongkar',
-      confirmColor: Colors.orange.shade800,
-      onConfirm: () => _executeDropOrder(delivHdr, entity),
-    );
-  }
-
-  Future<void> _executeDropOrder(DelivHdrItem delivHdr, String entity) async {
-    _showLoadingDialog('Mencatat koordinat GPS & bongkar muat...');
-    try {
-      final position = await StrictLocation.getCurrentPosition();
-      if (!mounted) return;
-
-      final repo = context.read<DriverActivityRepository>();
-      final result = await repo.dropOrder(
-        id: delivHdr.delivId,
-        entity: entity,
-        latitude: position.latitude,
-        longitude: position.longitude,
-      );
-
-      if (!mounted) return;
-      Navigator.of(context, rootNavigator: true).pop(); // dismiss loading
-
-      result.fold(
-        (failure) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(failure.message ?? 'Gagal mencatat bongkar muat'),
-              backgroundColor: Colors.red.shade700,
-              behavior: SnackBarBehavior.floating,
-            ),
-          );
-        },
-        (successMsg) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(successMsg),
-              backgroundColor: Colors.green.shade700,
-              behavior: SnackBarBehavior.floating,
-            ),
-          );
-          context.read<DeliveryListBloc>().add(const RefreshDeliveryListEvent());
-        },
-      );
-    } catch (e) {
-      if (!mounted) return;
-      Navigator.of(context, rootNavigator: true).pop(); // dismiss loading
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(e.toString().replaceAll('Exception: ', '')),
-          backgroundColor: Colors.red.shade700,
-          behavior: SnackBarBehavior.floating,
+  Future<void> _openBongkarMuatScreen(
+    DelivHdrItem delivHdr,
+    String entity,
+  ) async {
+    final result = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => BongkarMuatScreen(
+          delivHdr: delivHdr,
+          entity: entity,
         ),
-      );
+      ),
+    );
+
+    if (result == true && mounted) {
+      context.read<DeliveryListBloc>().add(const RefreshDeliveryListEvent());
     }
   }
 
@@ -1529,7 +1487,7 @@ class _DeliveryListViewState extends State<_DeliveryListView> {
                         ),
                       )
                     : ElevatedButton.icon(
-                        onPressed: () => _confirmDropOrder(delivHdr, entity),
+                        onPressed: () => _openBongkarMuatScreen(delivHdr, entity),
                         icon: Icon(
                           Icons.inventory_2,
                           size: 13.w,

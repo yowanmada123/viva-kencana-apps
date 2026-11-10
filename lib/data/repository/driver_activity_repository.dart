@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dartz/dartz.dart';
 import 'package:vivakencanaapp/data/data_providers/rest_api/driver_activity/driver_activity_rest.dart';
 import 'package:vivakencanaapp/models/driver_activity/driver_delivery.dart';
@@ -52,12 +54,14 @@ class DriverActivityRepository {
     required String entity,
     required double latitude,
     required double longitude,
+    File? imageFile,
   }) async {
     return await driverActivityRest.dropOrder(
       id: id,
       entity: entity,
       latitude: latitude,
       longitude: longitude,
+      imageFile: imageFile,
     );
   }
 }
