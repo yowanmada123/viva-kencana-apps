@@ -144,6 +144,7 @@ class _BongkarMuatScreenState extends State<BongkarMuatScreen> {
   void _showImageSourcePicker() {
     showModalBottomSheet(
       context: context,
+      backgroundColor: Colors.white,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16.r)),
       ),
@@ -241,6 +242,8 @@ class _BongkarMuatScreenState extends State<BongkarMuatScreen> {
       builder: (dialogCtx) => PopScope(
         canPop: false,
         child: AlertDialog(
+          backgroundColor: Colors.white,
+          surfaceTintColor: Colors.transparent,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16.r),
           ),
@@ -269,6 +272,8 @@ class _BongkarMuatScreenState extends State<BongkarMuatScreen> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16.r),
         ),
@@ -345,7 +350,7 @@ class _BongkarMuatScreenState extends State<BongkarMuatScreen> {
       ),
     );
 
-    if (confirm != true) return;
+    if (confirm != true || !mounted) return;
 
     _showLoadingDialog('Mencatat lokasi GPS & mengunggah data...');
     try {

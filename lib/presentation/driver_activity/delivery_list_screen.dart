@@ -6,7 +6,7 @@ import 'package:vivakencanaapp/bloc/driver_activity/delivery_list/delivery_list_
 import 'package:vivakencanaapp/data/repository/driver_activity_repository.dart';
 import 'package:vivakencanaapp/models/driver_activity/driver_delivery.dart';
 import 'package:vivakencanaapp/presentation/driver_activity/bongkar_muat_screen.dart';
-import 'package:vivakencanaapp/utils/strict_location.dart';
+import 'package:vivakencanaapp/presentation/driver_activity/sampai_tujuan_screen.dart';
 
 class DeliveryListScreen extends StatelessWidget {
   final String? entityId;
@@ -141,6 +141,8 @@ class _DeliveryListViewState extends State<_DeliveryListView> {
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
+          backgroundColor: Colors.white,
+          surfaceTintColor: Colors.transparent,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16.r),
           ),
@@ -203,95 +205,22 @@ class _DeliveryListViewState extends State<_DeliveryListView> {
     }
   }
 
-  void _showLoadingDialog(String message) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (dialogCtx) => PopScope(
-        canPop: false,
-        child: AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16.r),
-          ),
-          content: Row(
-            children: [
-              const CircularProgressIndicator(),
-              SizedBox(width: 16.w),
-              Expanded(
-                child: Text(
-                  message,
-                  style: TextStyle(
-                    fontSize: 12.sp,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-            ],
-          ),
+  Future<void> _openSampaiTujuanScreen(
+    DelivHdrItem delivHdr,
+    String entity,
+  ) async {
+    final result = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => SampaiTujuanScreen(
+          delivHdr: delivHdr,
+          entity: entity,
         ),
       ),
     );
-  }
 
-  void _confirmCheckPoint(DelivHdrItem delivHdr, String entity) {
-    _confirmAction(
-      title: 'Sampai di Tujuan',
-      message:
-          'Catat waktu dan titik koordinat GPS saat tiba di tujuan untuk Surat Jalan No. ${delivHdr.delivId}?',
-      confirmText: 'Ya, Sampai',
-      confirmColor: Colors.blue.shade700,
-      onConfirm: () => _executeCheckPoint(delivHdr, entity),
-    );
-  }
-
-  Future<void> _executeCheckPoint(DelivHdrItem delivHdr, String entity) async {
-    _showLoadingDialog('Mencatat koordinat GPS & titik kedatangan...');
-    try {
-      final position = await StrictLocation.getCurrentPosition();
-      if (!mounted) return;
-
-      final repo = context.read<DriverActivityRepository>();
-      final result = await repo.checkPointOrder(
-        id: delivHdr.delivId,
-        entity: entity,
-        latitude: position.latitude,
-        longitude: position.longitude,
-      );
-
-      if (!mounted) return;
-      Navigator.of(context, rootNavigator: true).pop(); // dismiss loading
-
-      result.fold(
-        (failure) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(failure.message ?? 'Gagal mencatat kedatangan'),
-              backgroundColor: Colors.red.shade700,
-              behavior: SnackBarBehavior.floating,
-            ),
-          );
-        },
-        (successMsg) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(successMsg),
-              backgroundColor: Colors.green.shade700,
-              behavior: SnackBarBehavior.floating,
-            ),
-          );
-          context.read<DeliveryListBloc>().add(const RefreshDeliveryListEvent());
-        },
-      );
-    } catch (e) {
-      if (!mounted) return;
-      Navigator.of(context, rootNavigator: true).pop(); // dismiss loading
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(e.toString().replaceAll('Exception: ', '')),
-          backgroundColor: Colors.red.shade700,
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+    if (result == true && mounted) {
+      context.read<DeliveryListBloc>().add(const RefreshDeliveryListEvent());
     }
   }
 
@@ -1420,7 +1349,7 @@ class _DeliveryListViewState extends State<_DeliveryListView> {
                         ),
                       )
                     : ElevatedButton.icon(
-                        onPressed: () => _confirmCheckPoint(delivHdr, entity),
+                        onPressed: () => _openSampaiTujuanScreen(delivHdr, entity),
                         icon: Icon(
                           Icons.location_on,
                           size: 13.w,
