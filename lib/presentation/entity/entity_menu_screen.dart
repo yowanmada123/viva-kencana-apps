@@ -20,9 +20,8 @@ import '../../models/errors/custom_exception.dart';
 import '../../models/menu.dart';
 import '../../utils/strict_location.dart';
 import '../qr_code/qr_code_screen.dart';
-import '../stock_opname/stock_opname_qr/qr_code_opname_screen.dart';
 import '../sales_activity/sales_activity_dashboard_screen.dart';
-import '../approval/approval_sr_menu_screen.dart';
+import '../driver_activity/delivery_history_screen.dart';
 import '../driver_activity/delivery_list_screen.dart';
 
 class EntityMenuScreen extends StatelessWidget {
@@ -184,12 +183,30 @@ class _MyGridLayoutState extends State<MyGridLayout> {
         };
         break;
       case 'Delivery List':
+      case 'deliveryList':
+      case 'mnuDeliveryList':
         routeAction = () async {
           Navigator.push(
             context,
             MaterialPageRoute(
               builder:
                   (_) => DeliveryListScreen(
+                    entityId: widget.entityId,
+                  ),
+            ),
+          );
+        };
+        break;
+      case 'Delivery History':
+      case 'deliveryHistory':
+      case 'mnuDeliveryHistory':
+      case 'DeliveryHistory':
+        routeAction = () async {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder:
+                  (_) => DeliveryHistoryScreen(
                     entityId: widget.entityId,
                   ),
             ),
@@ -211,7 +228,34 @@ class _MyGridLayoutState extends State<MyGridLayout> {
         };
         break;
       default:
-        routeAction = null;
+        if (caption.toLowerCase().contains('history')) {
+          routeAction = () async {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder:
+                    (_) => DeliveryHistoryScreen(
+                      entityId: widget.entityId,
+                    ),
+              ),
+            );
+          };
+        } else if (caption.toLowerCase().contains('delivery') &&
+            caption.toLowerCase().contains('list')) {
+          routeAction = () async {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder:
+                    (_) => DeliveryListScreen(
+                      entityId: widget.entityId,
+                    ),
+              ),
+            );
+          };
+        } else {
+          routeAction = null;
+        }
     }
 
     return {
@@ -324,6 +368,8 @@ class _MyGridLayoutState extends State<MyGridLayout> {
           },
         );
       case 'Delivery List':
+      case 'deliveryList':
+      case 'mnuDeliveryList':
         return submenu.copyWith(
           action: () async {
             Navigator.push(
@@ -331,6 +377,23 @@ class _MyGridLayoutState extends State<MyGridLayout> {
               MaterialPageRoute(
                 builder:
                     (_) => DeliveryListScreen(
+                      entityId: entityId,
+                    ),
+              ),
+            );
+          },
+        );
+      case 'Delivery History':
+      case 'deliveryHistory':
+      case 'mnuDeliveryHistory':
+      case 'DeliveryHistory':
+        return submenu.copyWith(
+          action: () async {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder:
+                    (_) => DeliveryHistoryScreen(
                       entityId: entityId,
                     ),
               ),
@@ -353,6 +416,37 @@ class _MyGridLayoutState extends State<MyGridLayout> {
           },
         );
       default:
+        if (submenu.menuCaption.toLowerCase().contains('history')) {
+          return submenu.copyWith(
+            action: () async {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder:
+                      (_) => DeliveryHistoryScreen(
+                        entityId: entityId,
+                      ),
+                ),
+              );
+            },
+          );
+        }
+        if (submenu.menuCaption.toLowerCase().contains('delivery') &&
+            submenu.menuCaption.toLowerCase().contains('list')) {
+          return submenu.copyWith(
+            action: () async {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder:
+                      (_) => DeliveryListScreen(
+                        entityId: entityId,
+                      ),
+                ),
+              );
+            },
+          );
+        }
         return submenu.copyWith(action: null);
     }
   }
@@ -368,12 +462,45 @@ class _MyGridLayoutState extends State<MyGridLayout> {
       case 'mnuGenQrFg':
         return Icons.inventory;
       case 'Delivery List':
+      case 'deliveryList':
+      case 'mnuDeliveryList':
         return Icons.local_shipping;
+      case 'Delivery History':
+      case 'deliveryHistory':
+      case 'mnuDeliveryHistory':
+      case 'DeliveryHistory':
+        return Icons.history;
       case 'mnuIncomingInspection':
         return Icons.fact_check;
       default:
-        return Icons.menu;
+        return Icons.apps;
     }
+  }
+
+  IconData _resolveMenuIcon(SubMenu submenu) {
+    final id = submenu.menuId.toLowerCase();
+    final caption = submenu.menuCaption.toLowerCase();
+
+    if (id.contains('history') || caption.contains('history')) {
+      return Icons.history;
+    }
+    if (id.contains('delivery') || caption.contains('delivery') || id == 'confirmloading') {
+      return Icons.local_shipping;
+    }
+    if (id.contains('approval') || caption.contains('approval')) {
+      return Icons.approval;
+    }
+    if (id.contains('sales') || caption.contains('sales')) {
+      return Icons.location_searching;
+    }
+    if (id.contains('qr') || caption.contains('qr') || id.contains('inventory')) {
+      return Icons.inventory;
+    }
+    if (id.contains('inspection') || caption.contains('inspection')) {
+      return Icons.fact_check;
+    }
+
+    return _getIconForMenuId(submenu.menuId);
   }
 
   void _navigateToScreen(
@@ -480,9 +607,6 @@ class _MyGridLayoutState extends State<MyGridLayout> {
                     widget.entityId,
                   );
 
-                  print("SUB MENU: $submenus");
-                  final iconCode =
-                      int.tryParse(submenu.icon) ?? Icons.help.codePoint;
                   final isLoading = _loadingMenuId == submenu.menuId;
 
                   return GestureDetector(
@@ -527,10 +651,7 @@ class _MyGridLayoutState extends State<MyGridLayout> {
                                       ),
                                     )
                                     : Icon(
-                                      IconData(
-                                        iconCode,
-                                        fontFamily: 'MaterialIcons',
-                                      ),
+                                      _resolveMenuIcon(submenu),
                                       color: Colors.white,
                                       size: 20.w,
                                     ),

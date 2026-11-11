@@ -88,6 +88,52 @@ class DriverActivityRest {
     }
   }
 
+  Future<Either<CustomException, List<DriverDelivery>>> getDeliveryHistory() async {
+    try {
+      http.options.headers['requiresToken'] = true;
+      final url = 'api/viva/driver-activity/getDeliveryHistory';
+      log('Request to ${http.options.baseUrl}$url (GET)');
+      debugPrint('Request to ${http.options.baseUrl}$url (GET)');
+
+      final response = await http.get(url);
+      log('Response from getDeliveryHistory [${response.statusCode}]: ${response.data}');
+
+      if (response.statusCode == 200) {
+        final body = response.data;
+        dynamic rawData;
+        if (body is Map) {
+          rawData = body['data'] ?? body['result'];
+        } else if (body is List) {
+          rawData = body;
+        }
+
+        final List listData = rawData is List ? rawData : [];
+        final deliveries = listData
+            .whereType<Map>()
+            .map((item) => DriverDelivery.fromMap(Map<String, dynamic>.from(item)))
+            .toList();
+        return Right(deliveries);
+      } else {
+        return Left(NetUtils.parseErrorResponse(response: response.data));
+      }
+    } on DioException catch (e) {
+      final statusCode = e.response?.statusCode;
+      if (statusCode == 404) {
+        return Left(CustomException(
+          message: 'Endpoint getDeliveryHistory tidak ditemukan (404 Not Found).',
+        ));
+      } else if (statusCode == 401) {
+        return Left(CustomException(
+          message: 'Sesi login telah berakhir (401 Unauthorized). Silakan login ulang.',
+        ));
+      }
+      return Left(NetUtils.parseDioException(e));
+    } catch (e) {
+      log('getDeliveryHistory Exception: $e');
+      return Left(CustomException(message: e.toString()));
+    }
+  }
+
   Future<Either<CustomException, List<DriverDeliveryDetailItem>>> getDetailItem({
     required String entity,
     required String id,

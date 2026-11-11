@@ -14,6 +14,10 @@ class DriverActivityRepository {
     return await driverActivityRest.getDeliveryList();
   }
 
+  Future<Either<CustomException, List<DriverDelivery>>> getDeliveryHistory() async {
+    return await driverActivityRest.getDeliveryHistory();
+  }
+
   Future<Either<CustomException, List<DriverDeliveryDetailItem>>> getDetailItem({
     required String entity,
     required String id,
