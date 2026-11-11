@@ -29,7 +29,7 @@ import 'package:vivakencanaapp/data/repository/stock_opname/mill_selector_reposi
 import 'package:vivakencanaapp/data/repository/stock_opname/opname_repository.dart';
 import 'package:vivakencanaapp/data/repository/stock_opname/opname_stock_dtl_repository.dart';
 import 'package:vivakencanaapp/data/repository/stock_opname/wh_bin_repository.dart';
-import 'package:vivakencanaapp/models/stock_opname/stock_opname_hdr.dart';
+// import 'package:vivakencanaapp/models/stock_opname/stock_opname_hdr.dart';
 
 import 'bloc/auth/authentication/authentication_bloc.dart';
 import 'bloc/sales_activity/checkin/sales_activity_form_checkin_bloc.dart';
@@ -58,7 +58,9 @@ import 'data/data_providers/rest_api/stock_opname/opname_update.dart';
 import 'data/data_providers/shared-preferences/shared_preferences_key.dart';
 import 'data/data_providers/shared-preferences/shared_preferences_manager.dart';
 import 'data/data_providers/rest_api/driver_activity/driver_activity_rest.dart';
+import 'data/data_providers/rest_api/receive_warehouse/receive_warehouse_rest.dart';
 import 'data/repository/driver_activity_repository.dart';
+import 'data/repository/receive_warehouse_repository.dart';
 import 'data/repository/auth_repository.dart';
 import 'data/repository/authorization_repository.dart';
 import 'data/repository/batch_repository.dart';
@@ -121,6 +123,7 @@ void main() async {
   final whBinRest = WHBinRest(androidKencanaClient);
   final incomingInspectionRest = IncomingInspectionRest(androidKencanaClient);
   final driverActivityRest = DriverActivityRest(dioClient);
+  final receiveWarehouseRest = ReceiveWarehouseRest(androidKencanaClient);
 
   final authRepository = AuthRepository(
     authRest: authRest,
@@ -154,6 +157,9 @@ void main() async {
   final driverActivityRepository = DriverActivityRepository(
     driverActivityRest: driverActivityRest,
   );
+  final receiveWarehouseRepository = ReceiveWarehouseRepository(
+    receiveWarehouseRest: receiveWarehouseRest,
+  );
 
   runApp(
     MultiRepositoryProvider(
@@ -174,6 +180,7 @@ void main() async {
         RepositoryProvider.value(value: binRepository),
         RepositoryProvider.value(value: incomingInspectionRepository),
         RepositoryProvider.value(value: driverActivityRepository),
+        RepositoryProvider.value(value: receiveWarehouseRepository),
       ],
       child: MultiBlocProvider(
         providers: [

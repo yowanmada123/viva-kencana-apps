@@ -8,6 +8,7 @@ import 'package:vivakencanaapp/bloc/authorization/credentials/credentials_bloc.d
 import 'package:vivakencanaapp/presentation/approval/approval_pr_screen.dart';
 import 'package:vivakencanaapp/presentation/incomine_inspection/incoming_inspection_screen.dart';
 import 'package:vivakencanaapp/presentation/stock_opname/stock_opname_qr/mill_selector_screen.dart';
+import 'package:vivakencanaapp/presentation/warehouse/kka_receive_finish_good/mill_and_wh_selector_screen.dart';
 
 import '../../bloc/auth/authentication/authentication_bloc.dart';
 import '../../bloc/auth/logout/logout_bloc.dart';
@@ -20,9 +21,9 @@ import '../../models/errors/custom_exception.dart';
 import '../../models/menu.dart';
 import '../../utils/strict_location.dart';
 import '../qr_code/qr_code_screen.dart';
-import '../stock_opname/stock_opname_qr/qr_code_opname_screen.dart';
+// import '../stock_opname/stock_opname_qr/qr_code_opname_screen.dart';
 import '../sales_activity/sales_activity_dashboard_screen.dart';
-import '../approval/approval_sr_menu_screen.dart';
+// import '../approval/approval_sr_menu_screen.dart';
 import '../driver_activity/delivery_list_screen.dart';
 
 class EntityMenuScreen extends StatelessWidget {
@@ -188,10 +189,7 @@ class _MyGridLayoutState extends State<MyGridLayout> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder:
-                  (_) => DeliveryListScreen(
-                    entityId: widget.entityId,
-                  ),
+              builder: (_) => DeliveryListScreen(entityId: widget.entityId),
             ),
           );
         };
@@ -323,16 +321,22 @@ class _MyGridLayoutState extends State<MyGridLayout> {
             );
           },
         );
+      case 'mnuReceiveFinishGoodMobile':
+        return submenu.copyWith(
+          action: () async {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => MillAndWhSelectorScreen()),
+            );
+          },
+        );
       case 'Delivery List':
         return submenu.copyWith(
           action: () async {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder:
-                    (_) => DeliveryListScreen(
-                      entityId: entityId,
-                    ),
+                builder: (_) => DeliveryListScreen(entityId: entityId),
               ),
             );
           },

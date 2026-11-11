@@ -37,7 +37,17 @@ class ScanOutcome {
 class InspectionScanScreen extends StatefulWidget {
   final ScanMode mode;
 
-  const InspectionScanScreen({super.key, required this.mode});
+  /// Judul dan petunjuk opsional, untuk fitur lain yang memakai layar ini
+  /// (mis. Receive Warehouse). Kosong berarti teks bawaan Incoming Inspection.
+  final String? title;
+  final String? hint;
+
+  const InspectionScanScreen({
+    super.key,
+    required this.mode,
+    this.title,
+    this.hint,
+  });
 
   @override
   State<InspectionScanScreen> createState() => _InspectionScanScreenState();
@@ -51,15 +61,17 @@ class _InspectionScanScreenState extends State<InspectionScanScreen> {
   bool _flashOn = false;
 
   String get _title =>
-      widget.mode == ScanMode.qr ? 'Scan QR Code' : 'Scan Barcode';
+      widget.title ??
+      (widget.mode == ScanMode.qr ? 'Scan QR Code' : 'Scan Barcode');
 
   String get _hint =>
-      widget.mode == ScanMode.qr
+      widget.hint ??
+      (widget.mode == ScanMode.qr
           ? 'Arahkan kamera ke QR code pada label coil.\n'
               'Pastikan seluruh kode masuk ke dalam kotak.'
           : 'Pastikan SELURUH barcode masuk ke dalam kotak, '
               'termasuk sisi kiri dan kanannya.\n'
-              'Kalau tidak muat, mundurkan kamera sedikit.';
+              'Kalau tidak muat, mundurkan kamera sedikit.');
 
   @override
   void reassemble() {
