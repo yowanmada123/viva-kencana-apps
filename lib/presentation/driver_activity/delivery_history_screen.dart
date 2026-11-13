@@ -135,8 +135,9 @@ class _DeliveryHistoryViewState extends State<_DeliveryHistoryView> {
           ),
         ],
       ),
-      body: Column(
-        children: [
+      body: SafeArea(
+        child: Column(
+          children: [
           // Search Bar
           Container(
             padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 12.h),
@@ -354,8 +355,9 @@ class _DeliveryHistoryViewState extends State<_DeliveryHistoryView> {
           ),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildHistoryBatchCard(DriverDelivery batch, Color primaryColor) {
     final duration = _calculateDuration(batch.dtLeave, batch.dtHome);

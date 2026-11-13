@@ -273,8 +273,9 @@ class _DeliveryListViewState extends State<_DeliveryListView> {
           ),
         ],
       ),
-      body: BlocBuilder<DeliveryListBloc, DeliveryListState>(
-        builder: (context, state) {
+      body: SafeArea(
+        child: BlocBuilder<DeliveryListBloc, DeliveryListState>(
+          builder: (context, state) {
           if (state is DeliveryListLoading) {
             return const Center(child: CircularProgressIndicator());
           }
@@ -465,8 +466,9 @@ class _DeliveryListViewState extends State<_DeliveryListView> {
           return const SizedBox.shrink();
         },
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildTopActionCard(
     BuildContext context,

@@ -189,10 +189,7 @@ class _MyGridLayoutState extends State<MyGridLayout> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder:
-                  (_) => DeliveryListScreen(
-                    entityId: widget.entityId,
-                  ),
+              builder: (_) => DeliveryListScreen(entityId: widget.entityId),
             ),
           );
         };
@@ -205,10 +202,7 @@ class _MyGridLayoutState extends State<MyGridLayout> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder:
-                  (_) => DeliveryHistoryScreen(
-                    entityId: widget.entityId,
-                  ),
+              builder: (_) => DeliveryHistoryScreen(entityId: widget.entityId),
             ),
           );
         };
@@ -234,9 +228,7 @@ class _MyGridLayoutState extends State<MyGridLayout> {
               context,
               MaterialPageRoute(
                 builder:
-                    (_) => DeliveryHistoryScreen(
-                      entityId: widget.entityId,
-                    ),
+                    (_) => DeliveryHistoryScreen(entityId: widget.entityId),
               ),
             );
           };
@@ -246,10 +238,7 @@ class _MyGridLayoutState extends State<MyGridLayout> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder:
-                    (_) => DeliveryListScreen(
-                      entityId: widget.entityId,
-                    ),
+                builder: (_) => DeliveryListScreen(entityId: widget.entityId),
               ),
             );
           };
@@ -375,10 +364,7 @@ class _MyGridLayoutState extends State<MyGridLayout> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder:
-                    (_) => DeliveryListScreen(
-                      entityId: entityId,
-                    ),
+                builder: (_) => DeliveryListScreen(entityId: entityId),
               ),
             );
           },
@@ -392,10 +378,7 @@ class _MyGridLayoutState extends State<MyGridLayout> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder:
-                    (_) => DeliveryHistoryScreen(
-                      entityId: entityId,
-                    ),
+                builder: (_) => DeliveryHistoryScreen(entityId: entityId),
               ),
             );
           },
@@ -422,10 +405,7 @@ class _MyGridLayoutState extends State<MyGridLayout> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder:
-                      (_) => DeliveryHistoryScreen(
-                        entityId: entityId,
-                      ),
+                  builder: (_) => DeliveryHistoryScreen(entityId: entityId),
                 ),
               );
             },
@@ -438,10 +418,7 @@ class _MyGridLayoutState extends State<MyGridLayout> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder:
-                      (_) => DeliveryListScreen(
-                        entityId: entityId,
-                      ),
+                  builder: (_) => DeliveryListScreen(entityId: entityId),
                 ),
               );
             },
@@ -484,7 +461,9 @@ class _MyGridLayoutState extends State<MyGridLayout> {
     if (id.contains('history') || caption.contains('history')) {
       return Icons.history;
     }
-    if (id.contains('delivery') || caption.contains('delivery') || id == 'confirmloading') {
+    if (id.contains('delivery') ||
+        caption.contains('delivery') ||
+        id == 'confirmloading') {
       return Icons.local_shipping;
     }
     if (id.contains('approval') || caption.contains('approval')) {
@@ -493,7 +472,9 @@ class _MyGridLayoutState extends State<MyGridLayout> {
     if (id.contains('sales') || caption.contains('sales')) {
       return Icons.location_searching;
     }
-    if (id.contains('qr') || caption.contains('qr') || id.contains('inventory')) {
+    if (id.contains('qr') ||
+        caption.contains('qr') ||
+        id.contains('inventory')) {
       return Icons.inventory;
     }
     if (id.contains('inspection') || caption.contains('inspection')) {
@@ -673,7 +654,7 @@ class _MyGridLayoutState extends State<MyGridLayout> {
                                 ),
                                 SizedBox(height: 4.w),
                                 Text(
-                                  "Let's see ${submenu.menuCaption} process",
+                                  "${submenu.menuCaption} Page",
                                   style: TextStyle(
                                     fontSize: 12.w,
                                     color: Colors.grey[600],
