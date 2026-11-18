@@ -8,6 +8,7 @@ import 'package:vivakencanaapp/bloc/authorization/credentials/credentials_bloc.d
 import 'package:vivakencanaapp/presentation/approval/approval_pr_screen.dart';
 import 'package:vivakencanaapp/presentation/incomine_inspection/incoming_inspection_screen.dart';
 import 'package:vivakencanaapp/presentation/stock_opname/stock_opname_qr/mill_selector_screen.dart';
+import 'package:vivakencanaapp/presentation/warehouse/kka_receive_finish_good/mill_and_wh_selector_screen.dart';
 
 import '../../bloc/auth/authentication/authentication_bloc.dart';
 import '../../bloc/auth/logout/logout_bloc.dart';
@@ -353,6 +354,15 @@ class _MyGridLayoutState extends State<MyGridLayout> {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (_) => MillSelectorScreen()),
+            );
+          },
+        );
+      case 'mnuReceiveFinishGoodMobile':
+        return submenu.copyWith(
+          action: () async {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => MillAndWhSelectorScreen()),
             );
           },
         );
