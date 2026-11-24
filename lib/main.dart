@@ -73,11 +73,13 @@ import 'data/repository/stock_opname/prod_master_repository.dart';
 import 'environment.dart';
 import 'presentation/entity/entity_screen.dart';
 import 'presentation/login/login_form_screen.dart';
+import 'utils/crash_reporting.dart';
 import 'utils/interceptors/dio_request_token_interceptor.dart';
 import 'utils/sales_activity/sales_activity_sync_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await CrashReporting.init();
   await initializeDateFormatting('id_ID', null);
 
   SalesActivitySyncService().syncPendingActivities();

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "853153126554",
+    "project_id": "viva-kencana-apps-425bf",
+    "storage_bucket": "viva-kencana-apps-425bf.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:853153126554:android:cf92fa0dc4a285e708e723",
+        "android_client_info": {
+          "package_name": "com.example.vivakencanaapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAh_4BH1yr2r9FOZUhcUj19aBcn2OR4WQU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
