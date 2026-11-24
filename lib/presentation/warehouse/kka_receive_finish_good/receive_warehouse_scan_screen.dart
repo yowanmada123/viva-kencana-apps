@@ -14,8 +14,21 @@ import '../../../models/receive_warehouse/receive_warehouse.dart';
 final _qtyFormat = NumberFormat('#,##0.##', 'id_ID');
 final _timeFormat = DateFormat('HH:mm:ss', 'id_ID');
 
+/// Format barcode yang dibaca kamera. Label kiriman dari web memakai CODE128;
+/// format 1D lain ikut diizinkan untuk berjaga-jaga. QR sengaja tidak
+/// termasuk, jadi scanner hanya membaca barcode garis.
+const _barcodeFormats = <BarcodeFormat>[
+  BarcodeFormat.code128,
+  BarcodeFormat.code39,
+  BarcodeFormat.code93,
+  BarcodeFormat.codabar,
+  BarcodeFormat.ean8,
+  BarcodeFormat.ean13,
+  BarcodeFormat.itf,
+];
+
 /// Langkah 2 Receive Warehouse: kamera langsung aktif untuk scan barcode
-/// kiriman (label CODE128 berisi tr_id dari web, QR juga bisa terbaca).
+/// kiriman (label CODE128 berisi tr_id dari web).
 ///
 /// Bagian atas selalu menampilkan posisi user (mill, warehouse, shift).
 /// Setiap scan dicek server: kalau tujuan kiriman bukan posisi ini, muncul
@@ -50,7 +63,9 @@ class _ScanView extends StatefulWidget {
 }
 
 class _ScanViewState extends State<_ScanView> {
-  final GlobalKey _qrKey = GlobalKey(debugLabel: 'ReceiveWarehouseQR');
+  final GlobalKey _scannerKey = GlobalKey(
+    debugLabel: 'ReceiveWarehouseBarcode',
+  );
 
   QRViewController? _controller;
   bool _flashOn = false;
@@ -354,8 +369,9 @@ class _ScanViewState extends State<_ScanView> {
               child: Stack(
                 children: [
                   QRView(
-                    key: _qrKey,
+                    key: _scannerKey,
                     onQRViewCreated: _onViewCreated,
+                    formatsAllowed: _barcodeFormats,
                     overlay: QrScannerOverlayShape(
                       borderColor: Colors.white,
                       borderRadius: 8,
@@ -373,13 +389,35 @@ class _ScanViewState extends State<_ScanView> {
                       );
                     },
                   ),
+
+                  /// Garis bidik merah melintang di tengah kotak, seperti
+                  /// scanner barcode. Kotak overlay selalu berada di tengah
+                  /// area kamera, jadi garis cukup diletakkan di tengah juga.
+                  IgnorePointer(
+                    child: Center(
+                      child: Container(
+                        width: cutOutWidth - 24.w,
+                        height: 2,
+                        decoration: BoxDecoration(
+                          color: Colors.redAccent,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.redAccent.withValues(alpha: 0.6),
+                              blurRadius: 6,
+                              spreadRadius: 1,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
                   Positioned(
                     left: 16.w,
                     right: 16.w,
                     bottom: 12.w,
                     child: Text(
-                      'Arahkan kamera ke barcode pada label kiriman.\n'
-                      'Pastikan seluruh barcode masuk ke dalam kotak.',
+                      'Arahkan garis merah melintang barcode pada label '
+                      'kiriman.\nPastikan seluruh barcode masuk ke dalam kotak.',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 12.sp,

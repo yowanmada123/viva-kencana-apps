@@ -31,7 +31,7 @@ class RwReceiveBloc extends Bloc<RwReceiveEvent, RwReceiveState> {
     final trId = parseTrId(event.code);
 
     if (trId.isEmpty) {
-      emit(RwLookupFailure('QR code tidak berisi tr_id yang bisa dibaca'));
+      emit(RwLookupFailure('Barcode tidak berisi tr_id yang bisa dibaca'));
       return;
     }
 
@@ -59,7 +59,8 @@ class RwReceiveBloc extends Bloc<RwReceiveEvent, RwReceiveState> {
     );
   }
 
-  /// Isi QR boleh tr_id mentah atau JSON yang memuat key tr_id.
+  /// Isi barcode berupa tr_id mentah (label CODE128 dari web). Bentuk JSON
+  /// yang memuat key tr_id tetap diterima, misalnya dari input manual.
   static String parseTrId(String raw) {
     final code = raw.trim();
     if (code.startsWith('{')) {
