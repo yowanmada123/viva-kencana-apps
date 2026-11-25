@@ -106,68 +106,7 @@ class _MyGridLayoutState extends State<MyGridLayout> {
         };
         break;
       case 'mnuSalesActivity':
-        routeAction = () async {
-          final bloc = context.read<SalesActivityFormCheckInBloc>();
-          final salesRepository = context.read<SalesActivityRepository>();
-          final position = await StrictLocation.getCurrentPosition();
-
-          bloc.add(const LoadSalesData());
-          bool isHandled = false;
-          Timer(const Duration(seconds: 3), () {
-            if (!isHandled) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text("Permintaan terlalu lama, coba lagi"),
-                ),
-              );
-            }
-          });
-
-          final salesState = bloc.state;
-          if (salesState is SalesDataSuccess) {
-            final salesId = salesState.sales.salesId;
-
-            if (salesId.isEmpty) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text("ID Sales belum terdaftarkan")),
-              );
-              return;
-            }
-
-            if (position.isMocked) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    "Perangkat terdeteksi menggunakan lokasi palsu",
-                  ),
-                  backgroundColor: Colors.red,
-                ),
-              );
-              return;
-            }
-
-            isHandled = true;
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder:
-                    (_) => BlocProvider.value(
-                      value: SalesActivityFormCheckInBloc(
-                        salesActivityRepository: salesRepository,
-                      ),
-                      child: SalesActivityDashboardScreen(
-                        sales: salesState.sales,
-                      ),
-                    ),
-              ),
-            );
-          } else if (salesState is SalesDataError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text("ID Sales belum terdaftarkan")),
-            );
-            isHandled = true;
-          }
-        };
+        routeAction = () => _openSalesActivity(context);
         break;
       case 'mnuApprovalList':
         routeAction = () async {
@@ -268,71 +207,7 @@ class _MyGridLayoutState extends State<MyGridLayout> {
           },
         );
       case 'mnuSalesActivity':
-        return submenu.copyWith(
-          action: () async {
-            final bloc = context.read<SalesActivityFormCheckInBloc>();
-            final salesRepository = context.read<SalesActivityRepository>();
-            final position = await StrictLocation.getCurrentPosition();
-
-            bloc.add(const LoadSalesData());
-            bool isHandled = false;
-
-            Timer(const Duration(seconds: 3), () {
-              if (!isHandled) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text("Permintaan terlalu lama, coba lagi"),
-                  ),
-                );
-              }
-            });
-
-            final salesState = bloc.state;
-            if (salesState is SalesDataSuccess) {
-              final salesId = salesState.sales.salesId;
-
-              if (salesId.isEmpty) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("ID Sales belum terdaftarkan")),
-                );
-                return;
-              }
-
-              if (position.isMocked) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text(
-                      "Perangkat terdeteksi menggunakan lokasi palsu",
-                    ),
-                    backgroundColor: Colors.red,
-                  ),
-                );
-                return;
-              }
-
-              isHandled = true;
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder:
-                      (_) => BlocProvider.value(
-                        value: SalesActivityFormCheckInBloc(
-                          salesActivityRepository: salesRepository,
-                        ),
-                        child: SalesActivityDashboardScreen(
-                          sales: salesState.sales,
-                        ),
-                      ),
-                ),
-              );
-            } else if (salesState is SalesDataError) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text("ID Sales belum terdaftarkan")),
-              );
-              isHandled = true;
-            }
-          },
-        );
+        return submenu.copyWith(action: () => _openSalesActivity(context));
       case 'mnuApprovalList':
         return submenu.copyWith(
           action: () async {
@@ -438,6 +313,77 @@ class _MyGridLayoutState extends State<MyGridLayout> {
     }
   }
 
+  /// Ambil data sales dari server, lalu buka dashboard Sales Activity.
+  ///
+  /// Hasil LoadSalesData harus ditunggu lewat bloc.stream. Membaca bloc.state
+  /// langsung setelah add() selalu mendapat state lama, sehingga klik pertama
+  /// tidak membuka apa pun dan berakhir dengan pesan "Permintaan terlalu lama".
+  ///
+  /// Selama method ini berjalan, _navigateToScreen menampilkan loading di tombol.
+  Future<void> _openSalesActivity(BuildContext context) async {
+    final bloc = context.read<SalesActivityFormCheckInBloc>();
+    final salesRepository = context.read<SalesActivityRepository>();
+    final messenger = ScaffoldMessenger.of(context);
+    final position = await StrictLocation.getCurrentPosition();
+
+    /// Dengarkan stream sebelum add(), supaya hasilnya tidak terlewat.
+    final pending = bloc.stream
+        .firstWhere((s) => s is SalesDataSuccess || s is SalesDataError)
+        .timeout(const Duration(seconds: 10));
+    bloc.add(const LoadSalesData());
+
+    final SalesActivityFormCheckInState salesState;
+    try {
+      salesState = await pending;
+    } on TimeoutException {
+      messenger.showSnackBar(
+        const SnackBar(content: Text("Permintaan terlalu lama, coba lagi")),
+      );
+      return;
+    }
+
+    if (!context.mounted) return;
+
+    if (salesState is SalesDataError) {
+      messenger.showSnackBar(
+        const SnackBar(content: Text("ID Sales belum terdaftarkan")),
+      );
+      return;
+    }
+
+    final sales = (salesState as SalesDataSuccess).sales;
+
+    if (sales.salesId.isEmpty) {
+      messenger.showSnackBar(
+        const SnackBar(content: Text("ID Sales belum terdaftarkan")),
+      );
+      return;
+    }
+
+    if (position.isMocked) {
+      messenger.showSnackBar(
+        const SnackBar(
+          content: Text("Perangkat terdeteksi menggunakan lokasi palsu"),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder:
+            (_) => BlocProvider.value(
+              value: SalesActivityFormCheckInBloc(
+                salesActivityRepository: salesRepository,
+              ),
+              child: SalesActivityDashboardScreen(sales: sales),
+            ),
+      ),
+    );
+  }
+
   IconData _getIconForMenuId(String? menuId) {
     switch (menuId) {
       case 'confirmLoading':
@@ -511,11 +457,17 @@ class _MyGridLayoutState extends State<MyGridLayout> {
       _loadingMenuId = submenu.menuId;
     });
 
-    await submenu.action!();
-
-    setState(() {
-      _loadingMenuId = null;
-    });
+    try {
+      await submenu.action!();
+    } finally {
+      /// Loading di tombol harus berhenti walaupun action gagal (misalnya
+      /// izin lokasi ditolak). Error-nya tetap diteruskan ke Crashlytics.
+      if (mounted) {
+        setState(() {
+          _loadingMenuId = null;
+        });
+      }
+    }
   }
 
   @override
